@@ -1,0 +1,421 @@
+Considering recent advancesin Deep Reinforcement Learning (DRL) and the resulting increase in the complexity of experimentalbenchmarks, the use of Deep Learning (DL) models, e.g
+
+In this paper we study the benefits of shared representations among tasks
+
+The outcome of the empirical analysis joins thetheoretical results, showing significant performance improvements compared to the single-task version of the algorithms in various RL problems, including several MuJoCo (Todorovet al., 2012) domains.2 PRELIMINARIESLet B(X ) be the space of bounded measurable functions w.r.t
+
+Both results in (b) and (c) are averaged over 100 experiments, andshow the 95% confidence intervals.a reasonable number of tasks the number of features used in the single-task case is enough to handlethem, as we show in some experiments in Section 5
+
+Figures 3(b) and 3(d) show evidentadvantages of pre-training the shared weights and a significant difference between keeping them fixedor not.8Published as a conference paper at ICLR 20206 RELATED WORKSOur work is inspired from both theoretical and empirical studies in MTL and MTRL literature
+
+Among theothers, Lazaric & Restelli (2011) and Brunskill & Li (2013) give theoretical proofs of the advantageof learning from multiple MDPs and introduces new algorithms to empirically support their claims,as done in this work.Generally, contributions in MTRL assume that properties of different tasks, e.g
+
+(2007) assumes that the tasks are generated from ahierarchical Bayesian model, and likewise Lazaric & Ghavamzadeh (2010) considers the case whenthe value functions are generated from a common prior distribution
+
+We have derived our results extending the AVI/API bounds (Farah-mand, 2011) to MTRL, leveraging the upper bounds on the approximation error in MTL providedin Maurer et al
+
+Journal of Artificial Intelligence Research, 47:253–279, 2013.Richard Bellman
+
+Journal of Machine Learning Research, 11(Oct):2901–2934, 2010.Carlo D’Eramo, Davide Tateo, Andrea Bonarini, Marcello Restelli, and Jan Peters
+
+Journal of Machine Learning Research, 7(Jan):117–139, 2006.Andreas Maurer
+
+(2005).4The IDs of the problems in the OpenAI Gym library are: CartPole-v0, Acrobot-v1, and MountainCar-v0.17Published as a conference paper at ICLR 2020Task Mass Action set1 1.0 {−4.0; 4.0}2 0.8 {−4.0; 4.0}3 1.0 {−4.5; 4.5}4 1.2 {−4.5; 4.5}5 1.0 {−4.125; 4.125}6 1.0 {−4.25; 4.25}7 0.8 {−4.375; 4.375}8 0.85 {−4.0; 4.0}Table 1: Different values of the mass of the car and available actions chosen for the Car-On-Hill tasksin the MFQI empirical evaluation.layer with 80 ReLu units and another one with 80 sigmoid units
+
+ 
+  
+  END OF PAPER
+
+
+  STARTING NEW PAPER
+  
+  Under review as a conference paper at ICLR 2020REINFORCEMENT LEARNING BASEDGRAPH-TO-SEQUENCE MODEL FORNATURAL QUESTION GENERATIONAnonymous authorsPaper under double-blind reviewABSTRACTNatural question generation (QG) aims to generate questions from a passage andan answer
+
+Previous works on QG either (i) ignore the rich structure informa-tion hidden in text, (ii) solely rely on cross-entropy loss that leads to issues likeexposure bias and inconsistency between train/test measurement, or (iii) fail tofully exploit the answer information
+
+To cope with these issues, some recent QG approaches (Song et al.,2017; Kumar et al., 2018b) directly optimize evaluation metrics using Reinforcement Learning1Under review as a conference paper at ICLR 2020(RL) (Williams, 1992)
+
+Our Graph2Seq model is based on a novel bidirectionalgated graph neural network, which extends the original gated graph neural network (Li et al., 2015)by considering both incoming and outgoing edges, and fusing them during the graph embeddinglearning
+
+The task of natural question2Under review as a conference paper at ICLR 2020Figure 1: Overall architecture of the proposed model
+
+In the first state, we train the model using regular cross-entropyloss, defined as,Llm “ÿt´ logP py˚t |X, y˚ătq ` λ covlosst (10)where y˚t is the word at the t-th position of the ground-truth output sequence and covlosst is thecoverage loss defined asřiminpati, ctiq, with ati being the i-th element of the attention vector over6Under review as a conference paper at ICLR 2020the input sequence at time step t
+
+For model settings andsensitivity analysis, please refer to Appendix B and C
+
+For fair comparison with previ-ous methods, we evaluated our model on both data split-1 (Song et al., 2018a)2 that contains75,500/17,934/11,805 (train/development/test) examples and data split-2 (Zhou et al., 2017) 3 thatcontains 86,635/8,965/8,964 examples.Following previous works, we use BLEU-4 (Papineni et al., 2002), METEOR (Banerjee & Lavie,2005), ROUGE-L (Lin, 2004) and Q-BLEU1 (Nema & Khapra, 2018) as our evaluation metrics.Initially, BLEU-4 and METEOR were designed for evaluating machine translation systems andROUGE-L was designed for evaluating text summarization systems
+
+Recently, Q-BLEU1 was de-signed for better evaluating question generation systems, which was shown to correlate significantlybetter with human judgments compared to existing metrics.Besides automatic evaluation metrics, we also conduct a human evaluation study on split-2
+
+Further details on human evaluation can be foundin Appendix E.3.3 EXPERIMENTAL RESULTS AND HUMAN EVALUATIONTable 1 shows the automatic evaluation results comparing our proposed models against other state-of-the-art baseline methods
+
+First of all, we can see that both of our full models G2Ssta+BERT+RLand G2Sdyn+BERT+RL achieve the new state-of-the-art scores on both data splits and consistentlyoutperform previous methods by a significant margin
+
+Between these two variants, G2Ssta+BERT+RL outperforms G2Sdyn+BERT+RL1The implementation of our model will be made publicly available after the review period.2https://www.cs.rochester.edu/˜lsong10/downloads/nqg_data.tgz3https://res.qyzhou.me/redistribute.zip7https://www.cs.rochester.edu/~lsong10/downloads/nqg_data.tgzhttps://res.qyzhou.me/redistribute.zipUnder review as a conference paper at ICLR 2020Table 1: Automatic evaluation results on the SQuAD test set.Methods Split-1 Split-2BLEU-4 METEOR ROUGE-L Q-BLEU1 BLEU-4 METEOR ROUGE-L Q-BLEU1SeqCopyNet – – – – 13.02 – 44.00 –NQG++ – – – – 13.29 – – –MPQG+R* 14.39 18.99 42.46 52.00 14.71 18.93 42.60 50.30AFPQA – – – – 15.64 – – –s2sa-at-mp-gsa 15.32 19.29 43.91 – 15.82 19.67 44.24 –ASs2s 16.20 19.92 43.96 – 16.17 – – –CGC-QG – – – – 17.55 21.24 44.53 –G2Sdyn+BERT+RL 17.55 21.42 45.59 55.40 18.06 21.53 45.91 55.00G2Ssta+BERT+RL 17.94 21.76 46.02 55.60 18.30 21.70 45.98 55.20Table 2: Human evaluation results (˘ standard deviation) on the SQuAD split-2 test set
+
+Also, unlike the baseline methods, our model does not rely on any hand-craftedrules or ad-hoc strategies, and is fully end-to-end trainable.As shown in Table 2, we conducted a human evaluation study to assess the quality of the questionsgenerated by our model, the baseline method MPQG+R, and the ground-truth data in terms of syn-tax, semantics and relevance metrics
+
+Surprisingly, using GCN (Kipf & Welling, 2016) as the graph en-coder (and converting the input graph to an undirected graph) does not provide good performance.In addition, fine-tuning the model using REINFORCE can further improve the model performancein all settings (i.e., w/ and w/o BERT), which shows the benefits of directly optimizing the evalu-ation metrics
+
+Very recently, researchers have started exploring methods to automat-ically construct a graph of visual objects (Norcliffe-Brown et al., 2018) or words (Liu et al., 2018;Chen et al., 2019b) when applying GNNs to non-graph structured data.To the best of our knowledge, we are the first to investigate systematically the performance differencebetween syntactic-aware static graph construction and semantics-aware dynamic graph constructionin the context of question generation.5 CONCLUSIONWe proposed a novel RL based Graph2Seq model for QG, where the answer information is utilizedby an effective Deep Alignment Network and a novel bidirectional GNN is proposed to process thedirected passage graph
+
+We also explore both static and dynamic graph constructionfrom text, and systematically investigate and analyze the performance difference between the two.On the benchmark SQuAD dataset, our proposed model outperforms previous state-of-the-art meth-ods by a significant margin and achieve new best results
+
+In Proceedings of the acl workshop on intrinsic and extrinsicevaluation measures for machine translation and/or summarization, pp
+
+Neural computation, 9(8):1735–1780, 1997.11Under review as a conference paper at ICLR 2020Yanghoon Kim, Hwanhee Lee, Joongbo Shin, and Kyomin Jung
+
+arXiv preprint arXiv:1705.04304, 2017.12Under review as a conference paper at ICLR 2020Jeffrey Pennington, Richard Socher, and Christopher Manning
+
+arXiv preprintarXiv:1808.07624, 2018b.13Under review as a conference paper at ICLR 2020Kun Xu, Lingfei Wu, Zhiguo Wang, Mo Yu, Liwei Chen, and Vadim Sheinin
+
+3 shows that our model is not very sensitive to the number of GNNhops and can achieve reasonably good results with various number of hops.14Under review as a conference paper at ICLR 2020Figure 3: Effect of the number of GNN hops.D DETAILS ON BASELINE METHODSSeqCopyNet (Zhou et al., 2018) proposed an extension to the copy mechanism which learns to copynot only single words but also sequences from the input sentence.NQG++ (Zhou et al., 2017) proposed an attention-based Seq2Seq model equipped with a copymechanism and a feature-rich encoder to encode answer position, POS and NER tag information.MPQG+R (Song et al., 2017) proposed an RL-based Seq2Seq model with a multi-perspectivematching encoder to incorporate answer information
+
+For faircomparison, we report the results of the sentence-level version of their model to match with oursettings.ASs2s (Kim et al., 2018) proposed an answer-separated Seq2Seq model which treats the passageand the answer separately.CGC-QG (Liu et al., 2019) proposed a multi-task learning framework to guide the model to learnthe accurate boundaries between copying and generation.E DETAILS ON HUMAN EVALUATIONWe conducted a small-scale (i.e., 50 random examples per system) human evaluation on the split-2data
+
+Our experimentalresults confirmed that every component in our proposed model makes the contribution to the overallperformance.16	Introduction	An RL-based Generator-Evaluator Architecture	Problem Formulation	Deep Alignment Network	Word-level Alignment	Hidden-level Alignment	Bidiectional Graph-to-Sequence Generator	Passage Graph Construction	Bidirectional Gated Graph Neural Networks	RNN Decoder	Hybrid Evaluator	Training and Testing	Experiments	Baseline Methods	Data and Metrics	Experimental Results and Human Evaluation	Ablation Study	Case Study	Related Work	Natural Question Generation	Graph Neural Networks	Conclusion	Details on the RNN Decoder	Model Settings	Sensitivity Analysis of Hyperparameters	Details on Baseline Methods	Details on human evaluation	More results on Ablation Study
+
+ 
+  
+  END OF PAPER
+
+
+  STARTING NEW PAPER
+  
+  The key contribution of our work is progressive filtering, i.e.,∗Computer Vision Group, University of Freiburg, Germany†Bosch Center for AI, Bosch GmbH, Germany‡Karlsruhe Institute of Technology, Germany1Published as a conference paper at ICLR 2020(a) Evaluation on CIFAR-10 (b) Evaluation on CIFAR-100Figure 1: Comparing the performance of SELF with previous works for learning under different(symmetric) label noise ratios on the (a) CIFAR-10 & (b) CIFAR-100 datasets
+
+Correctly,we maintain the running average model, such as proposed by Tarvainen & Valpola (2017), a.k.a.the Mean-Teacher model
+
+This model ensemble learning provides a more stable supervisory signalthan the noisy model snapshots and provides a stable ground for progressive filtering to filter outpotential noisy labels
+
+We evaluate the proposed technique on image classification tasks using CI-FAR10, CIFAR100 & ImageNet
+
+During training, the model maintains a self-ensemble, a running average of itself (Tarvainen & Valpola, 2017) to provide a stable learning signal.Also, the model collects a self-ensemble prediction (moving-average) for the subsequent filtering.Once the best model is found, these predictions identify and filter out noisy labels using the originallabel set L0
+
+The model attempts to identify correct labels progressively using self-forming ensembles of models and predictions
+
+Since wrong labels cause strong fluctuations in themodel’s predictions, using ensembles is a natural way to counteract noisy labels.Concretely, in each iteration, the model learns from a detected set of potentially correct labels andmaintains a running average of model snapshots (realized by the Mean Teacher model Tarvainen &Valpola (2017))
+
+This ensemble model is evaluated on the entire dataset and provides an additionallearning signal for training the single models
+
+The model is trained until we find thebest model w.r.t
+
+The iterative training procedure stopswhen no better model can be found
+
+Hence,using the model’s predictions gathered in one single training epoch for filtering is sub-optimal.Therefore, in our framework SELF, our model relies on ensembles of models and predictions.Model ensemble with Mean Teacher A natural way to form a model ensemble is by using anexponential running average of model snapshots (Fig
+
+In ourframework, both the mean teacher model and the normal model are evaluated on all data to preservethe consistency between both models
+
+Moredetails for training with the model ensemble can be found in Appendix A.1Prediction ensemble Additionally, we propose to collect the sample predictions over multipletraining epochs: zj = αzj−1 + (1 − α)ẑj , whereby zj depicts the moving-average predictionof sample k at epoch j, α is a momentum, ẑj is the model prediction for sample k in epoch j.This scheme is displayed in Fig
+
+Besides having a more stable basis for the filtering step, ourproposed procedure also leads to negligible memory and computation overhead.4Published as a conference paper at ICLR 2020(a) Model ensemble (Mean teacher) (b) Predictions ensembleFigure 3: Maintaining the (a) model and (b) predictions ensembles is very effective against noisymodel updates
+
+These ensembles are self-forming during the training process as a moving-averageof (a) model snapshots or (b) class predictions from previous training steps.Further, due to continuous training of the best model from the previous model, computation time canbe significantly reduced, compared to re-training the model from scratch
+
+Compared to these works, we use ensemble learning asa principled approach to counteract model fluctuations
+
+The progressive filtering procedure and self-ensemblelearning proposed are also applicable in these tasks to counteract noise effectively.5Published as a conference paper at ICLR 2020Table 1: Comparison of classification accuracy when learning under uniform label noise on CIFAR-10 and CIFAR-100
+
+Here * representsbaseline accuracy of the architectures that are trained on fully supervised setting at 0% label noise.CIFAR-10 CIFAR-100RESNET101 93.89* 81.14*NOISE 40% 80% 40% 80%MENTORNET 89.00 49.00 68.00 35.00CO-T
+
+In eachfiltering iteration, the model is trained for a maximum of 300 epochs, with patience of 50 epochs.For more training details, see the appendix.4.2 EXPERIMENTS RESULTS4.2.1 SYMMETRIC LABEL NOISECIFAR-10 and 100 Results for typical uniform noise scenarios with noise ratios on CIFAR-10and CIFAR-100 are shown in Tab
+
+The mod-els are trained at 40% label noise and thebest model is picked based on the evalu-ation on noisy validation data
+
+4 shows the precision@1 and @5 of various models, given 40% labelnoise in the training set
+
+Note that MentorNet(Jiang et al., 2017) uses Resnet101 (P@1: 78.25) (Goyal et al., 2017), which has higher performancecompared to Resnext50 (P@1: 77.8) (Xie et al., 2017) on the standard ImageNet validation set.Despite the weaker model, SELF (ResNext50) surpasses the best previously reported results bymore than 5% absolute improvement
+
+The analyses shows that each componentin SELF is essential for the model to learn robustly.8Published as a conference paper at ICLR 2020(a) Ablation exps
+
+Overall, SELF outperforms all considered combinations.9Published as a conference paper at ICLR 20205 CONCLUSIONWe propose a simple and easy to implement a framework to train robust deep learning models underincorrect or noisy labels
+
+We show that our framework results inDNN models with superior generalization performance on CIFAR-10, CIFAR-100 & ImageNet andoutperforms all previous works under symmetric (uniform) and asymmetric noises
+
+Thevalidation set is contaminated with the same noise ratio as the training data unless stated otherwise.12Published as a conference paper at ICLR 2020Network training For the training our model SELF, we use the standard configuration providedby Tarvainen & Valpola (2017) 2
+
+(a) shows the prediction of a sample givena model
+
+(b) Additionally, maximizing theentropy of the mean prediction on the entire dataset or a large batch forces the model to balance itspredictions over multiple samples.Table 8: Accuracy of the complete removal of samples during iterative filtering on CIFAR-10 andCIFAR-100
+
+The underlying model is the MeanTeacher based on Resnet26
+
+The unsupervised-lossprovides meaningful learning signals, which should be used for better model training.15Published as a conference paper at ICLR 2020(a) (b)Figure 7: Sample training curves of our approach SELF on CIFAR-100 with (a) 60% and (b) 80%noise, using noisy validation data
+
+ 
+  
+  END OF PAPER
+
+
+  STARTING NEW PAPER
+  
+  Published as a conference paper at ICLR 2020ON THE WEAKNESSES OF REINFORCEMENT LEARN-ING FOR NEURAL MACHINE TRANSLATIONLeshem Choshen1, Lior Fox2, Zohar Aizenbud1, Omri Abend1,31 School of Computer Science and Engineering, 2 The Edmond and Lily Safra Center for Brain Sciences3 Department of Cognitive SciencesThe Hebrew University of Jerusalemfirst.last@mail.huji.ac.il, oabend@cs.huji.ac.ilABSTRACTReinforcement learning (RL) is frequently used to increase performance in textgeneration tasks, including machine translation (MT), notably through the useof Minimum Risk Training (MRT) and Generative Adversarial Networks (GAN).However, little is known about what and how these methods learn in the context ofMT
+
+Nevertheless, despite increasinginterest and strong results, little is known about what accounts for these performance gains, and thetraining dynamics involved.We present the following contributions
+
+Fur-thermore, given their findings, it is reasonable to assume that our results are relevant for RL use inother generation tasks, whose output space too is discrete, high-dimensional and concentrated.4.1 CONTROLLED SIMULATIONSWe experiment with a 1-layer softmax model, that predicts a single token i ∈ V with probabilityeθi∑j eθj
+
+θ = {θj}j∈V are the model’s parameters
+
+To make experiments realistic,we use similar parameters as those reported in the influential Transformer NMT system (Vaswaniet al., 2017)
+
+The model was pretrained on WMT2015 training data(Bojar et al., 2015)
+
+Other hyper-parameters were an exact repli-cation of the experiments reported in (Yang et al., 2018).Results
+
+Thisimprovement is very stable across metrics, trials and pretrained models.7Published as a conference paper at ICLR 2020may play a role here
+
+ 
+  
+  END OF PAPER
+
+
+  STARTING NEW PAPER
+  
+  We arrive at this formulation by adapting methods for learning trans-lational graph embeddings (Bordes et al., 2013; Wang et al., 2014) to our use case
+
+The overall C-SWM model architectureusing object-factorized representations is shown in Figure 1.CNNObject extractorMLPObject encoderGNNTransitionmodelContrastivelossst mt zt zt + Δzt zt+1Figure 1: The C-SWM model is composed of the following components: 1) a CNN-based objectextractor, 2) an MLP-based object encoder, 3) a GNN-based relational transition model, and 4) anobject-factorized contrastive loss
+
+(6)3 RELATED WORKFor coverage of related work in the area of object discovery with autoencoder-based models, werefer the reader to the Introduction section
+
+Best viewed in color.5https://github.com/tkipf/c-swm4.2 EVALUATION METRICSIn order to evaluate model performance directly in latent space, we make use of ranking metrics,which are commonly used for the evaluation of link prediction models, as in, e.g., Bordes et al.(2013)
+
+This allows us to assess the quality of learned representations directly without relying onauxiliary metrics such as pixel-based reconstruction losses, or performance in downstream taskssuch as planning.Given an observation encoded by the model and an action, we use the model to predict the rep-resentation of the next state, reached after taking the action in the environment
+
+Additional details on these evaluation metrics can be found in Appendix C.4.3 BASELINESAutoencoder-based World Models The predominant method for state representation learning isbased on autoencoders, and often on the VAE (Kingma & Welling, 2013; Rezende et al., 2014)model in particular
+
+Model architecturedetails are provided in Appendix D.4.5 QUALITATIVE RESULTSWe present qualitative results for the grid world environments in Figure 3 and for the 3-body physicsenvironment in Figure 4
+
+The model further correctly captures that certain actions donot have an effect if a neighboring position is blocked by another object (shown as colored spheres),even though the transition model does not have access to visual inputs.(a) Observations from 3-body gravitational physics simulation(bottom) and learned abstract state transition graph for a singleobject slot (top).2.5 0.0 2.51012(b) Abstract state transition graph from50 test episodes for single object slot.Figure 4: Qualitative results for 3-body physics environment for a single representative test setepisode (left) and for a dataset of 50 test episodes (right)
+
+The model learns to smoothly embed objecttrajectories, with the circular motion represented in the latent space (projected from four to twodimensions via PCA)
+
+Journal of Artificial Intelligence Research,2013.Antoine Bordes, Nicolas Usunier, Alberto Garcia-Duran, Jason Weston, and Oksana Yakhnenko.Translating embeddings for modeling multi-relational data
+
+Proceedings of the IEEE, 2016a.Maximilian Nickel, Lorenzo Rosasco, and Tomaso Poggio
+
+arXiv preprintarXiv:1903.05136, 2019.13A ADDITIONAL RESULTS AND DISCUSSIONA.1 OBJECT-SPECIFIC REPRESENTATIONSWe visualize abstract state transition graphs separated by object slot for the 3D cubes environmentin Figure 5
+
+See Figure 6 for thisbaseline and note that the regular structure in the latent space is lost, which makes it difficult for thetransition model to learn transitions which generalize to unseen environment instances.Qualitative results for the 3-body physics dataset are summarized in Figures 7 and 8 for two differentrandom seeds.(a) Object slot 1
+
+The abstract state graph is nearly identical for each object, which illustrates thatthe model successfully represents objects in the same manner despite their visual differences.(a) Object slot 1
+
+This decoder has the same architecture as inthe other baseline models and is trained for 100 epochs.1 2 3 4 5 6 7 8 9 10Prediction steps101102103104Pixel-based MSEC-SWMWorld Model (AE)Figure 12: Quantitative model comparison inpixel space on a hold-out test set of the 2Dshapes environment
+
+The typi-cally used mean-squared error (MSE) in pixel space(see Figure 12), however, differs by several ordersof magnitude between the two models and does notcapture any of the nuanced differences in qualitativepredictive behavior
+
+In some cases, the discovered representation can be less suitablefor forward prediction in time or for generalization to novel scenes, which explains the variance insome of our results on these datasets.17A.7 TRAINING TIMEWe found that the overall training time of the C-SWM model was comparable to that of the WorldModel baseline
+
+Forevaluation, we extract learned position representations for all frames of the test set and further runthe latent physics prediction module (conditioned on the first two initial frames) to obtain modelpredictions
+
+ 
+  
+  END OF PAPER
+
+
+  STARTING NEW PAPER
+  
+  This pa-per is a proof of concept that illustrates how a simple imitation method based onRL with constant rewards can be as effective as more complex methods that uselearned rewards.1 INTRODUCTIONMany sequential decision-making problems can be tackled by imitation learning: an expert demon-strates near-optimal behavior to an agent, and the agent attempts to replicate that behavior in novelsituations (Argall et al., 2009)
+
+We call this method softQ imitation learning (SQIL).The main contribution of this paper is SQIL: a simple and general imitation learning algorithm that iseffective in MDPs with high-dimensional, continuous observations and unknown dynamics
+
+In the previous section, we used these assumptions to represent the imitationpolicy in terms of a model of the soft Q function Qθ (Equation 5)
+
+Comparisons to the biased version with implicit termination knowledgeare included in Section A.2 in the appendix.6Published as a conference paper at ICLR 20200 2000 4000 6000 8000Number of On-Policy Rollouts0100200300400RewardBreakoutSQIL (Ours)GAIL-DQLBC (P’91)Expert0 500 1000 1500 2000Number of On-Policy Rollouts−20−1001020RewardPong0 1000 2000 3000 4000Number of On-Policy Rollouts200400600RewardSpace InvadersFigure 2: Image-based Atari
+
+BC, GAIL:results from Dhariwal et al.(2017).The experiments in the previous sections evaluate SQIL on MDPswith a discrete action space
+
+Concurrently with SQIL, two other imitation learning algorithms that use constantrewards instead of a learned reward function were developed (Sasaki et al., 2019; Wang et al., 2019).We see our paper as contributing additional evidence to support this core idea, rather than proposinga competing method
+
+Simulation experiments on tasks withhigh-dimensional, continuous observations and unknown dynamics show that our method outper-forms BC and achieves competitive results compared to GAIL, while being simple to implement ontop of existing off-policy RL algorithms.Limitations and future work
+
+ 
+  
+  END OF PAPER
+
+
+  STARTING NEW PAPER
+  
+  Published as a conference paper at ICLR 2020STRUCTPOOL: STRUCTURED GRAPH POOLING VIACONDITIONAL RANDOM FIELDSHao YuanDepartment of Computer Science & EngineeringTexas A&M UniversityCollege Station, TX 77843, USAhao.yuan@tamu.eduShuiwang JiDepartment of Computer Science & EngineeringTexas A&M UniversityCollege Station, TX 77843, USAsji@tamu.eduABSTRACTLearning high-level representations for graphs is of great importance for graphanalysis tasks
+
+The CGNF (Ma et al., 2019) is a GNN architecture for graph node classification whichexplicitly models a joint probability of the entire set of node labels via CRFs and performs inference2Published as a conference paper at ICLR 2020via dynamic programming
+
+In addition, the GMNN (Qu et al., 2019) focuses on semi-supervisedobject classification tasks and models the joint distribution of object labels conditioned on objectattributes using CRFs
+
+Then the Gibbs3Published as a conference paper at ICLR 202012 34 5 612 34Original Graph New Graph  GCNsAttention Iteratively UpdateUnary Energy Assignment MatrixSoftmaxPairwise Energy    Figure 1: Illustrations of our proposed STRUCTPOOL
+
+The pairwiseenergy is measured by attention matrix using node feature X and topology information A
+
+Existing work on image tasks (Krähenbühl & Koltun, 2011) proposes to employ Gaus-sian kernels to measure the pairwise energy
+
+Altogether, the complexity STRUCT-POOL is O((m+ i)n3), which is close to the complexity of stacking m+ i layers of GCNs.5Published as a conference paper at ICLR 2020Table 1: Classification results for six benchmark datasets
+
+Given any input graph, our model first employs severallayers of GCNs (Equation (2)) to aggregate features from neighbors and learn representations fornodes
+
+For these 5 datasets, the classification results of our method are significantlybetter than all comparing methods, including advanced models DGCNN and DIFFPOOL
+
+Notably,our model outperforms the second-best performance by an average of 3.58% on these 5 datasets.In addition, the graph kernel method WL obtains the best performance on COLLAB dataset andnone of these deep models can achieve similar performance
+
+We conduct experiments to show how different iteration number m affectsthe prediction accuracy and the results are reported in Table 3
+
+With the increasing of `, more pairwiserelationships are considered by the model, and hence it is reasonable to obtain better performance.In addition, for the dataset IMDB-B, the results remain similar with different `, and even ` = 1yields competitive performance with dense CRF
+
+To demonstrate theeffectiveness of our STRUCTPOOL and show its generalizability, we build models based on GINsand evaluate their performance
+
+Finally,8Published as a conference paper at ICLR 2020we evaluate our proposed STRUCTPOOL on several benchmark datasets and our method can achievenew state-of-the-art results on five out of six datasets.ACKNOWLEDGEMENTThis work was supported in part by National Science Foundation grants DBI-1661289 and IIS-1908198.REFERENCESJames Atwood and Don Towsley
+
+1529–1537,2015.10https://openreview.net/forum?id=ryxMX2R9YQhttps://openreview.net/forum?id=rJXMpikCZhttps://openreview.net/forum?id=ryGs6iA5Kmhttps://openreview.net/forum?id=ryGs6iA5KmPublished as a conference paper at ICLR 2020A APPENDIXA.1 DATASETS AND EXPERIMENTAL SETTINGSTable 6: Statistics and properties of eight benchmark datasets.DatasetENZYMES D&D COLLAB PROTEINS# of Edges (avg) 124.20 1431.3 2457.78 72.82# of Nodes (avg) 32.63 284.32 74.49 39.06# of Graphs 600 1178 5000 1113# of Classes 6 2 3 2DatasetIMDB-B IMDB-M PTC MUTAG# of Edges (avg) 96.53 65.94 14.69 19.79# of Nodes (avg) 19.77 13.00 14.30 17.93# of Graphs 1000 1500 344 188# of Classes 2 3 2 2We report the statistics and properties of eight benchmark datasets in Supplementary Table 6
+
+The model is trained using Stochastic gradient descent(SGD) with the ADAM optimizer (Kingma & Ba, 2014)
+
+Inaddition, we conduct experiments to show the performance with the respect to different r values.We set r = 0.1, 0.3, 0.5, 0.7, 0.9 to evaluate the performance on a large-scale social network datasetD&D
+
+ 
+  
+  END OF PAPER
+
+
+  STARTING NEW PAPER
+  
+  Published as a conference paper at ICLR 2020LARGE BATCH OPTIMIZATION FOR DEEP LEARNING:TRAINING BERT IN 76 MINUTESYang You2, Jing Li1, Sashank Reddi1, Jonathan Hseu1, Sanjiv Kumar1, Srinadh Bhojanapalli1Xiaodan Song1, James Demmel2, Kurt Keutzer2, Cho-Jui Hsieh1,3Yang You was a student researcher at Google Brain
+
+The most prominent algorithm in thisline of research is LARS, which by employing layerwise adaptive learning ratestrains RESNET on ImageNet in a few minutes
+
+In this paper, we first study a principled layerwise adaptation strategyto accelerate training of deep neural networks using large mini-batches
+
+The goal of this paper is to investigate and develop optimization techniques to acceleratetraining large deep neural networks, mostly focusing on approaches based on variants of SGD.Methods based on SGD iteratively update the parameters of the model by moving them in a scaled(negative) direction of the gradient calculated on a minibatch
+
+Surprisingly, recent works have demonstrated that up to certain minibatchsizes, linear scaling of the learning rate with minibatch size can be used to further speed up the1https://github.com/tensorflow/addons/blob/master/tensorflow_addons/optimizers/lamb.py1https://github.com/tensorflow/addons/blob/master/tensorflow_addons/optimizers/lamb.pyhttps://github.com/tensorflow/addons/blob/master/tensorflow_addons/optimizers/lamb.pyPublished as a conference paper at ICLR 2020training Goyal et al
+
+To the best of our knowledge, ours is first adaptive solver that canachieve state-of-the-art accuracy for RESNET-50 as adaptive solvers like Adam fail to obtainthe accuracy of SGD with momentum for these tasks.1.1 RELATED WORKThe literature on optimization for machine learning is vast and hence, we restrict our attention to themost relevant works here
+
+Earlier works on large batch optimization for machine learning mostlyfocused on convex models, benefiting by a factor of square root of batch size using appropriately largelearning rate
+
+However,several important concerns were raised with respect to generalization and computational performancein large batch nonconvex settings
+
+Using LR warm-up and linear scaling, Goyal et al.(2017) managed to train RESNET-50 with batch size 8192 without loss in generalization performance.However, empirical study (Shallue et al., 2018) shows that learning rate scaling heuristics with thebatch size do not hold across all problems or across all batch sizes.More recently, to reduce hand-tuning of hyperparameters, adaptive learning rates for large batchtraining garnered significant interests
+
+Several recent works successfully scaled the batch size to largevalues using adaptive learning rates without degrading the performance, thereby, finishing RESNET-50 training on ImageNet in a few minutes (You et al., 2018; Iandola et al., 2016; Codreanu et al.,2017; Akiba et al., 2017; Jia et al., 2018; Smith et al., 2017; Martens & Grosse, 2015; Devarakonda2Published as a conference paper at ICLR 2020et al., 2017; Mikami et al., 2018; Osawa et al., 2018; You et al., 2019; Yamazaki et al., 2019)
+
+In the next section, we discuss algorithms to circumvent this issue.3Published as a conference paper at ICLR 20203 ALGORITHMSIn this section, we first discuss a general strategy to adapt the learning rate in large batch settings.Using this strategy, we discuss two specific algorithms in the later part of the section
+
+The F1 scoreon SQuAD-v1 is used as the accuracy metric in our experiments
+
+All our comparisons are with respectto the baseline BERT model by Devlin et al
+
+By usingthis strategy, we are able to make full utilization of the hardware resources throughout the training2https://rajpurkar.github.io/SQuAD-explorer/3Pre-trained BERT model can be downloaded from https://github.com/google-research/bert6Published as a conference paper at ICLR 2020Table 1: We use the F1 score on SQuAD-v1 as the accuracy metric
+
+All the successfulimplementations are based on momentum SGD (He et al., 2016; Goyal et al., 2017) or LARS optimizer(Ying et al., 2018; Jia et al., 2018; Mikami et al., 2018; You et al., 2018; Yamazaki et al., 2019).Before our study, we did not find any paper reporting a state-of-the-art accuracy achieved by ADAM,4https://mlperf.org/7Published as a conference paper at ICLR 2020ADAGRAD, or ADAMW optimizer
+
+All the adaptive solvers were comprehensively tuned
+
+In this paper, wepropose the LAMB optimizer, which supports adaptive elementwise updating and layerwise learning8Published as a conference paper at ICLR 2020rates
+
+The results on several applications (Word2Vec, Image Recognition,and LSTM Language Model) showed that Nadam optimizer improves the speed of convergenceand the quality of the learned models
+
+We did not observe any drop in the test or validationaccuracy for BERT and ImageNet training.15Published as a conference paper at ICLR 2020Figure 2: The figure shows that adam-correction has the same effect as learning rate warmup
+
+However, we did not observe a significantdifference in the validation accuracy of ImageNet training with ResNet-50
+
+Specifically, we use the learning rate recipe of Goyal et al
+
+Table 10 shows the tuning information of adding the learning ratescheme of Goyal et al
+
+Table shows the tuning information of adding the learning rate scheme of Goyal et al
+
+The tuning information is in Figures 17, 18, 19, and 20.18Published as a conference paper at ICLR 2020Table 8: ADAMW stops scaling at the batch size of 16K
+
+The tuning information is in Figures 23, 24, 25.Based on our comprehensive tuning results, we conclude the existing adaptive solvers do not performwell on ImageNet training or at least it is hard to tune them.19Published as a conference paper at ICLR 2020Figure 7: This figure shows the training loss curve of LAMB optimizer
+
+ 
+  
+  END OF PAPER
+
+
+  STARTING NEW PAPER
+  
+  Published as a conference paper at ICLR 2020GRAPH INFERENCE LEARNING FOR SEMI-SUPERVISEDCLASSIFICATIONChunyan Xu, Zhen Cui∗, Xiaobin Hong, Tong Zhang, and Jian YangSchool of Computer Science and Engineering, Nanjing University of Science and Technology, Nanjing, China{cyx,zhen.cui,xbhong,tong.zhang,csjyang}@njust.edu.cnWei LiuTencent AI Lab, Chinawl2223@columbia.eduABSTRACTIn this work, we address semi-supervised classification of graph data, where thecategories of those unlabeled nodes are inferred from labeled nodes as well asgraph structures
+
+Recent works often solve this problem via advanced graphconvolution in a conventionally supervised manner, but the performance coulddegrade significantly when labeled data is scarce
+
+Comprehensive evaluations on four benchmark datasets (includingCora, Citeseer, Pubmed, and NELL) demonstrate the superiority of our proposedGIL when compared against state-of-the-art methods on the semi-supervised nodeclassification task.1 INTRODUCTIONGraph, which comprises a set of vertices/nodes together with connected edges, is a formal structuralrepresentation of non-regular data
+
+For example, the Pubmed graph dataset (Sen et al., 2008) consists∗Corresponding author: Zhen Cui.1Published as a conference paper at ICLR 2020   (b) The process of Graph inference learning
+
+These aforementioned works usually boil down to a general classification task,where the model is learnt on a training set and selected by checking a validation set
+
+Several classic algorithms with graph Laplacian regularization containthe label propagation method using Gaussian random fields (Zhu et al., 2003), the regularizationframework by relying on the local/global consistency (Zhou et al., 2004), and the random walk-based sampling algorithm for acquiring the context information (Yang et al., 2016)
+
+The detailed implementation of our model can be found in Section 4.4Published as a conference paper at ICLR 20203.3 INFERENCE LEARNINGAccording to the class-to-node relationship function in Eqn
+
+In the regime of general classification, the crossentropy loss is a standard one that performs well.Given a training set Vtr, we expect that the best performance can be obtained on the validation setVval after optimizing the model on Vtr
+
+Given a trained/pretrained model Θ = {fe, φw, φr}, weperform iteratively gradient updates on the training set Vtr to obtain the new model, formally,Θ′ = Θ− α∇ΘLtr(Θ), (6)where α is the updating rate
+
+The updated model is used as thefinal model and is then fed into Eqn
+
+φr) with C-dimensions is finally adopted to obtain the relation regression score.5 EXPERIMENTS5.1 EXPERIMENTAL SETTINGSWe evaluate our proposed GIL method on three citation network datasets: Cora, Citeseer, Pubmed (Senet al., 2008), and one knowledge graph NELL dataset (Carlson et al., 2010)
+
+The GIL model consists of two graph convolution layers,each of which is followed by a mean-pooling layer, a class-to-node relationship regression module,and a final softmax layer
+
+We further improvethe inference learning capability of the GIL model for 1200 iterations with the validation set, wherethe meta-learning rates α and β are both set to 0.001.6Published as a conference paper at ICLR 20205.2 COMPARISON WITH STATE-OF-THE-ARTSWe compare the GIL approach with several state-of-the-art methods (Monti et al., 2017; Kipf &Welling, 2017; Zhou et al., 2004; Zhuang & Ma, 2018) over four graph datasets, including Cora,Citeseer, Pubmed, and NELL
+
+For example,we can achieve much higher performance than the deepwalk method (Zhou et al., 2004), e.g., 43.2%vs 74.1% on the Citeseer dataset, 65.3% vs 83.1% on the Pubmed dataset, and 58.1% vs 78.9% on theNELL dataset
+
+In contrast, the conventional methods often employ avalidation set to tune parameters of a certain model of interest.Table 3: Performance comparisons with several GIL variants and the classical GCN method on the Cora dataset.Methods Acc
+
+The reasonmay be that the graph network with two convolutional layers and the mean pooling mechanism canobtain the optimal graph embeddings, but when increasing the network layers, more parameters of acertain graph model need to be optimized, which may lead to the over-fitting issue.Influence of different between-node steps: We compare the classification performance withindifferent between-node steps for our proposed GIL and GCN (Kipf & Welling, 2017), as illustrated inFig
+
+(b) Performance comparisons with different label rates on the Pubmed dataset.8Published as a conference paper at ICLR 2020Influence of different label rates: We also explore the performance comparisons of the GIL methodwith different label rates, and the detailed results on the Pubmed dataset can be shown in Fig
+
+In the future, we would extend the graph inference method to handle moregraph-related tasks, such as graph generation and social network analysis.9Published as a conference paper at ICLR 2020ACKNOWLEDGMENTThis work was supported by the National Natural Science Foundation of China (Nos
+
+IEEE Transactions on Knowledge and Data Engineering, 29(10):2125–2139, 2017.10Published as a conference paper at ICLR 2020Federico Monti, Davide Boscaini, Jonathan Masci, Emanuele Rodola, Jan Svoboda, and Michael MBronstein
+
+ 
+  
+  END OF PAPER
+
+
+  STARTING NEW PAPER
+  
+  (2008) generalized early models to graph neural networks (GNNs) so as to bedirectly applied on cyclic, directed or undirected graphs
+
+(2016) further improved this line2Published as a conference paper at ICLR 2020of model by replacing standard RNNs with gated recurrent units (GRUs) (Cho et al., 2013)
+
+The learning procedure is explicitly derived from the factorization of affinitymatrix (Zhou & De la Torre, 2012), which makes the interpretation of the network behavior possible.However, the displacement loss in (Zanfir & Sminchisescu, 2018) measures the pixel-wise transla-tion which is similar to optical-flow (Dosovitskiy et al., 2015), being essentially a regression taskinstead of combinaotiral optimization
+
+In line with (Wang et al., 2019), we em-ploy VGG16 (Simonyan & Zisserman, 2014) to extract features from input images and bi-linearlyinterpolate the features at key points (provided by datasets)
+
+The final training loss isas follows, where SG andH correspond to binary true matching and Hungarian attention loss.minH(S,SG) (7)4Published as a conference paper at ICLR 2020𝐄(#)𝐇(#)LinearLinearΓ'Γ(𝐄(#)*)𝐇(#)*)𝑚×𝑘×𝑘𝑚×𝑘𝑚 channels𝜎𝜎Figure 2: Illustration of the proposed CIE layer for embedding based deep graph matching
+
+Among them, the Hungarian algorithm(Kuhn, 1955) is a widely adopted, for its efficiency and theoretical optimality.However, the Hungarian algorithm incurs a gap between training (loss function) and testing stages(Hungarian sampling)
+
+In this paper, instead of finding a continuous approximation of Hungar-ian algorithm, we treat it as a black box and dynamically generate network structure (sparse link)6Published as a conference paper at ICLR 2020Table 1: Accuracy on Pascal VOC (best in bold)
+
+This is a seminal work incorporating graph matching anddeep learning, and the solver is upon spectral matching (Leordeanu & Hebert, 2005)
+
+We randomly sample image pairs from the dataset following the implementation released byChoy et al
+
+Extensive experimental resultson multiple matching benchmarks show the leading performance of our solver, and highlight theorthogonal contribution of the two proposed components on top of existing techniques.ACKNOWLEDGMENTSTianshu Yu and Baoxin Li were supported in part by a grant from ONR
+
+RunzhongWang and Junchi Yan were supported in part by NSFC 61972250 and U19B2035.3The data size is too small to train a deep model
+
+Technical Report CNS-TR-2010-001, California Institute of Technology, 2010.Hongteng Xu, Dixin Luo, and Lawrence Carin
+
+In CVPR, 2012.A APPENDIXA.1 SYNTHETIC TESTSynthetic graphs are generated for training and testing following the protocol in (Cho et al., 2010).Specifically, Kpt keypoints are generated for a pair of graphs with a 1024-dimensional randomfeature for each node, which is sampled from uniform distribution U(−1, 1)
+
+The performance of PCA and CIE is reported
+
+(2019) for some other resultson synthetic test.However, we also notice that the way to generate synthetic graphs is much different from the dis-tribution of real-world data
+
+For real-world data, on one hand, there is strong correlation on the13Published as a conference paper at ICLR 20201.2 1.25 1.3 1.35 1.4 1.45 1.5 1.55 1.6Noise0.550.60.650.70.750.80.850.90.951AccuracyPCA-PCIE1-PCIE1-H5 10 15 20 25 30 35 40 45Node size0.60.650.70.750.80.850.90.951AccuracyPCA-PCIE1-PCIE1-HFigure 6: Results on synthetic test where two different loss functions are compared in ablative study.neighboring node features
+
+ 
+  
+  END OF PAPER
+
+
+  STARTING NEW PAPER
+  
+  
