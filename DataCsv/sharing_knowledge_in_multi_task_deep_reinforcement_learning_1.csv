@@ -1,0 +1,3496 @@
+b'Published as a conference paper at ICLR 2020\n\nSHARING KNOWLEDGE IN MULTI-TASK'
+<EOS>
+b'DEEP REINFORCEMENT LEARNING\n\nCarlo D\xe2\x80\x99Eramo & Davide Tateo\nDepartment of Computer Science'
+<EOS>
+b'TU Darmstadt, IAS'
+<EOS>
+b'Hochschulstra\xc3\x9fe 10, 64289, Darmstadt, Germany'
+<EOS>
+b'{carlo.deramo,davide.tateo}@tu-darmstadt.de\n\nAndrea Bonarini & Marcello Restelli\nPolitecnico di Milano, DEIB'
+<EOS>
+b'Piazza Leonardo da Vinci 32, 20133, Milano\n{'
+<EOS>
+b'andrea.bonarini,marcello.restelli}@polimi.it'
+<EOS>
+b'Jan Peters'
+<EOS>
+b'TU Darmstadt, IAS'
+<EOS>
+b'Hochschulstra\xc3\x9fe 10, 64289, Darmstadt, Germany'
+<EOS>
+b'Max Planck Institute for Intelligent Systems'
+<EOS>
+b'Max-Planck-Ring 4, 72076, T\xc3\xbcbingen, Germany'
+<EOS>
+b'jan.peters@tu-darmstadt.de'
+<EOS>
+b'ABSTRACT'
+<EOS>
+b'We study the bene\xef\xac\x81t of sharing representations among tasks to enable the effective\nuse of deep neural networks in Multi-Task Reinforcement Learning.'
+<EOS>
+b'We leverage\nthe assumption that learning from different tasks, sharing common properties, is\nhelpful to generalize the knowledge of them resulting in a more effective feature'
+<EOS>
+b'ex-'
+<EOS>
+b'traction compared to learning a single task.'
+<EOS>
+b'Intuitively, the resulting set of features\noffers performance bene\xef\xac\x81ts when used by Reinforcement Learning algorithms.'
+<EOS>
+b'We prove this by providing theoretical guarantees that highlight the conditions\nfor which is convenient to share representations among tasks, extending the well-'
+<EOS>
+b'known \xef\xac\x81nite-time bounds of Approximate Value-Iteration to the multi-task setting.'
+<EOS>
+b'In addition, we complement our analysis by proposing multi-task extensions of\nthree Reinforcement Learning algorithms that we empirically evaluate on widely\nused Reinforcement Learning benchmarks showing signi\xef\xac\x81cant improvements over\nthe single-task counterparts in terms of sample ef\xef\xac\x81ciency and performance.'
+<EOS>
+b'1'
+<EOS>
+b'INTRODUCTION'
+<EOS>
+b'Multi-Task Learning (MTL) ambitiously aims to learn multiple tasks jointly instead of learning them\nseparately, leveraging the assumption that the considered tasks have common properties which can be\nexploited by Machine Learning (ML) models to generalize the learning of each of them.'
+<EOS>
+b'For instance,\nthe features extracted in the hidden layers of a neural network trained on multiple tasks have the\nadvantage of being a general representation of structures common to each other.'
+<EOS>
+b'This translates into\nan effective way of learning multiple tasks at the same time, but it can also improve the learning\nof each individual task compared to learning them separately (Caruana, 1997).'
+<EOS>
+b'Furthermore, the\nlearned representation can be used to perform Transfer Learning (TL), i.e. using it as a preliminary\nknowledge to learn a new similar task resulting in a more effective and faster learning than learning'
+<EOS>
+b'the new task from scratch (Baxter, 2000; Thrun & Pratt, 2012).'
+<EOS>
+b'The same bene\xef\xac\x81ts of extraction and exploitation of common features among the tasks achieved\nin MTL, can be obtained in Multi-Task Reinforcement Learning (MTRL) when training a single\nagent on multiple Reinforcement Learning (RL) problems with common structures (Taylor & Stone,\n2009; Lazaric, 2012).'
+<EOS>
+b'In particular, in MTRL an agent can be trained on multiple tasks in the same\n\n1'
+<EOS>
+b'Published as a conference paper at ICLR 2020'
+<EOS>
+b'domain,'
+<EOS>
+b'e.g. riding a bicycle or cycling while going towards a goal, or on different but similar\ndomains,'
+<EOS>
+b'e.g. balancing a pendulum or balancing a double pendulum1.'
+<EOS>
+b'Considering recent advances\nin Deep Reinforcement Learning (DRL) and the resulting increase in the complexity of experimental\nbenchmarks, the use of Deep Learning (DL) models, e.g. deep neural networks, has become a popular\nand effective way to extract common features among tasks in MTRL algorithms (Rusu et al., 2015;\nLiu et al., 2016;'
+<EOS>
+b'Higgins et al., 2017).'
+<EOS>
+b'However, despite the high representational capacity of DL\nmodels, the extraction of good features remains challenging.'
+<EOS>
+b'For instance, the performance of the\nlearning process can degrade when unrelated tasks are used together (Caruana, 1997; Baxter, 2000);\nanother detrimental issue may occur when the training of a single model is not balanced properly\namong multiple tasks (Hessel et al., 2018).'
+<EOS>
+b'Recent developments in MTRL achieve signi\xef\xac\x81cant results in feature extraction by means of algorithms\nspeci\xef\xac\x81cally developed to address these issues.'
+<EOS>
+b'While some of these works rely on a single deep\nneural network to model the multi-task agent (Liu et al., 2016; Yang et al., 2017; Hessel et al., 2018;'
+<EOS>
+b'Wulfmeier et al., 2019), others use multiple deep neural networks, e.g. one for each task and another\nfor the multi-task agent (Rusu et al., 2015; Parisotto et al., 2015; Higgins et al., 2017; Teh et al., 2017).'
+<EOS>
+b'Intuitively, achieving good results in MTRL with a single deep neural network is more desirable\nthan using many of them, since the training time is likely much less and the whole architecture is\neasier to implement.'
+<EOS>
+b'In this paper we study the bene\xef\xac\x81ts of shared representations among tasks.'
+<EOS>
+b'We\ntheoretically motivate the intuitive effectiveness of our method, deriving theoretical guarantees that\nexploit the theoretical framework provided by Maurer et al.'
+<EOS>
+b'(2016), in which the authors present\nupper bounds on the quality of learning in MTL when extracting features for multiple tasks in a\nsingle shared representation.'
+<EOS>
+b'The signi\xef\xac\x81cancy of this result is that the cost of learning the shared\nrepresentation decreases with a factor O(1/\nT ), where T is the number of tasks for many function\napproximator hypothesis classes.'
+<EOS>
+b'The main contribution of this work is twofold.'
+<EOS>
+b'\xe2\x88\x9a\n\n1.'
+<EOS>
+b'We derive upper con\xef\xac\x81dence bounds for Approximate Value-Iteration (AVI) and Approximate'
+<EOS>
+b'Policy-Iteration (API)2'
+<EOS>
+b'(Farahmand, 2011) in the MTRL setting, and we extend the approx-\nimation error bounds in Maurer et al.'
+<EOS>
+b'(2016) to the case of multiple tasks with different\ndimensionalities.'
+<EOS>
+b'Then, we show how to combine these results resulting in, to the best\nof our knowledge, the \xef\xac\x81rst proposed extension of the \xef\xac\x81nite-time bounds of AVI/API to\nMTRL.'
+<EOS>
+b'Despite being an extension of previous works, we derive these results to justify'
+<EOS>
+b'our approach showing how the error propagation in AVI/API can theoretically bene\xef\xac\x81t from\nlearning multiple tasks jointly.'
+<EOS>
+b'2.'
+<EOS>
+b'We leverage these results proposing a neural network architecture, for which these bounds\nhold with minor assumptions, that allow us to learn multiple tasks with a single regressor\nextracting a common representation.'
+<EOS>
+b'We show an empirical evidence of the consequence of\nour bounds by means of a variant of Fitted Q-Iteration (FQI)'
+<EOS>
+b'(Ernst et al., 2005), based on our\nshared network and for which our bounds apply, that we call Multi Fitted Q-Iteration (MFQI).'
+<EOS>
+b'Then, we perform an empirical evaluation in challenging RL problems proposing multi-\ntask variants of the Deep Q-Network (DQN)'
+<EOS>
+b'(Mnih et al., 2015) and Deep Deterministic'
+<EOS>
+b'Policy Gradient (DDPG)'
+<EOS>
+b'(Lillicrap et al., 2015) algorithms.'
+<EOS>
+b'These algorithms are practical\nimplementations of the more general AVI/API framework, designed to solve complex\nproblems.'
+<EOS>
+b'In this case, the bounds apply to these algorithms only with some assumptions,\ne.g. stationary sampling distribution.'
+<EOS>
+b'The outcome of the empirical analysis joins the\ntheoretical results, showing signi\xef\xac\x81cant performance improvements compared to the single-\ntask version of the algorithms in various RL problems, including several MuJoCo'
+<EOS>
+b'(Todorov'
+<EOS>
+b'et al., 2012) domains.'
+<EOS>
+b'2 PRELIMINARIES'
+<EOS>
+b'Let B(X ) be the space of'
+<EOS>
+b'bounded measurable functions w.r.t.'
+<EOS>
+b'the \xcf\x83-algebra \xcf\x83X , and similarly\nB(X , L) be the same bounded by L < \xe2\x88\x9e.'
+<EOS>
+b'A Markov Decision Process (MDP) is de\xef\xac\x81ned as a 5-tuple M =< S, A, P, R, \xce\xb3 >, where S is the\nstate space, A is the action space, P :'
+<EOS>
+b'S'
+<EOS>
+b'\xc3\x97 A'
+<EOS>
+b'\xe2\x86\x92'
+<EOS>
+b'S is the transition distribution where P(s(cid:48)|s, a)'
+<EOS>
+b'1For simplicity, in this paper we refer to the concepts of task and domain interchangeably.'
+<EOS>
+b'2All proofs and the theorem for API are in Appendix A.2.'
+<EOS>
+b'2'
+<EOS>
+b'Published as a conference paper at ICLR 2020\n\nis the probability of reaching state s(cid:48)'
+<EOS>
+b'when performing action a in state s, R :'
+<EOS>
+b'S \xc3\x97 A \xc3\x97 S'
+<EOS>
+b'\xe2\x86\x92'
+<EOS>
+b'R is the reward function, and \xce\xb3 \xe2\x88\x88 (0, 1] is the discount factor.'
+<EOS>
+b'A deterministic policy \xcf\x80 maps,\nfor each state, the action to perform: \xcf\x80 :'
+<EOS>
+b'S \xe2\x86\x92 A.'
+<EOS>
+b'Given a policy \xcf\x80, the value of an action'
+<EOS>
+b'a in a state s represents the expected discounted cumulative reward obtained by performing a\nin s and following \xcf\x80 thereafter: Q\xcf\x80(s, a)'
+<EOS>
+b'(cid:44)'
+<EOS>
+b'E[(cid:80)\xe2\x88\x9e'
+<EOS>
+b'k=0 \xce\xb3kri+k+1|si'
+<EOS>
+b'= s, ai = a, \xcf\x80],'
+<EOS>
+b'where ri+1'
+<EOS>
+b'is the reward obtained after the i-th transition.'
+<EOS>
+b'The expected discounted cumulative reward is\nmaximized by following the optimal policy \xcf\x80\xe2\x88\x97 which is the one that determines the optimal action\nvalues, i.e., the ones that satisfy the Bellman optimality equation (Bellman, 1954)'
+<EOS>
+b':'
+<EOS>
+b'Q\xe2\x88\x97(s, a)'
+<EOS>
+b'(cid:44)'
+<EOS>
+b'(cid:82)\nS P(s(cid:48)|s, a)'
+<EOS>
+b'[R(s, a, s(cid:48)) + \xce\xb3 maxa(cid:48) Q\xe2\x88\x97(s(cid:48), a(cid:48))]'
+<EOS>
+b'ds(cid:48).'
+<EOS>
+b'The solution of the Bellman optimality equation\nis the \xef\xac\x81xed point of the optimal Bellman operator T \xe2\x88\x97 : B(S \xc3\x97 A) \xe2\x86\x92'
+<EOS>
+b'B(S \xc3\x97 A) de\xef\xac\x81ned as'
+<EOS>
+b'(T \xe2\x88\x97Q)(s, a)'
+<EOS>
+b'(cid:44)'
+<EOS>
+b'(cid:82)'
+<EOS>
+b'S P(s(cid:48)|s, a)[R(s, a, s(cid:48)) + \xce\xb3 maxa(cid:48)'
+<EOS>
+b'Q(s(cid:48), a(cid:48))]ds(cid:48).'
+<EOS>
+b'In the MTRL setting, there are\nmultiple MDPs M(t) ='
+<EOS>
+b'< S (t), A(t), P (t), R(t), \xce\xb3(t)'
+<EOS>
+b'> where t \xe2\x88\x88 {'
+<EOS>
+b'1, . . . , T } and T is the number\nof MDPs.'
+<EOS>
+b'For each MDP M(t), a deterministic policy \xcf\x80t : S (t)'
+<EOS>
+b'\xe2\x86\x92 A(t) induces an action-value\nfunction Q\xcf\x80t'
+<EOS>
+b'i+k+1|si'
+<EOS>
+b'= s(t), ai = a(t), \xcf\x80t].'
+<EOS>
+b'In this setting, the goal is to\nmaximize the sum of the expected cumulative discounted reward of each task.'
+<EOS>
+b't (s(t), a(t))'
+<EOS>
+b'='
+<EOS>
+b'E[(cid:80)\xe2\x88\x9e\n\nk=0 \xce\xb3kr(t)'
+<EOS>
+b'In our theoretical analysis of the MTRL problem, the complexity of representation plays a central role.'
+<EOS>
+b'As done in Maurer et al.'
+<EOS>
+b'(2016), we consider the Gaussian complexity, a variant of the well-known\nRademacher complexity, to measure the complexity of the representation.'
+<EOS>
+b'Given a set \xc2\xafX \xe2\x88\x88'
+<EOS>
+b'X T n of n\ninput samples for each task'
+<EOS>
+b't \xe2\x88\x88 {1, . . . , T }, and a class H composed of k \xe2\x88\x88'
+<EOS>
+b'{1, . . . , K} functions,\nthe Gaussian complexity of a random set H( \xc2\xafX) ='
+<EOS>
+b'{(hk(Xti))'
+<EOS>
+b': h \xe2\x88\x88 H}'
+<EOS>
+b'\xe2\x8a\x86 RKT n is de\xef\xac\x81ned as\nfollows:'
+<EOS>
+b'G(H( \xc2\xafX))'
+<EOS>
+b'='
+<EOS>
+b'E'
+<EOS>
+b'\xce\xb3tkihk(Xti)'
+<EOS>
+b'(cid:34)'
+<EOS>
+b'sup'
+<EOS>
+b'h\xe2\x88\x88H'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'tki'
+<EOS>
+b'(cid:35)\n\n,\n\n(cid:12)'
+<EOS>
+b'(cid:12)'
+<EOS>
+b'(cid:12)'
+<EOS>
+b'Xti'
+<EOS>
+b'(cid:12)'
+<EOS>
+b'(cid:12)'
+<EOS>
+b'where \xce\xb3tki are independent standard normal variables.'
+<EOS>
+b'We also need to de\xef\xac\x81ne the following quantity,\ntaken from Maurer (2016): let \xce\xb3 be a vector of m random standard normal variables, and f \xe2\x88\x88 F :'
+<EOS>
+b'Y'
+<EOS>
+b'\xe2\x86\x92 Rm, with Y'
+<EOS>
+b'\xe2\x8a\x86 Rn, we de\xef\xac\x81ne'
+<EOS>
+b'O(F) ='
+<EOS>
+b'sup'
+<EOS>
+b'y,y(cid:48)\xe2\x88\x88Y,y(cid:54)=y(cid:48)'
+<EOS>
+b'(cid:34)'
+<EOS>
+b'E'
+<EOS>
+b'sup'
+<EOS>
+b'f \xe2\x88\x88F\n\n(cid:104)\xce\xb3, f'
+<EOS>
+b'(y) \xe2\x88\x92 f (y(cid:48))(cid:105)'
+<EOS>
+b'(cid:107)y'
+<EOS>
+b'\xe2\x88\x92 y(cid:48)(cid:107)'
+<EOS>
+b'(cid:35)\n\n.'
+<EOS>
+b'(1)'
+<EOS>
+b'(2)\n\nEquation 2 can be viewed as a Gaussian average of Lipschitz quotients, and appears in the bounds\nprovided in this work.'
+<EOS>
+b'Finally, we de\xef\xac\x81ne L(F) as the upper bound of the Lipschitz constant of all the\nfunctions f in the function class F.\n\n3 THEORETICAL ANALYSIS'
+<EOS>
+b'The following theoretical study starts from the derivation of theoretical guarantees for MTRL in the\nAVI framework, extending the results of Farahmand (2011) in the MTRL scenario.'
+<EOS>
+b'Then, to bound\nthe approximation error term in the AVI bound, we extend the result described in Maurer (2006)\nto MTRL.'
+<EOS>
+b'As we discuss, the resulting bounds described in this section clearly show the bene\xef\xac\x81t of\nsharing representation in MTRL.'
+<EOS>
+b'To the best of our knowledge, this is the \xef\xac\x81rst general result for\nMTRL; previous works have focused on \xef\xac\x81nite MDPs'
+<EOS>
+b'(Brunskill & Li, 2013) or linear models ('
+<EOS>
+b'Lazaric\n& Restelli, 2011).'
+<EOS>
+b'3.1 MULTI-TASK REPRESENTATION LEARNING'
+<EOS>
+b'The multi-task representation learning problem consists in learning simultaneously a set of T tasks'
+<EOS>
+b'\xc2\xb5t, modeled as probability measures over the space of the possible input-output pairs (x, y), with\nx \xe2\x88\x88 X and y \xe2\x88\x88 R, being X the input space.'
+<EOS>
+b'Let w \xe2\x88\x88'
+<EOS>
+b'W :'
+<EOS>
+b'X \xe2\x86\x92 RJ , h \xe2\x88\x88 H : RJ \xe2\x86\x92 RK and\nf'
+<EOS>
+b'\xe2\x88\x88 F :'
+<EOS>
+b'RK'
+<EOS>
+b'\xe2\x86\x92 R be functions chosen from their respective hypothesis classes.'
+<EOS>
+b'The functions\nin the hypothesis classes must be Lipschitz continuous functions.'
+<EOS>
+b'Let \xc2\xafZ ='
+<EOS>
+b'(Z1, . . .'
+<EOS>
+b', ZT ) be the\nmulti-sample over the set of tasks'
+<EOS>
+b'\xc2\xb5 ='
+<EOS>
+b'(\xc2\xb51, . . . , \xc2\xb5T ), where Zt ='
+<EOS>
+b'(Zt1, . . .'
+<EOS>
+b', Ztn) \xe2\x88\xbc'
+<EOS>
+b'\xc2\xb5n'
+<EOS>
+b't and\nZti'
+<EOS>
+b'='
+<EOS>
+b'(Xti, Yti) \xe2\x88\xbc'
+<EOS>
+b'\xc2\xb5t.'
+<EOS>
+b'We can formalize our regression problem as the following minimization'
+<EOS>
+b'3'
+<EOS>
+b'Published as a conference paper at ICLR 2020'
+<EOS>
+b'problem:\n\nmin'
+<EOS>
+b'(cid:40)\n\n1\nnT'
+<EOS>
+b'T\n(cid:88)'
+<EOS>
+b'N\n(cid:88)'
+<EOS>
+b't=1'
+<EOS>
+b'i=1'
+<EOS>
+b'(cid:96)(ft(h(wt(Xti))), Yti) :'
+<EOS>
+b'f \xe2\x88\x88'
+<EOS>
+b'F T , h \xe2\x88\x88 H, w \xe2\x88\x88'
+<EOS>
+b'W T\n\n,'
+<EOS>
+b'(3)'
+<EOS>
+b'(cid:41)\n\nwhere we use f ='
+<EOS>
+b'(f1, . . .'
+<EOS>
+b', fT ), w ='
+<EOS>
+b'(w1, . . .'
+<EOS>
+b', wT ), and de\xef\xac\x81ne the minimizers of Equation (3) as \xcb\x86w,\n\xcb\x86h, and \xcb\x86f .'
+<EOS>
+b'We assume that the loss function (cid:96) : R \xc3\x97 R \xe2\x86\x92 [0, 1] is 1-Lipschitz in the \xef\xac\x81rst argument for\nevery value of the second argument.'
+<EOS>
+b'While this assumption may seem restrictive, the result obtained\ncan be easily scaled to the general case.'
+<EOS>
+b'To use the principal result of this section, for a generic loss\nfunction (cid:96)(cid:48), it is possible to use (cid:96)(\xc2\xb7) ='
+<EOS>
+b'(cid:96)(cid:48)(\xc2\xb7)/(cid:15)max, where (cid:15)max is the maximum value of (cid:96)(cid:48).'
+<EOS>
+b'The expected\nloss over the tasks, given w, h and f is the task-averaged risk:\n\n\xce\xb5avg(w, h, f ) ='
+<EOS>
+b'E [(cid:96)(ft(h(wt(X))), Y )]'
+<EOS>
+b'(4)\n\n1'
+<EOS>
+b'T\n\nT\n(cid:88)'
+<EOS>
+b't=1'
+<EOS>
+b'The minimum task-averaged risk, given the set of tasks \xc2\xb5 and the hypothesis classes W, H and F is\n\xce\xb5\xe2\x88\x97'
+<EOS>
+b'avg, and the corresponding minimizers are w\xe2\x88\x97, h\xe2\x88\x97 and f \xe2\x88\x97.'
+<EOS>
+b'3.2 MULTI-TASK APPROXIMATE VALUE ITERATION BOUND'
+<EOS>
+b'We start by considering the bound for the AVI framework which applies for the single-task scenario.'
+<EOS>
+b'Theorem 1.'
+<EOS>
+b'(Theorem 3.4 of Farahmand (2011)) Let K be a positive integer, and Qmax \xe2\x89\xa4 Rmax\n1\xe2\x88\x92\xce\xb3 .'
+<EOS>
+b'Then\nk=0 \xe2\x8a\x82 B(S \xc3\x97 A, Qmax) and the corresponding sequence (\xce\xb5k)K\xe2\x88\x921\nfor any sequence (Qk)K'
+<EOS>
+b'k=0 , where\n\xce\xb5k = (cid:107)Qk+1 \xe2\x88\x92 T \xe2\x88\x97Qk(cid:107)2\n\xce\xbd, we have:'
+<EOS>
+b'(cid:107)Q\xe2\x88\x97 \xe2\x88\x92 Q\xcf\x80K'
+<EOS>
+b'(cid:107)1,\xcf\x81 \xe2\x89\xa4'
+<EOS>
+b'2\xce\xb3'
+<EOS>
+b'(cid:20)'
+<EOS>
+b'(1 \xe2\x88\x92'
+<EOS>
+b'\xce\xb3)2'
+<EOS>
+b'1'
+<EOS>
+b'2'
+<EOS>
+b'inf\n\nr\xe2\x88\x88[0,1]'
+<EOS>
+b'C'
+<EOS>
+b'VI,\xcf\x81,\xce\xbd(K; r)E\n\n2'
+<EOS>
+b'(\xce\xb50, . . .'
+<EOS>
+b', \xce\xb5K\xe2\x88\x921; r)'
+<EOS>
+b'+'
+<EOS>
+b'(cid:21)'
+<EOS>
+b'\xce\xb3KRmax'
+<EOS>
+b','
+<EOS>
+b'(5)\n\n2'
+<EOS>
+b'1 \xe2\x88\x92'
+<EOS>
+b'\xce\xb3'
+<EOS>
+b'where\n\nCVI,\xcf\x81,\xce\xbd(K; r) ='
+<EOS>
+b'(cid:18) 1 \xe2\x88\x92 \xce\xb3'
+<EOS>
+b'(cid:19)2\n\n2'
+<EOS>
+b'sup'
+<EOS>
+b'1,'
+<EOS>
+b'...,\xcf\x80(cid:48)'
+<EOS>
+b'\xcf\x80(cid:48)\nK\n\nK\xe2\x88\x921'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'k=0'
+<EOS>
+b'a2(1\xe2\x88\x92r)'
+<EOS>
+b'k'
+<EOS>
+b'(cid:88)\n\n\xce\xb3m(cid:16)'
+<EOS>
+b'm\xe2\x89\xa50'
+<EOS>
+b'cVI1,\xcf\x81,\xce\xbd(m, K \xe2\x88\x92 k; \xcf\x80(cid:48)\n\nK)'
+<EOS>
+b'1'
+<EOS>
+b'\xef\xa3\xae'
+<EOS>
+b'\xef\xa3\xb0'
+<EOS>
+b'+cVI2,\xcf\x81,\xce\xbd(m'
+<EOS>
+b'+ 1; \xcf\x80(cid:48)\n\nk+1, . . .'
+<EOS>
+b', \xcf\x80(cid:48)\n\nK)'
+<EOS>
+b'\xef\xa3\xbb\n\n,'
+<EOS>
+b'(6)\n\n\xef\xa3\xb9'
+<EOS>
+b'2'
+<EOS>
+b'(cid:17)\n\nwith E(\xce\xb50, . . .'
+<EOS>
+b', \xce\xb5K\xe2\x88\x921; r) ='
+<EOS>
+b'(cid:80)K\xe2\x88\x921'
+<EOS>
+b'and \xce\xbd,'
+<EOS>
+b'and the series \xce\xb1k are de\xef\xac\x81ned as in Farahmand (2011).'
+<EOS>
+b'k=0 \xce\xb12r'
+<EOS>
+b'k \xce\xb5k, the two coef\xef\xac\x81cients cVI1,\xcf\x81,\xce\xbd, cVI2,\xcf\x81,\xce\xbd, the distributions \xcf\x81'
+<EOS>
+b'In the multi-task scenario, let the average approximation error across tasks be:\n\n\xce\xb5avg,k( \xcb\x86wk, \xcb\x86hk, \xcb\x86fk) ='
+<EOS>
+b'(cid:107)Qt,k+1 \xe2\x88\x92 T \xe2\x88\x97\n\nt Qt,k(cid:107)2\n\xce\xbd,\n\n(7)\n\n1\nT\n\nT\n(cid:88)'
+<EOS>
+b't=1'
+<EOS>
+b'is the optimal Bellman operator of task'
+<EOS>
+b't.'
+<EOS>
+b'where Qt,k+1'
+<EOS>
+b'= \xcb\x86ft,k \xe2\x97\xa6 \xcb\x86hk'
+<EOS>
+b'\xe2\x97\xa6 \xcb\x86wt,k, and T \xe2\x88\x97'
+<EOS>
+b't'
+<EOS>
+b'In the following, we extend the AVI bound of Theorem 1 to the multi-task scenario, by computing\nthe average loss across tasks and pushing inside the average using Jensen\xe2\x80\x99s inequality.'
+<EOS>
+b'Theorem 2.'
+<EOS>
+b'Let K be a positive integer, and Qmax \xe2\x89\xa4 Rmax\n1\xe2\x88\x92\xce\xb3 .'
+<EOS>
+b'Then for any sequence (Qk)K\nA, Qmax) and the corresponding sequence (\xce\xb5avg,k)K\xe2\x88\x921'
+<EOS>
+b'we have:\n\nk=0 \xe2\x8a\x82'
+<EOS>
+b'B(S \xc3\x97'
+<EOS>
+b't Qt,'
+<EOS>
+b'k(cid:107)2\n\xce\xbd,\n\nk=0 , where \xce\xb5avg,k =\n\nt=1(cid:107)Qt,k+1\xe2\x88\x92T \xe2\x88\x97\n\n(cid:80)T\n\n1\nT\n\n1'
+<EOS>
+b'T\n\nT\n(cid:88)'
+<EOS>
+b't=1'
+<EOS>
+b'(cid:107)Q\xe2\x88\x97'
+<EOS>
+b't \xe2\x88\x92'
+<EOS>
+b'Q\xcf\x80K'
+<EOS>
+b't (cid:107)1,\xcf\x81 \xe2\x89\xa4'
+<EOS>
+b'2\xce\xb3'
+<EOS>
+b'(cid:20)'
+<EOS>
+b'(1 \xe2\x88\x92'
+<EOS>
+b'\xce\xb3)2'
+<EOS>
+b'inf\n\nr\xe2\x88\x88[0,1]\n\n1'
+<EOS>
+b'2'
+<EOS>
+b'1'
+<EOS>
+b'2'
+<EOS>
+b'C\n\nVI(K;'
+<EOS>
+b'r)E'
+<EOS>
+b'avg(\xce\xb5avg,0, . . . , \xce\xb5avg,K\xe2\x88\x921; r) +\n\n2\xce\xb3KRmax,avg\n\n(cid:21)'
+<EOS>
+b'1'
+<EOS>
+b'\xe2\x88\x92 \xce\xb3'
+<EOS>
+b'(8)\n\nwith Eavg'
+<EOS>
+b'='
+<EOS>
+b'(cid:80)K\xe2\x88\x921\n\nk=0 \xce\xb12r'
+<EOS>
+b'k \xce\xb5avg,k, \xce\xb3 = max'
+<EOS>
+b'(cid:40)'
+<EOS>
+b'(1\xe2\x88\x92\xce\xb3)\xce\xb3K\xe2\x88\x92k\xe2\x88\x921'
+<EOS>
+b't\xe2\x88\x88{1,...'
+<EOS>
+b',T }'
+<EOS>
+b'1'
+<EOS>
+b'T'
+<EOS>
+b'(cid:80)T'
+<EOS>
+b't=1 Rmax,t and \xce\xb1k ='
+<EOS>
+b'1\xe2\x88\x92\xce\xb3K+1'
+<EOS>
+b'(1\xe2\x88\x92\xce\xb3)\xce\xb3K'
+<EOS>
+b'1\xe2\x88\x92\xce\xb3K+1'
+<EOS>
+b'0 \xe2\x89\xa4 k < K,\n\n.'
+<EOS>
+b'k = K\n\n\xce\xb3t, C\n\nVI(K; r)'
+<EOS>
+b'='
+<EOS>
+b'max'
+<EOS>
+b'C'
+<EOS>
+b'VI,\xcf\x81,\xce\xbd(K; t, r), Rmax,'
+<EOS>
+b'avg ='
+<EOS>
+b't\xe2\x88\x88{1,...'
+<EOS>
+b',T }\n\n1'
+<EOS>
+b'2'
+<EOS>
+b'1'
+<EOS>
+b'2'
+<EOS>
+b'4'
+<EOS>
+b'Published as a conference paper at ICLR 2020'
+<EOS>
+b'Remarks'
+<EOS>
+b'Theorem 2 retains most of the properties of Theorem 3.4 of Farahmand (2011), except\nthat the regression error in the bound is now task-averaged.'
+<EOS>
+b'Interestingly, the second term of the\nsum in Equation (8) depends on the average maximum reward for each task.'
+<EOS>
+b'In order to obtain this\nresult we use an overly pessimistic bound on \xce\xb3 and the concentrability coef\xef\xac\x81cients, however this\napproximation is not too loose if the MDPs are suf\xef\xac\x81ciently similar.'
+<EOS>
+b'3.3 MULTI-TASK APPROXIMATION ERROR BOUND'
+<EOS>
+b'We bound the task-averaged approximation error \xce\xb5avg at each AVI iteration k involved in (8) following\na derivation similar to the one proposed by Maurer et al.'
+<EOS>
+b'(2016), obtaining:'
+<EOS>
+b'Theorem 3.'
+<EOS>
+b'Let \xc2\xb5, W, H and F be de\xef\xac\x81ned as above and assume 0 \xe2\x88\x88 H and f (0)'
+<EOS>
+b'= 0, \xe2\x88\x80f \xe2\x88\x88'
+<EOS>
+b'F.'
+<EOS>
+b'Then for \xce\xb4 > 0 with probability at least 1 \xe2\x88\x92 \xce\xb4 in the draw of \xc2\xafZ \xe2\x88\xbc'
+<EOS>
+b'(cid:81)T'
+<EOS>
+b't=1'
+<EOS>
+b'\xc2\xb5n'
+<EOS>
+b't'
+<EOS>
+b'we have that'
+<EOS>
+b'\xce\xb5avg( \xcb\x86w, \xcb\x86h, \xcb\x86f ) \xe2\x89\xa4 L(F)'
+<EOS>
+b'c1'
+<EOS>
+b'(cid:18)\n\nL(H)'
+<EOS>
+b'supl\xe2\x88\x88{1,...,T } G(W(Xl))'
+<EOS>
+b'supw(cid:107)w( \xc2\xafX)(cid:107)O(H)\n\nminp\xe2\x88\x88P G(H(p))'
+<EOS>
+b'(cid:19)'
+<EOS>
+b'suph,w(cid:107)h(w('
+<EOS>
+b'\xc2\xafX))(cid:107)O(F)'
+<EOS>
+b'+c3'
+<EOS>
+b'nT'
+<EOS>
+b'n'
+<EOS>
+b'+ c4'
+<EOS>
+b'+ c2'
+<EOS>
+b'\xe2\x88\x9a'
+<EOS>
+b'n'
+<EOS>
+b'T'
+<EOS>
+b'nT'
+<EOS>
+b'(cid:115)'
+<EOS>
+b'+'
+<EOS>
+b'8 ln( 3\n\xce\xb4 )\nnT'
+<EOS>
+b'+ \xce\xb5\xe2\x88\x97'
+<EOS>
+b'avg.'
+<EOS>
+b'(9)\n\n\xe2\x88\x9a'
+<EOS>
+b'\xe2\x88\x9a'
+<EOS>
+b'Remarks The assumptions 0 \xe2\x88\x88 H and f (0)'
+<EOS>
+b'= 0 for all f \xe2\x88\x88 F'
+<EOS>
+b'are not essential for the proof and\nare only needed to simplify the result.'
+<EOS>
+b'For reasonable function classes, the Gaussian complexity\nn).'
+<EOS>
+b'If supw(cid:107)w( \xc2\xafX)(cid:107) and suph,w(cid:107)h(w( \xc2\xafX))(cid:107) can be uniformly bounded, then\nG(W(Xl)) is O'
+<EOS>
+b'(\nthey are O(\nnT ).'
+<EOS>
+b'For some function classes, the Gaussian average of Lipschitz quotients O(\xc2\xb7) can\nbe bounded independently from the number of samples.'
+<EOS>
+b'Given these assumptions, the \xef\xac\x81rst and the\nfourth term of the right hand side of Equation (9), which represent respectively the cost of learning the\nmeta-state space w and the task-speci\xef\xac\x81c f mappings, are both O(1/\xe2\x88\x9a\nn).'
+<EOS>
+b'The second term represents\nthe cost of learning the multi-task representation h and is O(1/\nnT ), thus vanishing in the multi-task\nlimit T'
+<EOS>
+b'\xe2\x86\x92 \xe2\x88\x9e.'
+<EOS>
+b'The third term can be removed if \xe2\x88\x80h \xe2\x88\x88 H, \xe2\x88\x83p0 \xe2\x88\x88'
+<EOS>
+b'P : h(p)'
+<EOS>
+b'= 0; even when this\nassumption does not hold, this term can be ignored for many classes of interest,'
+<EOS>
+b'e.g. neural networks,\nas it can be arbitrarily small.'
+<EOS>
+b'The last term to be bounded in (9) is the minimum average approximation error \xce\xb5\xe2\x88\x97'
+<EOS>
+b'avg at each AVI'
+<EOS>
+b'iteration k. Recalling that the task-averaged approximation error is de\xef\xac\x81ned as in (7), applying'
+<EOS>
+b'Theorem 5.3 by Farahmand (2011)'
+<EOS>
+b'we obtain:'
+<EOS>
+b'Lemma 4.'
+<EOS>
+b'Let Q\xe2\x88\x97'
+<EOS>
+b'T \xe2\x88\x97'
+<EOS>
+b't Qt,k(cid:107)2\n\nt,k, \xe2\x88\x80t \xe2\x88\x88 {'
+<EOS>
+b'1, . . .'
+<EOS>
+b', T } be the minimizers of \xce\xb5\xe2\x88\x97'
+<EOS>
+b'avg,k, \xcb\x87tk ='
+<EOS>
+b'arg'
+<EOS>
+b'maxt\xe2\x88\x88{1,...,T }'
+<EOS>
+b'(cid:107)Q\xe2\x88\x97\n\n\xce\xbd, and'
+<EOS>
+b'bk,i ='
+<EOS>
+b'(cid:107)Q\xcb\x87tk,i+1 \xe2\x88\x92 T \xe2\x88\x97\n\n\xcb\x87t Q\xcb\x87tk,i(cid:107)\xce\xbd, then:\n\nt,k+1 \xe2\x88\x92'
+<EOS>
+b'\xe2\x88\x9a'
+<EOS>
+b'(cid:32)'
+<EOS>
+b'(cid:33)2\n\n\xce\xb5\xe2\x88\x97'
+<EOS>
+b'avg,k \xe2\x89\xa4'
+<EOS>
+b'(cid:107)Q\xe2\x88\x97\n\n\xcb\x87tk,k+1 \xe2\x88\x92'
+<EOS>
+b'(T \xe2\x88\x97\n\n\xcb\x87t )'
+<EOS>
+b'k+1Q\xcb\x87tk,0(cid:107)\xce\xbd'
+<EOS>
+b'+'
+<EOS>
+b'(\xce\xb3\xcb\x87tk CAE(\xce\xbd; \xcb\x87tk, P ))'
+<EOS>
+b'i+1bk,k\xe2\x88\x921\xe2\x88\x92i\n\n,\n\n(10)\n\nk\xe2\x88\x921'
+<EOS>
+b'(cid:88)\n\ni=0\n\nwith CAE de\xef\xac\x81ned as in Farahmand (2011).'
+<EOS>
+b'Final remarks'
+<EOS>
+b'The bound for MTRL is derived by composing the results in Theorems 2 and 3, and\nLemma 4.'
+<EOS>
+b'The results above highlight the advantage of learning a shared representation.'
+<EOS>
+b'The bound\nin Theorem 2 shows that a small approximation error is critical to improve the convergence towards\nthe optimal action-value function, and the bound in Theorem 3 shows that the cost of learning the\nshared representation at each AVI iteration is mitigated by using multiple tasks.'
+<EOS>
+b'This is particularly\nbene\xef\xac\x81cial when the feature representation is complex,'
+<EOS>
+b'e.g. deep neural networks.'
+<EOS>
+b'3.4 DISCUSSION'
+<EOS>
+b'As stated in the remarks of Equation (9), the bene\xef\xac\x81t of MTRL is evinced by the second component\nof the bound, i.e. the cost of learning h, which vanishes with the increase of the number of tasks.'
+<EOS>
+b'Obviously, adding more tasks require the shared representation to be large enough to include all\nof them, undesirably causing the term suph,w(cid:107)h(w('
+<EOS>
+b'\xc2\xafX))(cid:107) in the fourth component of the bound to\nincrease.'
+<EOS>
+b'This introduces a tradeoff between the number of features and number of tasks; however, for\n\n5\n\n\x0cPublished as a conference paper at ICLR 2020'
+<EOS>
+b'(a)'
+<EOS>
+b'Shared network'
+<EOS>
+b'(b) FQI vs MFQI'
+<EOS>
+b'(c) #'
+<EOS>
+b'Task analysis'
+<EOS>
+b'Figure 1:'
+<EOS>
+b'(a)'
+<EOS>
+b'The architecture of the neural network we propose to learn T tasks simultaneously.'
+<EOS>
+b'The wt block maps each input xt from task \xc2\xb5t to a shared set of layers h which extracts a common\nrepresentation of the tasks.'
+<EOS>
+b'Eventually, the shared representation is specialized in block ft and the\noutput yt of the network is computed.'
+<EOS>
+b'Note that each block can be composed of arbitrarily many\nlayers.'
+<EOS>
+b'(b) Results of FQI and MFQI averaged over 4 tasks in Car-On-Hill, showing (cid:107)Q\xe2\x88\x97 \xe2\x88\x92 Q\xcf\x80K (cid:107) on\nthe left, and the discounted cumulative reward on the right.'
+<EOS>
+b'(c) Results of MFQI showing'
+<EOS>
+b'(cid:107)Q\xe2\x88\x97 \xe2\x88\x92Q\xcf\x80K (cid:107)\nfor increasing number of tasks.'
+<EOS>
+b'Both results in (b) and (c) are averaged over 100 experiments, and\nshow the 95% con\xef\xac\x81dence intervals.'
+<EOS>
+b'a reasonable number of tasks the number of features used in the single-task case is enough to handle\nthem, as we show in some experiments in Section 5.'
+<EOS>
+b'Notably, since the AVI/API framework provided\nby Farahmand (2011) provides an easy way to include the approximation error of a generic function'
+<EOS>
+b'approximator, it is easy to show the bene\xef\xac\x81t in MTRL of the bound in Equation (9).'
+<EOS>
+b'Despite being just\nmulti-task extensions of previous works, our results are the \xef\xac\x81rst one to theoretically show the bene\xef\xac\x81t\nof sharing representation in MTRL.'
+<EOS>
+b'Moreover, they serve as a signi\xef\xac\x81cant theoretical motivation,\nbesides to the intuitive ones, of the practical algorithms that we describe in the following sections.'
+<EOS>
+b'4 SHARING REPRESENTATIONS'
+<EOS>
+b'We want to empirically evaluate the bene\xef\xac\x81t of our theoretical study in the problem of jointly learning\nT different tasks \xc2\xb5t, introducing a neural network architecture for which our bounds hold.'
+<EOS>
+b'Following\nour theoretical framework, the network we propose extracts representations wt from inputs xt for each\ntask \xc2\xb5t, mapping them to common features in a set of shared layers h, specializing the learning of\neach task in respective separated layers ft, and \xef\xac\x81nally computing the output yt ='
+<EOS>
+b'(ft \xe2\x97\xa6 h \xe2\x97\xa6 wt)(xt) =\nft(h(wt(xt)))'
+<EOS>
+b'(Figure 1(a)).'
+<EOS>
+b'The idea behind this architecture is not new in the literature.'
+<EOS>
+b'For\ninstance, similar ideas have already been used in DQN variants to improve exploration on the same\ntask via bootstrapping (Osband et al., 2016) and to perform MTRL (Liu et al., 2016).'
+<EOS>
+b'The intuitive and desirable property of this architecture is the exploitation of the regularization effect\nintroduced by the shared representation of the jointly learned tasks.'
+<EOS>
+b'Indeed, unlike learning a single\ntask that may end up in over\xef\xac\x81tting, forcing the model to compute a shared representation of the tasks\nhelps the regression process to extract more general features, with a consequent reduction in the\nvariance of the learned function.'
+<EOS>
+b'This intuitive justi\xef\xac\x81cation for our approach, joins the theoretical\nbene\xef\xac\x81t proven in Section 3.'
+<EOS>
+b'Note that our architecture can be used in any MTRL problem involving a\nregression process; indeed, it can be easily used in value-based methods as a Q-function regressor,\nor in policy search as a policy regressor.'
+<EOS>
+b'In both cases, the targets are learned for each task \xc2\xb5t\nin its respective output block ft.'
+<EOS>
+b'Remarkably, as we show in the experimental Section 5, it is\nstraightforward to extend RL algorithms to their multi-task variants only through the use of the\nproposed network architecture, without major changes to the algorithms themselves.'
+<EOS>
+b'5 EXPERIMENTAL RESULTS'
+<EOS>
+b'To empirically evince the effect described by our bounds, we propose an extension of FQI (Ernst\net al., 2005; Riedmiller, 2005), that we call MFQI, for which our AVI bounds apply.'
+<EOS>
+b'Then, to\nempirically evaluate our approach in challenging RL problems, we introduce multi-task variants\nof two well-known DRL algorithms: DQN (Mnih et al., 2015) and DDPG'
+<EOS>
+b'(Lillicrap et al., 2015),'
+<EOS>
+b'which we call Multi'
+<EOS>
+b'Deep Q-Network (MDQN) and Multi Deep Deterministic Policy Gradient\n(MDDPG) respectively.'
+<EOS>
+b'Note that for these methodologies, our AVI and API bounds hold only with\n\n6'
+<EOS>
+b'hhw1w1w2w2wTwTf1f1f2f2fTfTInputOutputx1x2xTy1y2yT........'
+<EOS>
+b'02550# Iterations0.150.200.250.300.350.400.450.50Q*QKFQIMULTI02550# Iterations0.050.000.050.100.15Performance02550# Iterations0.150.200.250.300.350.400.450.50Q*QK1248\x0cPublished as a conference paper at ICLR 2020\n\n(a) Multi-task'
+<EOS>
+b'(b) Transfer'
+<EOS>
+b'Figure 2:'
+<EOS>
+b'Discounted cumulative reward averaged over 100 experiments of DQN and MDQN for\neach task and for transfer learning in the Acrobot problem.'
+<EOS>
+b'An epoch consists of 1, 000 steps, after\nwhich the greedy policy is evaluated for 2, 000 steps.'
+<EOS>
+b'The 95% con\xef\xac\x81dence intervals are shown.'
+<EOS>
+b'the simplifying assumption that the samples are i.i.d.'
+<EOS>
+b'; nevertheless they are useful to show the bene\xef\xac\x81t\nof our method also in complex scenarios,'
+<EOS>
+b'e.g. MuJoCo'
+<EOS>
+b'(Todorov et al., 2012).'
+<EOS>
+b'We remark that in\nthese experiments we are only interested in showing the bene\xef\xac\x81t of learning multiple tasks with a\nshared representation'
+<EOS>
+b'w.r.t.'
+<EOS>
+b'learning a single task; therefore, we only compare our methods with\nthe single task counterparts, ignoring other works on MTRL in literature.'
+<EOS>
+b'Experiments have been\ndeveloped using the MushroomRL library (D\xe2\x80\x99Eramo et al., 2020), and run on an NVIDIA R(cid:13)'
+<EOS>
+b'DGX\nStationTM and Intel R(cid:13) AI DevCloud.'
+<EOS>
+b'Refer to Appendix B for all the details and our motivations\nabout the experimental settings.'
+<EOS>
+b'5.1 MULTI FITTED Q-ITERATION'
+<EOS>
+b'As a \xef\xac\x81rst empirical evaluation, we consider FQI, as an example of an AVI algorithm, to show the\neffect described by our theoretical AVI bounds in experiments.'
+<EOS>
+b'We consider the Car-On-Hill problem\nas described in Ernst et al.'
+<EOS>
+b'(2005), and select four different tasks from it changing the mass of the\ncar and the value of the actions (details in Appendix B).'
+<EOS>
+b'Then, we run separate instances of FQI\nwith a single task network for each task respectively, and one of MFQI considering all the tasks\nsimultaneously.'
+<EOS>
+b'Figure 1(b) shows the L1-norm of the difference between Q\xe2\x88\x97 and Q\xcf\x80K averaged\nover all the tasks.'
+<EOS>
+b'It is clear how MFQI is able to get much closer to the optimal Q-function, thus\ngiving an empirical evidence of the AVI bounds in Theorem 2.'
+<EOS>
+b'For completeness, we also show the\nadvantage of MFQI w.r.t. FQI in performance.'
+<EOS>
+b'Then, in Figure 1(c) we provide an empirical evidence\nof the bene\xef\xac\x81t of increasing the number of tasks in MFQI in terms of both quality and stability.'
+<EOS>
+b'5.2 MULTI'
+<EOS>
+b'DEEP Q-NETWORK'
+<EOS>
+b'As in Liu et al.'
+<EOS>
+b'(2016), our MDQN uses separate replay memories for each task and'
+<EOS>
+b'the batch\nused in each training step is built picking the same number of samples from each replay memory.'
+<EOS>
+b'Furthermore, a step of the algorithm consists of exactly one step in each task.'
+<EOS>
+b'These are the only\nminor changes to the vanilla DQN algorithm we introduce, while all other aspects, such as the use of\nthe target network, are not modi\xef\xac\x81ed.'
+<EOS>
+b'Thus, the time complexity of MDQN is considerably lower than\nvanilla DQN'
+<EOS>
+b'thanks to the learning of T tasks with a single model, but at the cost of a higher memory\ncomplexity for the collection of samples for each task.'
+<EOS>
+b'We consider \xef\xac\x81ve problems with similar\nstate spaces, sparse rewards and discrete actions: Cart-Pole, Acrobot, Mountain-Car, Car-On-Hill,\nand Inverted-Pendulum.'
+<EOS>
+b'The implementation of the \xef\xac\x81rst three problems is the one provided by the\nOpenAI Gym library Brockman et al.'
+<EOS>
+b'(2016), while Car-On-Hill is described in Ernst et al.'
+<EOS>
+b'(2005)'
+<EOS>
+b'and Inverted-Pendulum in Lagoudakis & Parr (2003).'
+<EOS>
+b'Figure 2(a)'
+<EOS>
+b'shows the performance of MDQN w.r.t. to vanilla DQN that uses a single-task network\nstructured as the multi-task one in the case with T'
+<EOS>
+b'= 1.'
+<EOS>
+b'The \xef\xac\x81rst three plots from the left show good\nperformance of MDQN, which is both higher and more stable than DQN.'
+<EOS>
+b'In Car-On-Hill, MDQN is\nslightly slower than DQN to reach the best performance, but eventually manages to be more stable.'
+<EOS>
+b'Finally, the Inverted-Pendulum experiment is clearly too easy to solve for both approaches, but it is\nstill useful for the shared feature extraction in MDQN.'
+<EOS>
+b'The described results provide important hints\nabout the better quality of the features extracted by MDQN w.r.t. DQN.'
+<EOS>
+b'To further demonstrate this,\nwe evaluate the performance of DQN on Acrobot, arguably the hardest of the \xef\xac\x81ve problems, using\na single-task network with the shared parameters in h initialized with the weights of a multi-task\n\n7'
+<EOS>
+b'02550#Epochs20406080PerformanceCart'
+<EOS>
+b'-Pole02550#Epochs10090807060Acrobot02550#Epochs10095908580757065Mountain-Car02550#Epochs0.00.10.20.30.4Car-On-Hill02550#Epochs0.60.40.20.0Inverted-PendulumDQNMULTI02550#Epochs10090807060PerformanceAcrobotNo initializationUnfreeze-0Unfreeze-10No unfreeze'
+<EOS>
+b'Published as a conference paper at ICLR 2020'
+<EOS>
+b'(a) Multi-task for pendulums'
+<EOS>
+b'(b) Transfer for pendulums'
+<EOS>
+b'(c) Multi-task for walkers'
+<EOS>
+b'(d) Transfer for walkers'
+<EOS>
+b'Figure 3:'
+<EOS>
+b'Discounted cumulative reward averaged over 40 experiments of DDPG and MDDPG for\neach task and for transfer learning in the Inverted-Double-Pendulum and Hopper problems.'
+<EOS>
+b'An\nepoch consists of 10, 000 steps, after which the greedy policy is evaluated for 5, 000 steps.'
+<EOS>
+b'The 95%\ncon\xef\xac\x81dence intervals are shown.'
+<EOS>
+b'network trained with MDQN on the other four problems.'
+<EOS>
+b'Arbitrarily, the pre-trained weights can be\nadjusted during the learning of the new task or can be kept \xef\xac\x81xed and'
+<EOS>
+b'only the remaining randomly\ninitialized parameters in w and f are trained.'
+<EOS>
+b'From Figure 2(b), the advantages of initializing the\nweights are clear.'
+<EOS>
+b'In particular, we compare the performance of DQN without initialization'
+<EOS>
+b'w.r.t.'
+<EOS>
+b'DQN with initialization in three settings'
+<EOS>
+b': in Unfreeze-0 the initialized weights are adjusted, in No-'
+<EOS>
+b'Unfreeze they are kept \xef\xac\x81xed, and in Unfreeze-10 they are kept \xef\xac\x81xed until epoch 10 after which they\nstart to be optimized.'
+<EOS>
+b'Interestingly, keeping the shared weights \xef\xac\x81xed shows a signi\xef\xac\x81cant performance\nimprovement in the earliest epochs, but ceases to improve soon.'
+<EOS>
+b'On the other hand, the adjustment of\nweights from the earliest epochs shows improvements only compared to the uninitialized network\nin the intermediate stages of learning.'
+<EOS>
+b'The best results are achieved by starting to adjust the shared\nweights after epoch 10, which is approximately the point at which the improvement given by the\n\xef\xac\x81xed initialization starts to lessen.'
+<EOS>
+b'5.3 MULTI DEEP DETERMINISTIC POLICY GRADIENT'
+<EOS>
+b'In order to show how the \xef\xac\x82exibility of our approach easily allows to perform MTRL in policy search'
+<EOS>
+b'algorithms, we propose MDDPG as a multi-task variant of DDPG.'
+<EOS>
+b'As an actor-critic method, DDPG\nrequires an actor network and a critic network.'
+<EOS>
+b'Intuitively, to obtain MDDPG both the actor and critic'
+<EOS>
+b'networks should be built following our proposed structure.'
+<EOS>
+b'We perform separate experiments on two\nsets of MuJoCo'
+<EOS>
+b'Todorov'
+<EOS>
+b'et al.'
+<EOS>
+b'(2012) problems with similar continuous state and action spaces:'
+<EOS>
+b'the\n\xef\xac\x81rst set includes Inverted-Pendulum, Inverted-Double-Pendulum, and Inverted-Pendulum-Swingup as\nimplemented in the pybullet library, whereas the second set includes Hopper-Stand, Walker-Walk,\nand Half-Cheetah-Run as implemented in the DeepMind Control SuiteTassa et al.'
+<EOS>
+b'(2018).'
+<EOS>
+b'Figure 3(a)\nshows a relevant improvement of MDDPG w.r.t. DDPG in the pendulum tasks.'
+<EOS>
+b'Indeed, while in\nInverted-Pendulum, which is the easiest problem among the three, the performance of MDDPG is\nonly slightly better than DDPG, the difference in the other two problems is signi\xef\xac\x81cant.'
+<EOS>
+b'The advantage\nof MDDPG is con\xef\xac\x81rmed in Figure 3(c) where it performs better than DDPG in Hopper and equally\ngood in the other two tasks.'
+<EOS>
+b'Again, we perform a TL evaluation of DDPG in the problems where\nit suffers the most, by initializing the shared weights of a single-task network with the ones of a\nmulti-task network trained with MDDPG on the other problems.'
+<EOS>
+b'Figures 3(b) and 3(d) show evident\nadvantages of pre-training the shared weights and a signi\xef\xac\x81cant difference between keeping them \xef\xac\x81xed\nor not.'
+<EOS>
+b'8\n\n050100#Epochs2030405060708090100PerformanceInverted'
+<EOS>
+b'-PendulumDDPGMULTI050100#Epochs100200300400500600700800Inverted-Double-Pendulum050100#Epochs100806040200Inverted-Pendulum-Swingup050100#Epochs200400600800PerformanceInverted-Double-PendulumNo initializationUnfreeze-0No unfreeze050100#Epochs05101520253035PerformanceHopper050100#Epochs010203040506070Walker050100#Epochs0510152025303540Half-CheetahDDPGMULTI050100#Epochs010203040PerformanceHopperNo'
+<EOS>
+b'initializationUnfreeze-0No unfreeze\x0cPublished as a conference paper at ICLR 2020'
+<EOS>
+b'6 RELATED WORKS'
+<EOS>
+b'Our work is inspired from both theoretical and empirical studies in MTL and MTRL literature.'
+<EOS>
+b'In\nparticular, the theoretical analysis we provide follows previous results about the theoretical properties\nof multi-task algorithms.'
+<EOS>
+b'For instance, Cavallanti et al. (2010) and Maurer (2006) prove the theoretical\nadvantages of MTL based on linear approximation.'
+<EOS>
+b'More in detail, Maurer (2006) derives bounds on\nMTL when a linear approximator is used to extract a shared representation among tasks.'
+<EOS>
+b'Then, Maurer\net al.'
+<EOS>
+b'(2016), which we considered in this work, describes similar results that extend to the use of\nnon-linear approximators.'
+<EOS>
+b'Similar studies have been conducted in the context of MTRL.'
+<EOS>
+b'Among the\nothers, Lazaric & Restelli (2011) and Brunskill & Li (2013) give theoretical proofs of the advantage\nof learning from multiple MDPs and introduces new algorithms to empirically support their claims,\nas done in this work.'
+<EOS>
+b'Generally, contributions in MTRL assume that properties of different tasks, e.g. dynamics and reward\nfunction, are generated from a common generative model.'
+<EOS>
+b'About this, interesting analyses consider\nBayesian approaches; for instance Wilson et al.'
+<EOS>
+b'(2007) assumes that the tasks are generated from a\nhierarchical Bayesian model, and likewise Lazaric & Ghavamzadeh (2010) considers the case when\nthe value functions are generated from a common prior distribution.'
+<EOS>
+b'Similar considerations, which\nhowever does not use a Bayesian approach, are implicitly made in Taylor et al.'
+<EOS>
+b'(2007), Lazaric et al.'
+<EOS>
+b'(2008), and also in this work.'
+<EOS>
+b'In recent years, the advantages of MTRL have been empirically evinced also in DRL, especially\nexploiting the powerful representational capacity of deep neural networks.'
+<EOS>
+b'For instance, Parisotto\net al.'
+<EOS>
+b'(2015) and Rusu et al.'
+<EOS>
+b'(2015) propose to derive a multi-task policy from the policies learned by\nDQN experts trained separately on different tasks.'
+<EOS>
+b'Rusu et al.'
+<EOS>
+b'(2015) compares to a therein introduced\nvariant of DQN, which is very similar to our MDQN and the one in Liu et al.'
+<EOS>
+b'(2016), showing how\ntheir method overcomes it in the Atari benchmark Bellemare et al.'
+<EOS>
+b'(2013).'
+<EOS>
+b'Further developments,\nextend the analysis to policy search'
+<EOS>
+b'(Yang et al., 2017;'
+<EOS>
+b'Teh et al., 2017), and to multi-goal RL'
+<EOS>
+b'(Schaul'
+<EOS>
+b'et al., 2015;'
+<EOS>
+b'Andrychowicz et al., 2017).'
+<EOS>
+b'Finally, Hessel et al.'
+<EOS>
+b'(2018) addresses the problem of\nbalancing the learning of multiple tasks with a single deep neural network proposing a method that\nuniformly adapts the impact of each task on the training updates of the agent.'
+<EOS>
+b'7 CONCLUSION'
+<EOS>
+b'We have theoretically proved the advantage in RL of using a shared representation to learn multiple\ntasks'
+<EOS>
+b'w.r.t.'
+<EOS>
+b'learning a single task.'
+<EOS>
+b'We have derived our results extending the AVI/API bounds (Farah-\nmand, 2011) to MTRL, leveraging the upper bounds on the approximation error in MTL provided\nin Maurer et al.'
+<EOS>
+b'(2016).'
+<EOS>
+b'The results of this analysis show that the error propagation during the\nAVI/API iterations is reduced according to the number of tasks.'
+<EOS>
+b'Then, we proposed a practical way of\nexploiting this theoretical bene\xef\xac\x81t which consists in an effective way of extracting shared representa-'
+<EOS>
+b'tions of multiple tasks by means of deep neural networks.'
+<EOS>
+b'To empirically show the advantages of our\nmethod, we carried out experiments on challenging RL problems with the introduction of multi-task\nextensions of FQI, DQN, and DDPG based on the neural network structure we proposed.'
+<EOS>
+b'As desired,\nthe favorable empirical results con\xef\xac\x81rm the theoretical bene\xef\xac\x81t we described.'
+<EOS>
+b'9'
+<EOS>
+b'Published as a conference paper at ICLR 2020'
+<EOS>
+b'ACKNOWLEDGMENTS'
+<EOS>
+b'This project has received funding from the European Union\xe2\x80\x99s Horizon 2020'
+<EOS>
+b'research and innovation\nprogramme under grant agreement'
+<EOS>
+b'No.'
+<EOS>
+b'#640554 (SKILLS4ROBOTS) and No. #713010 (GOAL-\nRobots).'
+<EOS>
+b'This project has also been supported by grants from NVIDIA, the NVIDIA DGX Station,\nand the Intel R(cid:13) AI DevCloud.'
+<EOS>
+b'The authors thank Alberto Maria Metelli, Andrea Tirinzoni and Matteo\nPapini for their helpful insights during the development of the project.'
+<EOS>
+b'REFERENCES'
+<EOS>
+b'Marcin Andrychowicz, Filip Wolski, Alex Ray, Jonas Schneider, Rachel Fong, Peter Welinder, Bob\nMcGrew, Josh Tobin, OpenAI Pieter Abbeel, and Wojciech Zaremba.'
+<EOS>
+b'Hindsight experience replay.'
+<EOS>
+b'In Advances in Neural Information Processing Systems, pp.'
+<EOS>
+b'5048\xe2\x80\x935058, 2017.'
+<EOS>
+b'Jonathan Baxter.'
+<EOS>
+b'A model of inductive bias learning.'
+<EOS>
+b'Journal of Arti\xef\xac\x81cial Intelligence Research, 12:\n\n149\xe2\x80\x93198, 2000.'
+<EOS>
+b'Marc G Bellemare, Yavar Naddaf, Joel Veness, and Michael Bowling.'
+<EOS>
+b'The arcade learning environ-\nment:'
+<EOS>
+b'An evaluation platform for general agents.'
+<EOS>
+b'Journal of Arti\xef\xac\x81cial Intelligence Research, 47:\n253\xe2\x80\x93279, 2013.'
+<EOS>
+b'Richard Bellman.'
+<EOS>
+b'The theory of dynamic programming.'
+<EOS>
+b'Technical report, RAND Corp Santa Monica\n\nCA, 1954.'
+<EOS>
+b'Greg Brockman, Vicki Cheung, Ludwig Pettersson, Jonas Schneider, John Schulman, Jie Tang, and\n\nWojciech Zaremba.'
+<EOS>
+b'Openai gym, 2016.'
+<EOS>
+b'Emma Brunskill and Lihong Li.'
+<EOS>
+b'Sample complexity of multi-task reinforcement learning.'
+<EOS>
+b'Proceedings of the Twenty-Ninth Conference on Uncertainty in Arti\xef\xac\x81cial Intelligence, 2013.'
+<EOS>
+b'In\n\nRich Caruana.'
+<EOS>
+b'Multitask learning.'
+<EOS>
+b'Machine learning, 28(1):41\xe2\x80\x9375, 1997.'
+<EOS>
+b'Giovanni Cavallanti, Nicolo Cesa-Bianchi, and Claudio Gentile.'
+<EOS>
+b'Linear algorithms for online\n\nmultitask classi\xef\xac\x81cation.'
+<EOS>
+b'Journal of Machine Learning Research, 11(Oct):2901\xe2\x80\x932934, 2010.'
+<EOS>
+b'Carlo D\xe2\x80\x99Eramo, Davide Tateo, Andrea Bonarini, Marcello Restelli, and Jan Peters.'
+<EOS>
+b'Mushroomrl:'
+<EOS>
+b'Simplifying reinforcement learning research.'
+<EOS>
+b'arXiv:2001.01102, 2020.'
+<EOS>
+b'Damien Ernst, Pierre Geurts, and Louis Wehenkel.'
+<EOS>
+b'Tree-based batch mode reinforcement learning.'
+<EOS>
+b'Journal of Machine Learning Research, 6(Apr):503\xe2\x80\x93556, 2005.'
+<EOS>
+b'Amir-massoud Farahmand.'
+<EOS>
+b'Regularization in reinforcement learning.'
+<EOS>
+b'2011.'
+<EOS>
+b'Matteo Hessel, Hubert Soyer, Lasse Espeholt, Wojciech Czarnecki, Simon Schmitt, and Hado van'
+<EOS>
+b'Hasselt.'
+<EOS>
+b'Multi-task deep reinforcement learning with popart.'
+<EOS>
+b'arXiv:1809.04474, 2018.'
+<EOS>
+b'Irina Higgins, Arka Pal, Andrei Rusu, Loic Matthey, Christopher Burgess, Alexander Pritzel, Matthew\nBotvinick, Charles Blundell, and Alexander Lerchner.'
+<EOS>
+b'Darla: Improving zero-shot transfer in\nreinforcement learning.'
+<EOS>
+b'In International Conference on Machine Learning, pp. 1480\xe2\x80\x931490, 2017.'
+<EOS>
+b'Michail G Lagoudakis and Ronald Parr.'
+<EOS>
+b'Least-squares policy iteration.'
+<EOS>
+b'Journal of machine learning\n\nresearch, 4(Dec):1107\xe2\x80\x931149, 2003.'
+<EOS>
+b'Alessandro Lazaric.'
+<EOS>
+b'Transfer in reinforcement learning:'
+<EOS>
+b'a framework and a survey.'
+<EOS>
+b'In Reinforcement\n\nLearning, pp.'
+<EOS>
+b'143\xe2\x80\x93173.'
+<EOS>
+b'Springer, 2012.'
+<EOS>
+b'Alessandro Lazaric and Mohammad Ghavamzadeh.'
+<EOS>
+b'Bayesian multi-task reinforcement learning.'
+<EOS>
+b'In\n\nICML-27th International Conference on Machine Learning, pp. 599\xe2\x80\x93606.'
+<EOS>
+b'Omnipress, 2010.'
+<EOS>
+b'Alessandro Lazaric and Marcello Restelli.'
+<EOS>
+b'Transfer from multiple mdps.'
+<EOS>
+b'In Advances in Neural\n\nInformation Processing Systems, pp. 1746\xe2\x80\x931754, 2011.'
+<EOS>
+b'Alessandro Lazaric, Marcello Restelli, and Andrea Bonarini.'
+<EOS>
+b'Transfer of samples in batch rein-'
+<EOS>
+b'forcement learning.'
+<EOS>
+b'In Proceedings of the 25th international conference on Machine learning, pp.\n544\xe2\x80\x93551.'
+<EOS>
+b'ACM, 2008.'
+<EOS>
+b'10'
+<EOS>
+b'Published as a conference paper at ICLR 2020'
+<EOS>
+b'Timothy P Lillicrap, Jonathan J Hunt, Alexander Pritzel, Nicolas Heess, Tom Erez, Yuval Tassa,\nDavid Silver, and Daan Wierstra.'
+<EOS>
+b'Continuous control with deep reinforcement learning.'
+<EOS>
+b'arXiv\npreprint'
+<EOS>
+b'arXiv:1509.02971, 2015.'
+<EOS>
+b'Lydia Liu, Urun Dogan, and Katja Hofmann.'
+<EOS>
+b'Decoding multitask dqn in the world of minecraft.'
+<EOS>
+b'In\n\nEuropean Workshop on Reinforcement Learning, 2016.'
+<EOS>
+b'Andreas Maurer.'
+<EOS>
+b'Bounds for linear multi-task learning.'
+<EOS>
+b'Journal of Machine Learning Research, 7'
+<EOS>
+b'(Jan):117\xe2\x80\x93139, 2006.'
+<EOS>
+b'Science, 650:109\xe2\x80\x93122, 2016.'
+<EOS>
+b'Andreas Maurer.'
+<EOS>
+b'A chain rule for the expected suprema of gaussian processes.'
+<EOS>
+b'Theoretical Computer'
+<EOS>
+b'Andreas Maurer, Massimiliano Pontil, and Bernardino Romera-Paredes.'
+<EOS>
+b'The bene\xef\xac\x81t of multitask\n\nrepresentation learning.'
+<EOS>
+b'The Journal of Machine Learning Research, 17(1):2853\xe2\x80\x932884, 2016.'
+<EOS>
+b'Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Andrei A Rusu, Joel Veness, Marc G Bellemare,\nAlex Graves, Martin Riedmiller, Andreas K Fidjeland, Georg Ostrovski, et al.'
+<EOS>
+b'Human-level control\nthrough deep reinforcement learning.'
+<EOS>
+b'Nature, 518(7540):529, 2015.'
+<EOS>
+b'Ian Osband, Charles Blundell, Alexander Pritzel, and Benjamin Van Roy.'
+<EOS>
+b'Deep exploration via\nbootstrapped dqn.'
+<EOS>
+b'In Advances in neural information processing systems, pp.'
+<EOS>
+b'4026\xe2\x80\x934034, 2016.'
+<EOS>
+b'Emilio Parisotto, Jimmy Lei Ba, and Ruslan Salakhutdinov.'
+<EOS>
+b'Actor-mimic:'
+<EOS>
+b'Deep multitask and\n\ntransfer reinforcement learning.'
+<EOS>
+b'arXiv preprint arXiv:1511.06342, 2015.'
+<EOS>
+b'Martin Riedmiller.'
+<EOS>
+b'Neural \xef\xac\x81tted q'
+<EOS>
+b'iteration\xe2\x80\x93\xef\xac\x81rst experiences with a data ef\xef\xac\x81cient neural reinforcement\n\nlearning method.'
+<EOS>
+b'In European Conference on Machine Learning, pp. 317\xe2\x80\x93328.'
+<EOS>
+b'Springer, 2005.'
+<EOS>
+b'Andrei'
+<EOS>
+b'A Rusu, Sergio Gomez Colmenarejo, Caglar Gulcehre, Guillaume Desjardins, James Kirk-\npatrick, Razvan Pascanu, Volodymyr Mnih, Koray Kavukcuoglu, and Raia Hadsell.'
+<EOS>
+b'Policy\ndistillation.'
+<EOS>
+b'arXiv preprint arXiv:1511.06295, 2015.'
+<EOS>
+b'Tom Schaul, Daniel Horgan, Karol Gregor, and David Silver.'
+<EOS>
+b'Universal value function approximators.'
+<EOS>
+b'In International Conference on Machine Learning, pp. 1312\xe2\x80\x931320, 2015.'
+<EOS>
+b'Yuval Tassa, Yotam Doron, Alistair Muldal, Tom Erez, Yazhe Li, Diego de Las Casas, David Budden,'
+<EOS>
+b'Abbas Abdolmaleki, Josh Merel, Andrew Lefrancq, Timothy P. Lillicrap, and Martin A. Riedmiller.'
+<EOS>
+b'Deepmind control suite.'
+<EOS>
+b'CoRR, abs/1801.00690, 2018.'
+<EOS>
+b'Matthew E Taylor and Peter Stone.'
+<EOS>
+b'Transfer learning for reinforcement learning domains:'
+<EOS>
+b'A survey.'
+<EOS>
+b'Journal of Machine Learning Research, 10(Jul):1633\xe2\x80\x931685, 2009.'
+<EOS>
+b'Matthew E Taylor, Peter Stone, and Yaxin Liu.'
+<EOS>
+b'Transfer learning via inter-task mappings for temporal\n\ndifference learning.'
+<EOS>
+b'Journal of Machine Learning Research, 8(Sep):2125\xe2\x80\x932167, 2007.'
+<EOS>
+b'Yee Teh, Victor Bapst, Wojciech M Czarnecki, John Quan, James Kirkpatrick, Raia Hadsell, Nicolas'
+<EOS>
+b'Heess, and Razvan Pascanu.'
+<EOS>
+b'Distral:'
+<EOS>
+b'Robust multitask reinforcement learning.'
+<EOS>
+b'In Advances in\nNeural Information Processing Systems, pp. 4496\xe2\x80\x934506, 2017.'
+<EOS>
+b'Sebastian Thrun and Lorien Pratt.'
+<EOS>
+b'Learning to learn.'
+<EOS>
+b'Springer Science & Business Media, 2012.'
+<EOS>
+b'Emanuel Todorov, Tom Erez, and Yuval Tassa.'
+<EOS>
+b'Mujoco:'
+<EOS>
+b'A physics engine for model-based control.'
+<EOS>
+b'In 2012 IEEE/RSJ International Conference on Intelligent Robots and Systems.'
+<EOS>
+b'IEEE, 2012.'
+<EOS>
+b'Aaron Wilson, Alan Fern, Soumya Ray, and Prasad Tadepalli.'
+<EOS>
+b'Multi-task reinforcement learning: a\nhierarchical bayesian approach.'
+<EOS>
+b'In Proceedings of the 24th international conference on Machine\nlearning, pp. 1015\xe2\x80\x931022.'
+<EOS>
+b'ACM, 2007.'
+<EOS>
+b'Markus Wulfmeier, Abbas Abdolmaleki, Roland Hafner, Jost Tobias Springenberg, Michael Neunert,'
+<EOS>
+b'Tim Hertweck, Thomas Lampe, Noah Siegel, Nicolas Heess, and Martin Riedmiller.'
+<EOS>
+b'Regularized\nhierarchical policies for compositional transfer in robotics.'
+<EOS>
+b'arXiv:1906.11228, 2019.'
+<EOS>
+b'Zhaoyang Yang, Kathryn E Merrick, Hussein A Abbass, and Lianwen Jin.'
+<EOS>
+b'Multi-task deep reinforce-'
+<EOS>
+b'ment learning for continuous action control.'
+<EOS>
+b'In IJCAI, pp. 3301\xe2\x80\x933307, 2017.'
+<EOS>
+b'11'
+<EOS>
+b'Published as a conference paper at ICLR 2020'
+<EOS>
+b'A PROOFS\n\nA.1 APPROXIMATED VALUE-ITERATION BOUNDS\n\nProof of Theorem 2.'
+<EOS>
+b'We compute the average expected loss across tasks:\n\n1'
+<EOS>
+b'T\n\nT\n(cid:88)'
+<EOS>
+b't=1'
+<EOS>
+b'(cid:107)Q\xe2\x88\x97'
+<EOS>
+b't \xe2\x88\x92'
+<EOS>
+b'Q\xcf\x80K'
+<EOS>
+b't ('
+<EOS>
+b'cid:107)1,\xcf\x81\n\n1'
+<EOS>
+b'T\n\nT\n(cid:88)'
+<EOS>
+b't=1'
+<EOS>
+b'2\xce\xb3'
+<EOS>
+b'(1 \xe2\x88\x92'
+<EOS>
+b'\xce\xb3)2'
+<EOS>
+b'(1 \xe2\x88\x92'
+<EOS>
+b'\xce\xb3)2'
+<EOS>
+b'(1 \xe2\x88\x92'
+<EOS>
+b'\xce\xb3)2'
+<EOS>
+b'2\xce\xb3'
+<EOS>
+b'2\xce\xb3'
+<EOS>
+b'2\xce\xb3'
+<EOS>
+b'\xe2\x89\xa4'
+<EOS>
+b'\xe2\x89\xa4'
+<EOS>
+b'\xe2\x89\xa4'
+<EOS>
+b'\xe2\x89\xa4\n\n\xe2\x89\xa4'
+<EOS>
+b'2\xce\xb3t'
+<EOS>
+b'(cid:20)\n\n(1 \xe2\x88\x92 \xce\xb3t)2'
+<EOS>
+b'inf\n\nr\xe2\x88\x88[0,1]'
+<EOS>
+b'T\n(cid:88)'
+<EOS>
+b'(cid:20)'
+<EOS>
+b't=1'
+<EOS>
+b'inf\n\nr\xe2\x88\x88[0,1]'
+<EOS>
+b'1'
+<EOS>
+b'T\n\nT\n(cid:88)'
+<EOS>
+b'(cid:18)'
+<EOS>
+b't=1'
+<EOS>
+b'inf\n\nr\xe2\x88\x88[0,1]'
+<EOS>
+b'1'
+<EOS>
+b'T\n\ninf\n\nr\xe2\x88\x88[0,1]'
+<EOS>
+b'T\n(cid:88)'
+<EOS>
+b'(cid:16)'
+<EOS>
+b't=1'
+<EOS>
+b'1'
+<EOS>
+b'T'
+<EOS>
+b'(cid:34)'
+<EOS>
+b'(cid:34)'
+<EOS>
+b'(cid:34)'
+<EOS>
+b'1'
+<EOS>
+b'2'
+<EOS>
+b'1'
+<EOS>
+b'2'
+<EOS>
+b'1'
+<EOS>
+b'2'
+<EOS>
+b'1'
+<EOS>
+b'2'
+<EOS>
+b'1'
+<EOS>
+b'T'
+<EOS>
+b'C'
+<EOS>
+b'VI,\xcf\x81,\xce\xbd(K; t, r)E\n\n2 (\xce\xb5t,0, . . .'
+<EOS>
+b', \xce\xb5t,K\xe2\x88\x921; t, r) +\n\nC\n\nVI,\xcf\x81,\xce\xbd(K'
+<EOS>
+b'; t, r)E\n\n2 (\xce\xb5t,0, . . . , \xce\xb5t,K\xe2\x88\x921; t, r) +'
+<EOS>
+b'C'
+<EOS>
+b'VI,\xcf\x81,\xce\xbd(K; t, r)E\n\n2 (\xce\xb5t,0, . . .'
+<EOS>
+b', \xce\xb5t,K\xe2\x88\x921; t, r)\n\n+\n\nC\n\nVI,\xcf\x81,\xce\xbd(K; t, r)E\n\n2 (\xce\xb5t,0, . . . , \xce\xb5t,K\xe2\x88\x921; t, r)\n\n+\n\n1\n\n1\n\n1\n\n1\n\n2'
+<EOS>
+b'1 \xe2\x88\x92 \xce\xb3t\n\n\xce\xb3K'
+<EOS>
+b't Rmax,t'
+<EOS>
+b'2'
+<EOS>
+b'1 \xe2\x88\x92 \xce\xb3t\n\n\xce\xb3K'
+<EOS>
+b't Rmax,t'
+<EOS>
+b'(cid:21)'
+<EOS>
+b'(cid:21)'
+<EOS>
+b'(cid:19)\n\n2'
+<EOS>
+b'1'
+<EOS>
+b'\xe2\x88\x92'
+<EOS>
+b'\xce\xb3'
+<EOS>
+b'\xce\xb3KRmax,avg'
+<EOS>
+b'(cid:17)\n\n2'
+<EOS>
+b'1'
+<EOS>
+b'\xe2\x88\x92'
+<EOS>
+b'\xce\xb3'
+<EOS>
+b'\xce\xb3KRmax,avg'
+<EOS>
+b'(cid:35)'
+<EOS>
+b'(cid:35)'
+<EOS>
+b'(cid:35)'
+<EOS>
+b'(1 \xe2\x88\x92'
+<EOS>
+b'\xce\xb3)2'
+<EOS>
+b'inf\n\nr\xe2\x88\x88[0,1]\n\n1'
+<EOS>
+b'2'
+<EOS>
+b'C'
+<EOS>
+b'VI(K; r)'
+<EOS>
+b'T\n(cid:88)'
+<EOS>
+b'(cid:16)\n\n1'
+<EOS>
+b't=1'
+<EOS>
+b'E\n\n2'
+<EOS>
+b'(\xce\xb5t,0, . . . , \xce\xb5t,K\xe2\x88\x921; t, r)\n\n+\n\n\xce\xb3KRmax,avg\n\n(11)'
+<EOS>
+b'(cid:17)\n\n2'
+<EOS>
+b'1 \xe2\x88\x92'
+<EOS>
+b'\xce\xb3'
+<EOS>
+b'with \xce\xb3 = max\n\n\xce\xb3t, C\n\nVI(K; r) ='
+<EOS>
+b'max'
+<EOS>
+b't\xe2\x88\x88{1,...,T }'
+<EOS>
+b't\xe2\x88\x88{1,...'
+<EOS>
+b',T }\n\n1'
+<EOS>
+b'2'
+<EOS>
+b'1'
+<EOS>
+b'2'
+<EOS>
+b'VI,\xcf\x81,\xce\xbd(K; t, r), and Rmax,avg = 1'
+<EOS>
+b'/T (cid:80)T'
+<EOS>
+b'C'
+<EOS>
+b't=1 Rmax,t.'
+<EOS>
+b'Considering the term 1/T (cid:80)T'
+<EOS>
+b'(cid:104)'
+<EOS>
+b'E 1'
+<EOS>
+b't=1\n\n2'
+<EOS>
+b'(\xce\xb5t,0, . . . , \xce\xb5t,K\xe2\x88\x921; t, r)'
+<EOS>
+b'(cid:105)'
+<EOS>
+b'='
+<EOS>
+b'1/T ('
+<EOS>
+b'cid:80)T'
+<EOS>
+b't=1'
+<EOS>
+b'(cid:16)(cid:80)K\xe2\x88\x921'
+<EOS>
+b'k=0'
+<EOS>
+b'\xce\xb12r\n\nt,k\xce\xb5t,k'
+<EOS>
+b'(cid:17) 1'
+<EOS>
+b'2'
+<EOS>
+b'let\n\n\xce\xb1k ='
+<EOS>
+b'(cid:40)'
+<EOS>
+b'(1\xe2\x88\x92\xce\xb3)\xce\xb3K\xe2\x88\x92k\xe2\x88\x921'
+<EOS>
+b'1\xe2\x88\x92\xce\xb3K+1'
+<EOS>
+b'(1\xe2\x88\x92\xce\xb3)\xce\xb3K'
+<EOS>
+b'1\xe2\x88\x92\xce\xb3K+1'
+<EOS>
+b'0 \xe2\x89\xa4 k < K,\n\n,\n\nk'
+<EOS>
+b'= K\n\nT\n(cid:88)'
+<EOS>
+b'(cid:32)K\xe2\x88\x921\n(cid:88)'
+<EOS>
+b't=1'
+<EOS>
+b'k=0'
+<EOS>
+b'\xce\xb12r\n\nt,k\xce\xb5t,k\n\n(cid:33)'
+<EOS>
+b'1'
+<EOS>
+b'2'
+<EOS>
+b'\xe2\x89\xa4'
+<EOS>
+b'1'
+<EOS>
+b'T\n\nT\n(cid:88)'
+<EOS>
+b'(cid:32)K\xe2\x88\x921\n(cid:88)'
+<EOS>
+b't=1'
+<EOS>
+b'k=0'
+<EOS>
+b'(cid:33) 1'
+<EOS>
+b'2'
+<EOS>
+b'\xce\xb12r'
+<EOS>
+b'k \xce\xb5t,k\n\n.'
+<EOS>
+b'T\n(cid:88)'
+<EOS>
+b'(cid:32)K\xe2\x88\x921\n(cid:88)'
+<EOS>
+b't=1'
+<EOS>
+b'k=0'
+<EOS>
+b'(cid:33) 1'
+<EOS>
+b'2'
+<EOS>
+b'\xce\xb12r'
+<EOS>
+b'k \xce\xb5t,k\n\n\xe2\x89\xa4'
+<EOS>
+b'(cid:32)K\xe2\x88\x921\n(cid:88)'
+<EOS>
+b'k=0'
+<EOS>
+b'\xce\xb12r'
+<EOS>
+b'k\n\n1'
+<EOS>
+b'T\n\nT\n(cid:88)'
+<EOS>
+b't=1'
+<EOS>
+b'(cid:33) 1'
+<EOS>
+b'2'
+<EOS>
+b'\xce\xb5t,k\n\n.'
+<EOS>
+b'then we bound'
+<EOS>
+b'Using Jensen'
+<EOS>
+b'\xe2\x80\x99s inequality:\n\n1'
+<EOS>
+b'T\n\n1'
+<EOS>
+b'T'
+<EOS>
+b'So, now we can write (11) as\n\n1'
+<EOS>
+b'T\n\nT\n(cid:88)'
+<EOS>
+b't=1'
+<EOS>
+b'(cid:107)Q\xe2\x88\x97'
+<EOS>
+b't \xe2\x88\x92'
+<EOS>
+b'Q\xcf\x80K'
+<EOS>
+b't (cid:107)1,\xcf\x81 \xe2\x89\xa4'
+<EOS>
+b'2\xce\xb3'
+<EOS>
+b'(cid:20)'
+<EOS>
+b'(1 \xe2\x88\x92'
+<EOS>
+b'\xce\xb3)2'
+<EOS>
+b'1'
+<EOS>
+b'2'
+<EOS>
+b'inf\n\nr\xe2\x88\x88[0,1]'
+<EOS>
+b'C\n\nVI(K;'
+<EOS>
+b'r)E'
+<EOS>
+b'avg(\xce\xb5avg,0, . . . , \xce\xb5avg,K\xe2\x88\x921; r)\n\n1\n2\n\n(cid:21)\n\n2'
+<EOS>
+b'+'
+<EOS>
+b'1 \xe2\x88\x92'
+<EOS>
+b'\xce\xb3'
+<EOS>
+b'\xce\xb3KRmax,avg\n\n,\n\nwith \xce\xb5avg,k = 1'
+<EOS>
+b'/T (cid:80)T'
+<EOS>
+b't=1 \xce\xb5t,k and Eavg(\xce\xb5avg,0, . . .'
+<EOS>
+b', \xce\xb5avg,K\xe2\x88\x921; r) ='
+<EOS>
+b'(cid:80)K\xe2\x88\x921'
+<EOS>
+b'k=0 \xce\xb12r'
+<EOS>
+b'k \xce\xb5avg,k.'
+<EOS>
+b'Proof of Lemma 4.'
+<EOS>
+b'Let us start from the de\xef\xac\x81nition of optimal task-averaged risk:\n\n\xce\xb5\xe2\x88\x97'
+<EOS>
+b'avg,k ='
+<EOS>
+b'(cid:107)Q\xe2\x88\x97\n\nt,k+1 \xe2\x88\x92 T \xe2\x88\x97\n\nt Qt,k(cid:107)2\n\xce\xbd,\n\n1'
+<EOS>
+b'T\n\nT\n(cid:88)'
+<EOS>
+b't=1'
+<EOS>
+b'12'
+<EOS>
+b'Published as a conference paper at ICLR 2020'
+<EOS>
+b'where Q\xe2\x88\x97\n\nt,k, with t \xe2\x88\x88'
+<EOS>
+b'[1, T ], are the minimizers of \xce\xb5avg,k.'
+<EOS>
+b'Consider the task \xcb\x87t'
+<EOS>
+b'such that\n\nwe can write the following inequality:\n\n\xcb\x87tk ='
+<EOS>
+b'arg'
+<EOS>
+b'max'
+<EOS>
+b'(cid:107)Q\xe2\x88\x97\n\nt,k+1 \xe2\x88\x92 T \xe2\x88\x97\n\nt Qt,k(cid:107)2\n\xce\xbd,'
+<EOS>
+b't\xe2\x88\x88{1,...,T }\n\n(cid:113)'
+<EOS>
+b'avg,k \xe2\x89\xa4'
+<EOS>
+b'(cid:107)Q\xe2\x88\x97\n\xce\xb5\xe2\x88\x97'
+<EOS>
+b'\xcb\x87tk,k+1 \xe2\x88\x92 T \xe2\x88\x97\n\n\xcb\x87t Q\xcb\x87tk,k(cid:107)\xce\xbd.'
+<EOS>
+b'By the application of Theorem 5.3 by Farahmand (2011) to the right hand side, and de\xef\xac\x81ning\nbk,i = (cid:107)Q\xcb\x87tk,i+1 \xe2\x88\x92 T \xe2\x88\x97\n\n\xcb\x87t Q\xcb\x87tk,i(cid:107)\xce\xbd, we obtain:'
+<EOS>
+b'(cid:113)'
+<EOS>
+b'avg,k \xe2\x89\xa4'
+<EOS>
+b'(cid:107)Q\xe2\x88\x97\n\xce\xb5\xe2\x88\x97\n\n\xcb\x87tk,k+1 \xe2\x88\x92'
+<EOS>
+b'(T \xe2\x88\x97\n\n\xcb\x87t )'
+<EOS>
+b'k+1Q\xcb\x87tk,0(cid:107)\xce\xbd'
+<EOS>
+b'+'
+<EOS>
+b'(\xce\xb3\xcb\x87tk CAE(\xce\xbd; \xcb\x87tk, P ))'
+<EOS>
+b'i+1bk,k\xe2\x88\x921\xe2\x88\x92i.'
+<EOS>
+b'Squaring both sides yields the result:\n\n(cid:32)\n\n\xce\xb5\xe2\x88\x97'
+<EOS>
+b'avg,k \xe2\x89\xa4'
+<EOS>
+b'(cid:107)Q\xe2\x88\x97\n\n\xcb\x87tk,k+1 \xe2\x88\x92'
+<EOS>
+b'(T \xe2\x88\x97\n\n\xcb\x87t )'
+<EOS>
+b'k+1Q\xcb\x87tk,0(cid:107)\xce\xbd'
+<EOS>
+b'+'
+<EOS>
+b'(\xce\xb3\xcb\x87tk CAE(\xce\xbd; \xcb\x87tk, P ))'
+<EOS>
+b'i+1bk,k\xe2\x88\x921\xe2\x88\x92i\n\n.'
+<EOS>
+b'(cid:33)2'
+<EOS>
+b'k\xe2\x88\x921'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'i=0'
+<EOS>
+b'k\xe2\x88\x921'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'i=0'
+<EOS>
+b'A.2 APPROXIMATED POLICY-ITERATION BOUNDS'
+<EOS>
+b'We start by considering the bound for the API framework:'
+<EOS>
+b'Theorem 5.'
+<EOS>
+b'(Theorem 3.2 of Farahmand (2011)) Let K be a positive integer, and Qmax \xe2\x89\xa4 Rmax\nfor any sequence (Qk)K\xe2\x88\x921'
+<EOS>
+b'k=0 \xe2\x8a\x82 B(S \xc3\x97 A, Qmax) and the corresponding sequence (\xce\xb5k)K\xe2\x88\x921'
+<EOS>
+b'\xce\xb5k ='
+<EOS>
+b'(cid:107)Qk'
+<EOS>
+b'\xe2\x88\x92 Q\xcf\x80k (cid:107)2\n\n1\xe2\x88\x92\xce\xb3 .'
+<EOS>
+b'Then\nk=0 , where\n\n1'
+<EOS>
+b'2'
+<EOS>
+b'C'
+<EOS>
+b'PI,\xcf\x81,\xce\xbd(K; r)E\n\n1\n\n2'
+<EOS>
+b'(\xce\xb50, . . .'
+<EOS>
+b', \xce\xb5K\xe2\x88\x921; r)'
+<EOS>
+b'+'
+<EOS>
+b'\xce\xb3K\xe2\x88\x921Rmax\n\n,'
+<EOS>
+b'(12)'
+<EOS>
+b'(cid:21)'
+<EOS>
+b'(cid:107)Q\xe2\x88\x97 \xe2\x88\x92 Q\xcf\x80K (cid:107)1,\xcf\x81 \xe2\x89\xa4'
+<EOS>
+b'\xce\xbd'
+<EOS>
+b', we have:'
+<EOS>
+b'2\xce\xb3'
+<EOS>
+b'(1 \xe2\x88\x92'
+<EOS>
+b'\xce\xb3)2'
+<EOS>
+b'(cid:20)\n\ninf\n\nr\xe2\x88\x88[0,1]'
+<EOS>
+b'where\n\nCPI,\xcf\x81,\xce\xbd(K'
+<EOS>
+b'; r) ='
+<EOS>
+b'(cid:18) 1 \xe2\x88\x92 \xce\xb3'
+<EOS>
+b'(cid:19)2\n\n2'
+<EOS>
+b'sup'
+<EOS>
+b'0,'
+<EOS>
+b'...,\xcf\x80(cid:48)'
+<EOS>
+b'\xcf\x80(cid:48)\nK\n\nK\xe2\x88\x921'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'k=0'
+<EOS>
+b'a2(1\xe2\x88\x92r)'
+<EOS>
+b'k'
+<EOS>
+b'\xef\xa3\xab'
+<EOS>
+b'\xef\xa3\xad'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'm\xe2\x89\xa50'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'm\xe2\x89\xa51\n\n\xce\xb3mcPI1,\xcf\x81,\xce\xbd(K \xe2\x88\x92 k \xe2\x88\x92 1, m + 1; \xcf\x80(cid:48)\n\nk+1)+'
+<EOS>
+b'\xce\xb3mcPI2,\xcf\x81,\xce\xbd(K \xe2\x88\x92 k \xe2\x88\x92 1, m; \xcf\x80(cid:48)\n\nk+1, \xcf\x80(cid:48)\n\nk)'
+<EOS>
+b'+'
+<EOS>
+b'cPI3,\xcf\x81,\xce\xbd'
+<EOS>
+b'\xef\xa3\xb8\n\n;\n\n\xef\xa3\xb6'
+<EOS>
+b'2'
+<EOS>
+b'(13)\n\nwith E(\xce\xb50, . . .'
+<EOS>
+b', \xce\xb5K\xe2\x88\x921; r) ='
+<EOS>
+b'(cid:80)K\xe2\x88\x921\nbutions \xcf\x81 and \xce\xbd, and the series \xce\xb1k are de\xef\xac\x81ned as in Farahmand (2011).'
+<EOS>
+b'k=0 \xce\xb12r'
+<EOS>
+b'k \xce\xb5k, the three coef\xef\xac\x81cients cPI1,\xcf\x81,\xce\xbd, cPI2,\xcf\x81,\xce\xbd, cPI3,\xcf\x81,\xce\xbd, the distri-'
+<EOS>
+b'From Theorem 5, by computing the average loss across tasks and pushing inside the average using'
+<EOS>
+b'Jensen\xe2\x80\x99s inequality, we derive the API bounds averaged on multiple tasks.'
+<EOS>
+b'Theorem 6.'
+<EOS>
+b'Let K be a positive integer, and Qmax \xe2\x89\xa4 Rmax'
+<EOS>
+b'A, Qmax) and the corresponding sequence'
+<EOS>
+b'(\xce\xb5avg,k)K\xe2\x88\x921\nhave:\n\n1\xe2\x88\x92\xce\xb3 .'
+<EOS>
+b'Then for any sequence (Qk)K\xe2\x88\x921'
+<EOS>
+b'k=0 , where \xce\xb5avg,k =\n\nt=1(cid:107)Qt,k \xe2\x88\x92'
+<EOS>
+b'Q\xcf\x80k'
+<EOS>
+b'k=0 \xe2\x8a\x82 B(S'
+<EOS>
+b'\xc3\x97'
+<EOS>
+b'\xce\xbd, we\n\nt (cid:107)2'
+<EOS>
+b'(cid:80)T\n\n1'
+<EOS>
+b'T\n\n1'
+<EOS>
+b'T\n\nT\n(cid:88)'
+<EOS>
+b't=1'
+<EOS>
+b'(cid:107)Q\xe2\x88\x97'
+<EOS>
+b't \xe2\x88\x92'
+<EOS>
+b'Q\xcf\x80K'
+<EOS>
+b't (cid:107)1,\xcf\x81 \xe2\x89\xa4'
+<EOS>
+b'2\xce\xb3'
+<EOS>
+b'(cid:20)'
+<EOS>
+b'(1 \xe2\x88\x92'
+<EOS>
+b'\xce\xb3)2'
+<EOS>
+b'inf\n\nr\xe2\x88\x88[0,1]\n\n1'
+<EOS>
+b'2'
+<EOS>
+b'1'
+<EOS>
+b'2'
+<EOS>
+b'C'
+<EOS>
+b'PI(K; r)E'
+<EOS>
+b'avg(\xce\xb5avg,0, . . . , \xce\xb5avg,K\xe2\x88\x921; r)'
+<EOS>
+b'+\xce\xb3K\xe2\x88\x921Rmax,avg'
+<EOS>
+b'(cid:3) ,'
+<EOS>
+b'(14)\n\n13'
+<EOS>
+b'Published as a conference paper at ICLR 2020\n\nwith Eavg ='
+<EOS>
+b'(cid:80)K\xe2\x88\x921\n\nk=0 \xce\xb12r'
+<EOS>
+b'k \xce\xb5avg,k, \xce\xb3 = max'
+<EOS>
+b'(cid:40)'
+<EOS>
+b'(1\xe2\x88\x92\xce\xb3)\xce\xb3K\xe2\x88\x92k\xe2\x88\x921'
+<EOS>
+b't\xe2\x88\x88{1,...'
+<EOS>
+b',T }'
+<EOS>
+b'1'
+<EOS>
+b'T'
+<EOS>
+b'(cid:80)T'
+<EOS>
+b't=1 Rmax,t and \xce\xb1k ='
+<EOS>
+b'1\xe2\x88\x92\xce\xb3K+1'
+<EOS>
+b'(1\xe2\x88\x92\xce\xb3)\xce\xb3K'
+<EOS>
+b'1\xe2\x88\x92\xce\xb3K+1'
+<EOS>
+b'0 \xe2\x89\xa4 k < K,\n\n.'
+<EOS>
+b'k ='
+<EOS>
+b'K\n\n1'
+<EOS>
+b'2'
+<EOS>
+b'1'
+<EOS>
+b'2'
+<EOS>
+b'\xce\xb3t, C\n\nPI(K; r) ='
+<EOS>
+b'max'
+<EOS>
+b'C'
+<EOS>
+b'PI,\xcf\x81,\xce\xbd(K'
+<EOS>
+b'; t, r), Rmax,avg ='
+<EOS>
+b't\xe2\x88\x88{1,...'
+<EOS>
+b',T }'
+<EOS>
+b'Proof of Theorem 6.'
+<EOS>
+b'The proof is very similar to the one for AVI.'
+<EOS>
+b'We compute the average expected'
+<EOS>
+b'loss across tasks:\n\n1'
+<EOS>
+b'T\n\nT\n(cid:88)'
+<EOS>
+b't=1'
+<EOS>
+b'(cid:107)Q\xe2\x88\x97'
+<EOS>
+b't \xe2\x88\x92'
+<EOS>
+b'Q\xcf\x80K'
+<EOS>
+b't ('
+<EOS>
+b'cid:107)1,\xcf\x81\n\n1'
+<EOS>
+b'T\n\nT\n(cid:88)'
+<EOS>
+b't=1'
+<EOS>
+b'2\xce\xb3'
+<EOS>
+b'(1 \xe2\x88\x92'
+<EOS>
+b'\xce\xb3)2'
+<EOS>
+b'(1 \xe2\x88\x92'
+<EOS>
+b'\xce\xb3)2'
+<EOS>
+b'(1 \xe2\x88\x92'
+<EOS>
+b'\xce\xb3)2'
+<EOS>
+b'2\xce\xb3'
+<EOS>
+b'2\xce\xb3'
+<EOS>
+b'2\xce\xb3'
+<EOS>
+b'\xe2\x89\xa4'
+<EOS>
+b'\xe2\x89\xa4'
+<EOS>
+b'\xe2\x89\xa4'
+<EOS>
+b'\xe2\x89\xa4\n\n\xe2\x89\xa4'
+<EOS>
+b'2\xce\xb3t'
+<EOS>
+b'(cid:20)\n\n(1 \xe2\x88\x92 \xce\xb3t)2'
+<EOS>
+b'inf\n\nr\xe2\x88\x88[0,1]'
+<EOS>
+b'T\n(cid:88)'
+<EOS>
+b'(cid:20)'
+<EOS>
+b't=1'
+<EOS>
+b'inf\n\nr\xe2\x88\x88[0,1]'
+<EOS>
+b'1'
+<EOS>
+b'T\n\nT\n(cid:88)'
+<EOS>
+b'(cid:18)'
+<EOS>
+b't=1'
+<EOS>
+b'inf\n\nr\xe2\x88\x88[0,1]'
+<EOS>
+b'1'
+<EOS>
+b'T\n\ninf\n\nr\xe2\x88\x88[0,1]'
+<EOS>
+b'T\n(cid:88)'
+<EOS>
+b'(cid:16)'
+<EOS>
+b't=1'
+<EOS>
+b'1'
+<EOS>
+b'T'
+<EOS>
+b'(cid:34)'
+<EOS>
+b'(cid:34)'
+<EOS>
+b'(cid:34)'
+<EOS>
+b'1'
+<EOS>
+b'2'
+<EOS>
+b'1'
+<EOS>
+b'2'
+<EOS>
+b'1'
+<EOS>
+b'T\n\n1\n2'
+<EOS>
+b'C'
+<EOS>
+b'PI,\xcf\x81,\xce\xbd(K; t, r)E\n\n1\n\n2 (\xce\xb5t,0, . . .'
+<EOS>
+b', \xce\xb5t,K\xe2\x88\x921; t, r) + \xce\xb3K\xe2\x88\x921\n\nRmax,t'
+<EOS>
+b't'
+<EOS>
+b'1'
+<EOS>
+b'2'
+<EOS>
+b'C'
+<EOS>
+b'PI,\xcf\x81,\xce\xbd(K; t, r)E\n\n1\n\n2 (\xce\xb5t,0, . . .'
+<EOS>
+b', \xce\xb5t,K\xe2\x88\x921; t, r) + \xce\xb3K\xe2\x88\x921\n\nRmax,t\n\nt'
+<EOS>
+b'C'
+<EOS>
+b'PI,\xcf\x81,\xce\xbd(K; t, r)E\n\n2 (\xce\xb5t,0, . . .'
+<EOS>
+b', \xce\xb5t,K\xe2\x88\x921; t, r)\n\n+ \xce\xb3K\xe2\x88\x921Rmax,avg'
+<EOS>
+b'C'
+<EOS>
+b'PI,\xcf\x81,\xce\xbd(K; t, r)E\n\n2 (\xce\xb5t,0, . . .'
+<EOS>
+b', \xce\xb5t,K\xe2\x88\x921; t, r)\n\n+ \xce\xb3K\xe2\x88\x921Rmax,avg\n\n1'
+<EOS>
+b'1'
+<EOS>
+b'(cid:21)'
+<EOS>
+b'(cid:21)'
+<EOS>
+b'(cid:35)'
+<EOS>
+b'(cid:35)'
+<EOS>
+b'(cid:35)'
+<EOS>
+b'(1 \xe2\x88\x92'
+<EOS>
+b'\xce\xb3)2'
+<EOS>
+b'inf\n\nr\xe2\x88\x88[0,1]\n\n1'
+<EOS>
+b'2'
+<EOS>
+b'C'
+<EOS>
+b'PI(K; r)'
+<EOS>
+b'T\n(cid:88)'
+<EOS>
+b'(cid:16)\n\n1'
+<EOS>
+b't=1'
+<EOS>
+b'E\n\n2'
+<EOS>
+b'(\xce\xb5t,0, . . . , \xce\xb5t,K\xe2\x88\x921; t, r)\n\n+ \xce\xb3K\xe2\x88\x921Rmax'
+<EOS>
+b',avg\n\n.'
+<EOS>
+b'(15)'
+<EOS>
+b'(cid:17)'
+<EOS>
+b'Using Jensen\xe2\x80\x99s inequality as in the AVI scenario, we can write (15) as:\n\n1'
+<EOS>
+b'T\n\nT\n(cid:88)'
+<EOS>
+b't=1'
+<EOS>
+b'(cid:107)Q\xe2\x88\x97'
+<EOS>
+b't \xe2\x88\x92'
+<EOS>
+b'Q\xcf\x80K'
+<EOS>
+b't (cid:107)1,\xcf\x81 \xe2\x89\xa4'
+<EOS>
+b'2\xce\xb3'
+<EOS>
+b'(cid:20)'
+<EOS>
+b'(1 \xe2\x88\x92'
+<EOS>
+b'\xce\xb3)2'
+<EOS>
+b'inf\n\nr\xe2\x88\x88[0,1]\n\n1'
+<EOS>
+b'2'
+<EOS>
+b'1'
+<EOS>
+b'2'
+<EOS>
+b'C'
+<EOS>
+b'PI(K; r)E'
+<EOS>
+b'avg(\xce\xb5avg,0, . . . , \xce\xb5avg,K\xe2\x88\x921; r)'
+<EOS>
+b'+\xce\xb3K\xe2\x88\x921Rmax,avg'
+<EOS>
+b'(cid:3) ,'
+<EOS>
+b'(16)\n\nwith \xce\xb5avg,k = 1'
+<EOS>
+b'/T (cid:80)T'
+<EOS>
+b't=1 \xce\xb5t,k and Eavg(\xce\xb5avg,0, . . .'
+<EOS>
+b', \xce\xb5avg,K\xe2\x88\x921; r) ='
+<EOS>
+b'(cid:80)K\xe2\x88\x921'
+<EOS>
+b'k=0 \xce\xb12r'
+<EOS>
+b'k \xce\xb5avg,k.'
+<EOS>
+b'A.3'
+<EOS>
+b'APPROXIMATION'
+<EOS>
+b'BOUNDS\n\n1,'
+<EOS>
+b'.'
+<EOS>
+b'. . , w\xe2\x88\x97'
+<EOS>
+b'Proof of Theorem 3.'
+<EOS>
+b'Let w\xe2\x88\x97'
+<EOS>
+b'(cid:32)\n\nT , h\xe2\x88\x97 and f \xe2\x88\x97\n\n1 , . . .'
+<EOS>
+b', f \xe2\x88\x97\n\nT be the minimizers of \xce\xb5\xe2\x88\x97'
+<EOS>
+b'avg, then:'
+<EOS>
+b'\xce\xb5avg( \xcb\x86w, \xcb\x86h, \xcb\x86f ) \xe2\x88\x92 \xce\xb5\xe2\x88\x97'
+<EOS>
+b'avg ='
+<EOS>
+b'\xce\xb5avg( \xcb\x86w, \xcb\x86h, \xcb\x86f ) \xe2\x88\x92'
+<EOS>
+b'(cid:96)'
+<EOS>
+b'( \xcb\x86ft(\xcb\x86h( \xcb\x86wt(Xti))), Yti)'
+<EOS>
+b'(cid:19)'
+<EOS>
+b'(cid:17)'
+<EOS>
+b'(cid:33)'
+<EOS>
+b'(cid:125)'
+<EOS>
+b'(cid:96)'
+<EOS>
+b'( \xcb\x86ft(\xcb\x86h( \xcb\x86wt(Xti))),'
+<EOS>
+b'Yti) \xe2\x88\x92'
+<EOS>
+b'(cid:96)(f \xe2\x88\x97\n\nt (h\xe2\x88\x97(w\xe2\x88\x97\n\nt (Xti))), Yti)'
+<EOS>
+b'(cid:124)'
+<EOS>
+b'(cid:32)'
+<EOS>
+b'(cid:124)'
+<EOS>
+b'(cid:32)'
+<EOS>
+b'(cid:124)'
+<EOS>
+b'+'
+<EOS>
+b'+\n\n1\nnT'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'ti\n\n1'
+<EOS>
+b'nT'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'ti'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'1'
+<EOS>
+b'nT'
+<EOS>
+b'(cid:123)(cid:122)\nB'
+<EOS>
+b'ti'
+<EOS>
+b'(cid:33)'
+<EOS>
+b'(cid:125)'
+<EOS>
+b'(cid:96)(f \xe2\x88\x97\n\nt (h\xe2\x88\x97(w\xe2\x88\x97\n\nt (Xti))), Yti) \xe2\x88\x92 \xce\xb5\xe2\x88\x97\navg\n\n.'
+<EOS>
+b'(cid:33)'
+<EOS>
+b'(cid:125)'
+<EOS>
+b'(17)'
+<EOS>
+b'We proceed to bound the three components individually:'
+<EOS>
+b'\xe2\x80\xa2 C can be bounded using Hoeffding\xe2\x80\x99s inequality, with probability 1 \xe2\x88\x92 \xce\xb4/2 by (cid:112)ln(2/\xce\xb4)/(2nT ),\n\nas it contains only nT'
+<EOS>
+b'random variables bounded in the interval [0, 1];\n\n(cid:88)'
+<EOS>
+b'1'
+<EOS>
+b'nT'
+<EOS>
+b'ti'
+<EOS>
+b'(cid:123)(cid:122)'
+<EOS>
+b'A\n\n(cid:123)(cid:122)'
+<EOS>
+b'C'
+<EOS>
+b'14'
+<EOS>
+b'Published as a conference paper at ICLR 2020'
+<EOS>
+b'\xe2\x80\xa2 B can be bounded by 0, by de\xef\xac\x81nition of \xcb\x86w, \xcb\x86h and \xcb\x86f , as they are the minimizers of Equa-\n\ntion (3);'
+<EOS>
+b'\xe2\x80\xa2'
+<EOS>
+b'the bounding of A is less straightforward and is described in the following.'
+<EOS>
+b'We de\xef\xac\x81ne the following auxiliary function spaces:'
+<EOS>
+b'\xe2\x80\xa2 W (cid:48) = {'
+<EOS>
+b'x \xe2\x88\x88'
+<EOS>
+b'X'
+<EOS>
+b'\xe2\x86\x92 (wt(xti))'
+<EOS>
+b': (w1, . . .'
+<EOS>
+b', wT )'
+<EOS>
+b'\xe2\x88\x88 W T },'
+<EOS>
+b'\xe2\x80\xa2 F (cid:48) ='
+<EOS>
+b'(cid:8)y \xe2\x88\x88 RKT n'
+<EOS>
+b'\xe2\x86\x92 (ft(yti)) : (f1, . . .'
+<EOS>
+b', fT )'
+<EOS>
+b'\xe2\x88\x88'
+<EOS>
+b'F T (cid:9),\n\nand the following auxiliary sets:\n\n\xe2\x80\xa2 S ='
+<EOS>
+b'(cid:8)((cid:96)(ft(h(wt(Xti))), Yti)) :'
+<EOS>
+b'f \xe2\x88\x88'
+<EOS>
+b'F T , h \xe2\x88\x88 H, w \xe2\x88\x88'
+<EOS>
+b'W T'
+<EOS>
+b'(cid:9)'
+<EOS>
+b'\xe2\x8a\x86 RT n,'
+<EOS>
+b'\xe2\x80\xa2 S(cid:48)'
+<EOS>
+b'= F (cid:48)(H(W (cid:48)( \xc2\xafX))) ='
+<EOS>
+b'(cid:8)(ft(h(wt(Xti))))'
+<EOS>
+b': f \xe2\x88\x88 F T , h \xe2\x88\x88 H,'
+<EOS>
+b'w \xe2\x88\x88'
+<EOS>
+b'W T'
+<EOS>
+b'(cid:9)'
+<EOS>
+b'\xe2\x8a\x86 RT n,'
+<EOS>
+b'\xe2\x80\xa2 S(cid:48)(cid:48)'
+<EOS>
+b'='
+<EOS>
+b'H(W (cid:48)( \xc2\xafX)) ='
+<EOS>
+b'(cid:8)(h(wt(Xti)))'
+<EOS>
+b': h \xe2\x88\x88 H, w \xe2\x88\x88'
+<EOS>
+b'W T'
+<EOS>
+b'(cid:9)'
+<EOS>
+b'\xe2\x8a\x86 RKT n,\n\nwhich will be useful in our proof.'
+<EOS>
+b'Using Theorem 9 by Maurer et al.'
+<EOS>
+b'(2016), we can write:\n\n\xce\xb5avg( \xcb\x86w, \xcb\x86h, \xcb\x86f ) \xe2\x88\x92'
+<EOS>
+b'(cid:96)'
+<EOS>
+b'( \xcb\x86ft(\xcb\x86h( \xcb\x86wt(Xti))), Yti)\n\n1\nnT'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'ti\n\nsup'
+<EOS>
+b'\xce\xb5avg(w, h, f ) \xe2\x88\x92'
+<EOS>
+b'(cid:96)(ft(h(wt(Xti))), Yti)\n\n1'
+<EOS>
+b'nT'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'ti'
+<EOS>
+b'(cid:32)'
+<EOS>
+b'\xe2\x89\xa4\n\n\xe2\x89\xa4'
+<EOS>
+b'w\xe2\x88\x88W T ,h\xe2\x88\x88H,f \xe2\x88\x88F T'
+<EOS>
+b'(cid:115)'
+<EOS>
+b'\xe2\x88\x9a'
+<EOS>
+b'2\xcf\x80G(S)'
+<EOS>
+b'+'
+<EOS>
+b'nT'
+<EOS>
+b'9 ln( 2\n\xce\xb4 )\n2nT'
+<EOS>
+b',\n\nthen by Lipschitz property of the loss function (cid:96) and the contraction lemma Corollary 11 Maurer et al.'
+<EOS>
+b'1 and c(cid:48)'
+<EOS>
+b'(2016): G(S) \xe2\x89\xa4 G(S(cid:48)).'
+<EOS>
+b'By Theorem 12 by Maurer et al.'
+<EOS>
+b'(2016), for universal constants'
+<EOS>
+b'c(cid:48)\n2:\n\nG(S(cid:48)) \xe2\x89\xa4 c(cid:48)\n\n1L(F'
+<EOS>
+b'(cid:48))G(S(cid:48)(cid:48))'
+<EOS>
+b'+ c(cid:48)\n\n2D(S(cid:48)(cid:48))O(F'
+<EOS>
+b'(cid:48))'
+<EOS>
+b'+ min'
+<EOS>
+b'y\xe2\x88\x88Y\n\nG(F(y)),\n\nwhere L(F (cid:48)) is the largest value for the Lipschitz constants in the function space F (cid:48), and D(S(cid:48)(cid:48))'
+<EOS>
+b'is\nthe Euclidean diameter of the set S(cid:48)(cid:48).'
+<EOS>
+b'Using Theorem 12 by Maurer et al.'
+<EOS>
+b'(2016) again, for universal constants c(cid:48)(cid:48)'
+<EOS>
+b'1 and c(cid:48)(cid:48)'
+<EOS>
+b'2 :\n\nG(S(cid:48)(cid:48))'
+<EOS>
+b'\xe2\x89\xa4 c(cid:48)(cid:48)'
+<EOS>
+b'1 L(H)G(W (cid:48)( \xc2\xafX))'
+<EOS>
+b'+ c(cid:48)(cid:48)'
+<EOS>
+b'2 D(W (cid:48)( \xc2\xafX))O(H)'
+<EOS>
+b'+'
+<EOS>
+b'min'
+<EOS>
+b'G(H(p)).'
+<EOS>
+b'(20)\n\nPutting (19) and (20) together:\n\n(cid:18)\n\nG(S(cid:48)) \xe2\x89\xa4 c(cid:48)'
+<EOS>
+b'1L(F'
+<EOS>
+b'(cid:48))'
+<EOS>
+b'1 L(H)G(W (cid:48)( \xc2\xafX))'
+<EOS>
+b'+ c(cid:48)(cid:48)'
+<EOS>
+b'c(cid:48)(cid:48)'
+<EOS>
+b'2 D(W (cid:48)( \xc2\xafX))O(H)'
+<EOS>
+b'+'
+<EOS>
+b'min'
+<EOS>
+b'G(H(p))'
+<EOS>
+b'p\xe2\x88\x88P'
+<EOS>
+b'p\xe2\x88\x88P'
+<EOS>
+b'(cid:19)'
+<EOS>
+b'+ c(cid:48)\n\n='
+<EOS>
+b'c(cid:48)\n\n1c(cid:48)(cid:48)'
+<EOS>
+b'+ c(cid:48)'
+<EOS>
+b'G(F(y))\n\n2D(S(cid:48)(cid:48))O(F'
+<EOS>
+b'(cid:48))'
+<EOS>
+b'+ min'
+<EOS>
+b'y\xe2\x88\x88Y'
+<EOS>
+b'1 L(F (cid:48))L(H)G(W (cid:48)( \xc2\xafX))'
+<EOS>
+b'+ c(cid:48)\n2D(S(cid:48)(cid:48))O(F (cid:48))'
+<EOS>
+b'+ min'
+<EOS>
+b'y\xe2\x88\x88Y\n\nG(F(y)).'
+<EOS>
+b'1c(cid:48)(cid:48)'
+<EOS>
+b'2 L(F (cid:48))D(W (cid:48)( \xc2\xafX))O(H)'
+<EOS>
+b'+'
+<EOS>
+b'c(cid:48)\n\n1L(F (cid:48))'
+<EOS>
+b'min'
+<EOS>
+b'p\xe2\x88\x88P'
+<EOS>
+b'G(H(p))'
+<EOS>
+b'At this point, we have to bound the individual terms in the right hand side of (21), following the same\nprocedure proposed by Maurer et al.'
+<EOS>
+b'(2016).'
+<EOS>
+b'15'
+<EOS>
+b'(cid:33)'
+<EOS>
+b'(18)'
+<EOS>
+b'(19)'
+<EOS>
+b'(21)\n\n\x0cPublished as a conference paper at ICLR 2020'
+<EOS>
+b'Firstly, to bound L(F (cid:48)), let y, y(cid:48)'
+<EOS>
+b'\xe2\x88\x88'
+<EOS>
+b'RKT n,'
+<EOS>
+b'where y ='
+<EOS>
+b'(yti) with yti \xe2\x88\x88 RK and y(cid:48) ='
+<EOS>
+b'(y(cid:48)'
+<EOS>
+b'ti'
+<EOS>
+b'\xe2\x88\x88 RK.'
+<EOS>
+b'We can write the following:'
+<EOS>
+b'y(cid:48)\n\nti) with'
+<EOS>
+b'(cid:107)f (y'
+<EOS>
+b') \xe2\x88\x92 f (y(cid:48))(cid:107)2 ='
+<EOS>
+b'(ft(yti) \xe2\x88\x92 ft(y(cid:48)'
+<EOS>
+b'ti))2\n\n(cid:88)'
+<EOS>
+b'ti'
+<EOS>
+b'\xe2\x89\xa4 L(F)2'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'(cid:107)yti \xe2\x88\x92 y(cid:48)'
+<EOS>
+b'ti(cid:107)2'
+<EOS>
+b'ti'
+<EOS>
+b'='
+<EOS>
+b'L(F)2(cid:107)y \xe2\x88\x92 y(cid:48)(cid:107)2,\n\n(22)'
+<EOS>
+b'(23)'
+<EOS>
+b'(24)\n\nwhence L(F (cid:48))'
+<EOS>
+b'\xe2\x89\xa4 L(F).'
+<EOS>
+b'Then, we bound:'
+<EOS>
+b'G(W (cid:48)( \xc2\xafX)) ='
+<EOS>
+b'E'
+<EOS>
+b'(cid:34)'
+<EOS>
+b'sup'
+<EOS>
+b'w\xe2\x88\x88W T'
+<EOS>
+b'(cid:12)'
+<EOS>
+b'(cid:12)'
+<EOS>
+b'(cid:12)\n\xce\xb3ktiwtk(Xti)'
+<EOS>
+b'(cid:12)'
+<EOS>
+b'(cid:12)'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'kti'
+<EOS>
+b'(cid:35)'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'Xti\n\n\xe2\x89\xa4'
+<EOS>
+b'(cid:34)'
+<EOS>
+b'E'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'(cid:12)'
+<EOS>
+b'(cid:12)'
+<EOS>
+b'(cid:12)\n\xce\xb3kliwk(Xli)'
+<EOS>
+b'(cid:12)'
+<EOS>
+b'(cid:12)'
+<EOS>
+b'(cid:35)'
+<EOS>
+b'Xli'
+<EOS>
+b'sup'
+<EOS>
+b'l\xe2\x88\x88{1,...'
+<EOS>
+b',T }'
+<EOS>
+b'sup'
+<EOS>
+b'w\xe2\x88\x88W'
+<EOS>
+b't'
+<EOS>
+b'='
+<EOS>
+b'T'
+<EOS>
+b'sup'
+<EOS>
+b'l\xe2\x88\x88{1,...'
+<EOS>
+b',T }'
+<EOS>
+b'ki\nG(W(Xl)).'
+<EOS>
+b'Then, since it is possible to bound the Euclidean diameter using the norm of the supremum value in\nthe set, we bound D(S(cid:48)(cid:48))'
+<EOS>
+b'\xe2\x89\xa4 2 suph,w(cid:107)h(w('
+<EOS>
+b'\xc2\xafX))(cid:107) and D(W (cid:48)( \xc2\xafX))'
+<EOS>
+b'\xe2\x89\xa4 2'
+<EOS>
+b'supw\xe2\x88\x88W T (cid:107)w( \xc2\xafX)(cid:107).'
+<EOS>
+b'Also, we bound O(F (cid:48)):'
+<EOS>
+b'(cid:21)\n(cid:104)\xce\xb3, g(y) \xe2\x88\x92 g(y(cid:48))(cid:105)'
+<EOS>
+b'='
+<EOS>
+b'E'
+<EOS>
+b'(cid:34)'
+<EOS>
+b'(cid:20)'
+<EOS>
+b'E'
+<EOS>
+b'sup'
+<EOS>
+b'g\xe2\x88\x88F (cid:48)'
+<EOS>
+b'\xce\xb3ti ('
+<EOS>
+b'ft(yti) \xe2\x88\x92 ft(y(cid:48)'
+<EOS>
+b'ti))'
+<EOS>
+b'\xce\xb3i (f'
+<EOS>
+b'(yti) \xe2\x88\x92 f (y(cid:48)'
+<EOS>
+b'(cid:35)'
+<EOS>
+b'(cid:35)\nti))'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'ti'
+<EOS>
+b'sup'
+<EOS>
+b'f \xe2\x88\x88F T'
+<EOS>
+b'(cid:34)'
+<EOS>
+b'sup'
+<EOS>
+b'f \xe2\x88\x88F'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'i'
+<EOS>
+b'(cid:34)'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'E'
+<EOS>
+b't'
+<EOS>
+b'sup'
+<EOS>
+b'f \xe2\x88\x88F'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'i\n\n\xce\xb3i (f'
+<EOS>
+b'(yti) \xe2\x88\x92 f (y(cid:48)\n\nti))'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'O(F)2 (cid:88)'
+<EOS>
+b'(cid:107)yti \xe2\x88\x92 y(cid:48)'
+<EOS>
+b'ti(cid:107)2\n\n(cid:33)'
+<EOS>
+b'1'
+<EOS>
+b'2'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'E'
+<EOS>
+b'='
+<EOS>
+b't'
+<EOS>
+b'\xe2\x88\x9a'
+<EOS>
+b'\xef\xa3\xab'
+<EOS>
+b'\xe2\x89\xa4'
+<EOS>
+b'T\n\n\xef\xa3\xad\n\n(cid:32)'
+<EOS>
+b'\xe2\x88\x9a\n\n\xe2\x89\xa4'
+<EOS>
+b'T'
+<EOS>
+b'\xe2\x88\x9a'
+<EOS>
+b't'
+<EOS>
+b'i'
+<EOS>
+b'T O(F)(cid:107)y \xe2\x88\x92 y(cid:48)(cid:107),'
+<EOS>
+b'='
+<EOS>
+b'1'
+<EOS>
+b'2'
+<EOS>
+b'(cid:35)2\xef\xa3\xb6\n\xef\xa3\xb8\n\nwhence O(F (cid:48)) \xe2\x89\xa4'
+<EOS>
+b'T O(F).'
+<EOS>
+b'\xe2\x88\x9a'
+<EOS>
+b'To minimize the last term, it is possible to choose y0 = 0, as f (0)'
+<EOS>
+b'= 0, \xe2\x88\x80f \xe2\x88\x88 F, resulting in\nminy\xe2\x88\x88Y G(F(y))'
+<EOS>
+b'= G(F(0))'
+<EOS>
+b'= 0.'
+<EOS>
+b'Then, substituting in (21), and recalling that G(S) \xe2\x89\xa4 G(S(cid:48)):'
+<EOS>
+b'G(S) \xe2\x89\xa4 c(cid:48)\n\n1c(cid:48)(cid:48)'
+<EOS>
+b'1'
+<EOS>
+b'L(F)L(H)T'
+<EOS>
+b'sup\n\nG(W(Xl))'
+<EOS>
+b'+'
+<EOS>
+b'2c(cid:48)'
+<EOS>
+b'l\xe2\x88\x88{1,...'
+<EOS>
+b',T }\n\n1c(cid:48)(cid:48)'
+<EOS>
+b'2 L(F)'
+<EOS>
+b'sup'
+<EOS>
+b'w\xe2\x88\x88W T'
+<EOS>
+b'\xe2\x88\x9a'
+<EOS>
+b'(cid:107)w( \xc2\xafX)(cid:107)O(H)'
+<EOS>
+b'+ c(cid:48)\n\n1L(F) min'
+<EOS>
+b'p\xe2\x88\x88P'
+<EOS>
+b'G(H(p))'
+<EOS>
+b'+'
+<EOS>
+b'2c(cid:48)'
+<EOS>
+b'(cid:107)h(w('
+<EOS>
+b'\xc2\xafX))(cid:107)'
+<EOS>
+b'T O(F).'
+<EOS>
+b'(25)\n\n2 sup'
+<EOS>
+b'h,w\n\n16'
+<EOS>
+b'Published as a conference paper at ICLR 2020'
+<EOS>
+b'Now, the \xef\xac\x81rst term A of (17) can be bounded substituting (25) in (18):\n\n\xce\xb5avg('
+<EOS>
+b'\xcb\x86w, \xcb\x86h, \xcb\x86f ) \xe2\x88\x92'
+<EOS>
+b'\xe2\x88\x9a\n\n1'
+<EOS>
+b'nT'
+<EOS>
+b'(cid:88)'
+<EOS>
+b'ti'
+<EOS>
+b'(cid:96)'
+<EOS>
+b'( \xcb\x86ft(\xcb\x86h( \xcb\x86wt(Xti))), Yti)\n\n\xe2\x89\xa4'
+<EOS>
+b'(cid:16)'
+<EOS>
+b'2\xcf\x80'
+<EOS>
+b'nT'
+<EOS>
+b'c(cid:48)\n1c(cid:48)(cid:48)'
+<EOS>
+b'1'
+<EOS>
+b'L(F)L(H)T'
+<EOS>
+b'sup\n\nG(W(Xl))'
+<EOS>
+b'+'
+<EOS>
+b'2c(cid:48)\n\n1c(cid:48)(cid:48)'
+<EOS>
+b'l\xe2\x88\x88{1,...'
+<EOS>
+b',T }'
+<EOS>
+b'(cid:107)w( \xc2\xafX)(cid:107)O(H)'
+<EOS>
+b'+ c(cid:48)\n\n1L(F) min'
+<EOS>
+b'p\xe2\x88\x88P'
+<EOS>
+b'G(H(p))'
+<EOS>
+b'+'
+<EOS>
+b'2c(cid:48)'
+<EOS>
+b'(cid:107)h(w( \xc2\xafX))(cid:107)'
+<EOS>
+b'2 sup'
+<EOS>
+b'h,w\n\nL(F)L(H)'
+<EOS>
+b'supl\xe2\x88\x88{1,...,T } G(W(Xl))'
+<EOS>
+b'= c1'
+<EOS>
+b'n'
+<EOS>
+b'L(F)'
+<EOS>
+b'minp\xe2\x88\x88P G(H(p))'
+<EOS>
+b'+ c3'
+<EOS>
+b'+ c4'
+<EOS>
+b'nT'
+<EOS>
+b'2 L(F)'
+<EOS>
+b'sup'
+<EOS>
+b'w\xe2\x88\x88W T\n(cid:115)'
+<EOS>
+b'(cid:17)'
+<EOS>
+b'\xe2\x88\x9a'
+<EOS>
+b'T O(F)'
+<EOS>
+b'9 ln( 2\n\xce\xb4 )'
+<EOS>
+b'2nT\nsupw(cid:107)w'
+<EOS>
+b'( \xc2\xafX)(cid:107)L(F)O(H)'
+<EOS>
+b'+'
+<EOS>
+b'+ c2'
+<EOS>
+b'nT'
+<EOS>
+b'suph,w(cid:107)h(w'
+<EOS>
+b'( \xc2\xafX))(cid:107)O(F)'
+<EOS>
+b'(cid:115)'
+<EOS>
+b'+\n\n9 ln( 2\n\xce\xb4 )'
+<EOS>
+b'2nT\n\n.'
+<EOS>
+b'A union bound between A, B and C of (17) completes the proof:\n\n\xce\xb5avg('
+<EOS>
+b'\xcb\x86w, \xcb\x86h, \xcb\x86f ) \xe2\x88\x92 \xce\xb5\xe2\x88\x97\n\navg \xe2\x89\xa4 c1\n\nL(F)L(H)'
+<EOS>
+b'supl\xe2\x88\x88{1,...,T } G(W(Xl))'
+<EOS>
+b'\xe2\x88\x9a'
+<EOS>
+b'n'
+<EOS>
+b'T'
+<EOS>
+b'n'
+<EOS>
+b'+ c2'
+<EOS>
+b'+ c3'
+<EOS>
+b'+ c4'
+<EOS>
+b'(cid:115)'
+<EOS>
+b'+\n\nsupw(cid:107)w'
+<EOS>
+b'( \xc2\xafX)(cid:107)L(F)O(H)\n\nL(F)'
+<EOS>
+b'minp\xe2\x88\x88P G(H(p))'
+<EOS>
+b'suph,w(cid:107)h(w('
+<EOS>
+b'\xc2\xafX))(cid:107)O(F)\n\nnT'
+<EOS>
+b'nT'
+<EOS>
+b'\xe2\x88\x9a'
+<EOS>
+b'n'
+<EOS>
+b'T'
+<EOS>
+b'8 ln( 3\n\xce\xb4 )\nnT\n\n.'
+<EOS>
+b'B'
+<EOS>
+b'ADDITIONAL DETAILS OF EMPIRICAL EVALUATION'
+<EOS>
+b'B.1 MULTI FITTED Q-ITERATION'
+<EOS>
+b'We consider Car-On-Hill problem with discount factor 0.95 and horizon 100.'
+<EOS>
+b'Running Adam\noptimizer with learning rate 0.001 and using a mean squared loss, we train a neural network composed\nof 2 shared layers of 30 neurons each, with sigmoidal activation function, as described in Riedmiller\n(2005).'
+<EOS>
+b'We select 8 tasks for the problem changing the mass of the car m and the value of the\ndiscrete actions a (Table 1).'
+<EOS>
+b'Figure 1(b) is computed considering the \xef\xac\x81rst four tasks, while Figure 1(c)\nconsiders task 1 in the result with 1 task, tasks 1 and 2 for the result with 2 tasks, tasks 1, 2, 3, and 4\nfor the result with 4 tasks, and all the tasks for the result with 8 tasks.'
+<EOS>
+b'To run FQI and MFQI, for each\ntask we collect transitions running an extra-tree trained following the procedure and setting in Ernst'
+<EOS>
+b'et al.'
+<EOS>
+b'(2005)'
+<EOS>
+b', using an (cid:15)-greedy policy with (cid:15) = 0.1, to obtain a small, but representative dataset.'
+<EOS>
+b'The\noptimal Q-function for each task is computed by tree-search3 for 100 states uniformly picked from\nthe state space, and the 2 discrete actions, for a total of 200 state-action tuples.'
+<EOS>
+b'B.2 MULTI DEEP Q-NETWORK'
+<EOS>
+b'The \xef\xac\x81ve problems we consider for this experiment are: Cart-Pole, Acrobot, Mountain-Car, Car-'
+<EOS>
+b'On-'
+<EOS>
+b'Hill, and Inverted-Pendulum4.'
+<EOS>
+b'The discount factors are respectively 0.99, 0.99, 0.99, 0.95, and 0.95.'
+<EOS>
+b'The horizons are respectively 500, 1, 000, 1, 000, 100, and 3, 000.'
+<EOS>
+b'The network we use consists of 80\nReLu units for each wt, t \xe2\x88\x88 {1, . . . , T } block, with T = 5.'
+<EOS>
+b'Then, the shared block h consists of one'
+<EOS>
+b'3We follow the method described in Ernst et al.'
+<EOS>
+b'(2005).'
+<EOS>
+b'4The IDs of the problems in the OpenAI Gym library are: CartPole-v0, Acrobot-v1, and MountainCar-v0.'
+<EOS>
+b'17'
+<EOS>
+b'Published as a conference paper at ICLR 2020'
+<EOS>
+b'Task Mass'
+<EOS>
+b'1.0\n0.8'
+<EOS>
+b'1.0'
+<EOS>
+b'1.2'
+<EOS>
+b'1.0'
+<EOS>
+b'1.0'
+<EOS>
+b'0.8'
+<EOS>
+b'0.85'
+<EOS>
+b'1'
+<EOS>
+b'2'
+<EOS>
+b'3'
+<EOS>
+b'4'
+<EOS>
+b'5'
+<EOS>
+b'6'
+<EOS>
+b'7'
+<EOS>
+b'8'
+<EOS>
+b'Action set\n{\xe2\x88\x924.0; 4.0}\n{\xe2\x88\x924.0; 4.0}\n{\xe2\x88\x924.5; 4.5}\n{\xe2\x88\x924.5; 4.5}\n\n{\xe2\x88\x924.125; 4.125}\n\n{\xe2\x88\x924.25; 4.25}'
+<EOS>
+b'{\xe2\x88\x924.375; 4.375}\n\n{\xe2\x88\x924.0; 4.0}\n\nTable 1:'
+<EOS>
+b'Different values of the mass of the car and available actions chosen for the Car-On-Hill tasks\nin the MFQI empirical evaluation.'
+<EOS>
+b'i ) ='
+<EOS>
+b'yt(s, a(t)\n\ni )'
+<EOS>
+b'= ft(h(wt(s))'
+<EOS>
+b', a(t)'
+<EOS>
+b'layer with 80 ReLu units and another one with 80 sigmoid units.'
+<EOS>
+b'Eventually, each ft has a number of\nlinear units equal to the number of discrete actions a(t)\n, i \xe2\x88\x88 {1, . . . , #A(t)'
+<EOS>
+b'} of task \xc2\xb5t'
+<EOS>
+b'which outputs'
+<EOS>
+b'i'
+<EOS>
+b'the action-value Qt(s, a(t)\ni ),'
+<EOS>
+b'\xe2\x88\x80s \xe2\x88\x88 S (t).'
+<EOS>
+b'The use of sigmoid units\nin the second layer of h is due to our choice to extract meaningful shared features bounded between 0\nand 1 to be used as input of the last linear layer, as in most RL approaches.'
+<EOS>
+b'In practice, we have also\nfound that sigmoid units help to reduce task interference in multi-task networks, where instead the\nlinear response of ReLu units cause a problematic increase in the feature values.'
+<EOS>
+b'Furthermore, the use\nof a bounded feature space reduces the suph,w(cid:107)h(w( \xc2\xafX))(cid:107) term in the upper bound of Theorem 3,\ncorresponding to the upper bound of the diameter of the feature space, as shown in Appendix A.'
+<EOS>
+b'The initial replay memory size for each task is 100 and the maximum size is 5, 000.'
+<EOS>
+b'We use Huber\nloss with Adam optimizer using learning rate 10\xe2\x88\x923 and batch size of 100 samples for each task.'
+<EOS>
+b'The\ntarget network is updated every 100 steps.'
+<EOS>
+b'The exploration is \xce\xb5-greedy with \xce\xb5 linearly decaying from\n1 to 0.01 in the \xef\xac\x81rst 5, 000 steps.'
+<EOS>
+b'B.3 MULTI DEEP DETERMINISTIC POLICY GRADIENT'
+<EOS>
+b'The two set of problems we consider for this experiment are: one including Inverted-Pendulum,\nInverted-Double-Pendulum, and Inverted-Pendulum-Swingup, and another one including Hopper-'
+<EOS>
+b'Stand, Walker-Walk, and Half-Cheetah-Run5.'
+<EOS>
+b'The discount factors are 0.99 and the horizons are\n1, 000 for all problems.'
+<EOS>
+b'The actor network is composed of 600 ReLu units for each wt, t \xe2\x88\x88 {1, . . .'
+<EOS>
+b', T }\nblock, with T'
+<EOS>
+b'= 3.'
+<EOS>
+b'The shared block h has 500 units with ReLu activation function as for MDQN.'
+<EOS>
+b'Finally, each ft has a number of tanh units equal to the number of dimensions of the continuous\nactions a(t)'
+<EOS>
+b'\xe2\x88\x88 A(t) of task \xc2\xb5t which outputs the policy \xcf\x80t(s) ='
+<EOS>
+b'yt(s)'
+<EOS>
+b'= ft(h(wt(s)))'
+<EOS>
+b', \xe2\x88\x80s \xe2\x88\x88 S (t).'
+<EOS>
+b'On the other hand, the critic network consists of the same wt units of the actor, except for the use of\nsigmoidal units in the h layer, as in MDQN.'
+<EOS>
+b'In addition to this, the actions a(t) are given as input to\nh.'
+<EOS>
+b'Finally, each ft has a single linear unit Qt(s, a(t))'
+<EOS>
+b'='
+<EOS>
+b'yt(s, a(t))'
+<EOS>
+b'='
+<EOS>
+b'ft(h(wt(s), a(t)))'
+<EOS>
+b', \xe2\x88\x80s \xe2\x88\x88 S (t).'
+<EOS>
+b'The initial replay memory size for each task is 64 and the maximum size is 50, 000.'
+<EOS>
+b'We use Huber\nloss to update the critic network and the policy gradient to update the actor network.'
+<EOS>
+b'In both cases\nthe optimization is performed with Adam optimizer and batch size of 64 samples for each task.'
+<EOS>
+b'The\nlearning rate of the actor is 10\xe2\x88\x924 and the learning rate of the critic is 10\xe2\x88\x923.'
+<EOS>
+b'Moreover, we apply'
+<EOS>
+b'(cid:96)2-penalization to the critic network using a regularization coef\xef\xac\x81cient of 0.01.'
+<EOS>
+b'The target networks are\nupdated with soft-updates using \xcf\x84 = 10\xe2\x88\x923.'
+<EOS>
+b'The exploration is performed using the action computed\nby the actor network adding a noise generated with an Ornstein-Uhlenbeck process with \xce\xb8'
+<EOS>
+b'= 0.15'
+<EOS>
+b'and \xcf\x83 = 0.2.'
+<EOS>
+b'Note that most of these values are taken from the original DDPG paper'
+<EOS>
+b'Lillicrap'
+<EOS>
+b'et al.'
+<EOS>
+b'(2015), which optimizes them for the single-task scenario.'
+<EOS>
+b'5The'
+<EOS>
+b'IDs of\n\nthe problems\n\nInvertedPendulumBulletEnv-v0,\nInvertedDoublePendulumBulletEnv-v0, and InvertedPendulumSwingupBulletEnv-v0.'
+<EOS>
+b'The names of the\ndomain and the task of the problems in the DeepMind Control Suite are: hopper-stand, walker-walk, and\ncheetah-run.'
+<EOS>
+b'in the pybullet'
+<EOS>
+b'library are:\n\n18'
+<EOS>
