@@ -1,4 +1,772 @@
-I am a human.We all are humans.You are a human
+b'Published as a conference paper at ICLR 2020\n\nSELF:LEARNING TO FILTER NOISY LABELS WITHSELF-ENSEMBLING'
 <EOS>
-Hello world. Hi. Test World
+b'DucTam Nguyen \xe2\x88\x97, Chaithanya Kumar Mummadi \xe2\x88\x97\xe2\x80\xa0, Thi Phuong Nhung Ngo \xe2\x80\xa0,Thi Hoai Phuong Nguyen \xe2\x80\xa1,'
+<EOS>
+b'Laura Beggel \xe2\x80\xa0, Thomas Brox \xe2\x80\xa0ABSTRACTDeep neural networks (DNNs) have been shown to over-\xef\xac\x81t a dataset when be-'
+<EOS>
+b'ing trained with noisy labels for a long enough time.To overcome this problem,\nwe present a simple and effective method self-ensemble label \xef\xac\x81ltering (SELF) toprogressively \xef\xac\x81lter out the wrong labels during training.'
+<EOS>
+b'Our method improves\nthe task performance by gradually allowing supervision only from the potentially\nnon-noisy (clean) labels and stops learning on the \xef\xac\x81ltered noisy labels.For the\n\xef\xac\x81ltering, we form running averages of predictions over the entire training dataset\nusing the network output at different training epochs.We show that these en-'
+<EOS>
+b'semble estimates yield more accurate identi\xef\xac\x81cation of inconsistent predictions\nthroughout training than the single estimates of the network at the most recent\ntraining epoch.While \xef\xac\x81ltered samples are removed entirely from the supervised\ntraining loss, we dynamically leverage them via semi-supervised learning in the\nunsupervised loss.We demonstrate the positive effect of such an approach on var-\nious image classi\xef\xac\x81cation tasks under both symmetric and asymmetric label noise\nand at different noise ratios.'
+<EOS>
+b'It substantially outperforms all previous works on\nnoise-aware learning across different datasets and can be applied to a broad set of\nnetwork architectures.1INTRODUCTION'
+<EOS>
+b'The acquisition of large quantities of a high-quality human annotation is a frequent bottleneck in\napplying DNNs.There are two cheap but imperfect alternatives to collect annotation at large scale:\ncrowdsourcing from non-experts and web annotations, particularly for image data where the tags and\nonline query keywords are treated as valid labels.Both these alternatives typically introduce noisy\n(wrong) labels.'
+<EOS>
+b'While Rolnick et al.(2017) empirically demonstrated that DNNs can be surprisingly\nrobust to label noise under certain conditions, Zhang et al.(2017) has shown that DNNs have the\ncapacity to memorize the data and will do so eventually when being confronted with too many noisy\nlabels.'
+<EOS>
+b'Consequently, training DNNs with traditional learning procedures on noisy data strongly\ndeteriorates their ability to generalize \xe2\x80\x93 a severe problem.Hence, limiting the in\xef\xac\x82uence of label\nnoise is of great practical importance.A common approach to mitigate the negative in\xef\xac\x82uence of noisy labels is to eliminate them from the\ntraining data and train deep learning models just with the clean labels (Fr\xc2\xb4enay & Verleysen, 2013).'
+<EOS>
+b'Employing semi-supervised learning can even counteract the noisy labels (Laine & Aila, 2016; Luo\net al., 2018).However, the decision which labels are noisy and which are not is decisive for learning\nrobust models.Otherwise, un\xef\xac\x81ltered noisy labels still in\xef\xac\x82uence the (supervised) loss and affect the\ntask performance as in these previous works.'
+<EOS>
+b'They use the entire label set to compute the loss and\nseverely lack a mechanism to identify and \xef\xac\x81lter out the erroneous labels from the labels set.In this paper, we propose a self-ensemble label \xef\xac\x81ltering (SELF) framework that identi\xef\xac\x81espotentially\nnoisy labels during training and keeps the network from receiving supervision from the \xef\xac\x81ltered noisy\nlabels.'
+<EOS>
+b'This allows DNNs to gradually focus on learning from undoubtedly correct samples even\nwith an extreme level of noise in the labels (e.g., 80% noise ratio) and leads to improved performance\nas the supervision become less noisy.The key contribution of our work is progressive \xef\xac\x81ltering, i.e.,\n\n\xe2\x88\x97Computer Vision Group, University of Freiburg, Germany\n\xe2\x80\xa0Bosch Center for AI, Bosch GmbH, Germany\xe2\x80\xa1Karlsruhe Institute of Technology, Germany'
+<EOS>
+b'1Published as a conference paper at ICLR 2020(a) Evaluation on CIFAR-10'
+<EOS>
+b'(b) Evaluation on CIFAR-100Figure 1: Comparing the performance of SELF with previous works for learning under different\n(symmetric)label noise ratios on the (a)'
+<EOS>
+b'CIFAR-10 &(b) CIFAR-100 datasets.SELF retains higher\nrobust classi\xef\xac\x81cation accuracy at all noise levels.'
+<EOS>
+b'leverage the knowledge provided in the network\xe2\x80\x99s output over different training iterations to form a\nconsensus of predictions (self-ensemble predictions) to progressively identify and \xef\xac\x81lter out the noisy\nlabels from the labeled data.When learning under label noise, the network receives noisy updates and hence \xef\xac\x82uctuates strongly.Such conduct of training would impede to learn stable neural representations and further mislead the\nconsensus of the predictions.'
+<EOS>
+b'Therefore, it is essential to incorporate a model with stable training\nbehavior to obtain better estimates from the consensus.Concretely, we employ the semi-supervised\ntechnique as a backbone to our framework to stabilize the learning process of the model.Correctly,\nwe maintain the running average model, such as proposed by Tarvainen & Valpola (2017),'
+<EOS>
+b'a.k.a.the Mean-Teacher model.This model ensemble learning provides a more stable supervisory signal\nthan the noisy model snapshots and provides a stable ground for progressive \xef\xac\x81ltering to \xef\xac\x81lter out\npotential noisy labels.'
+<EOS>
+b'Note that this is different from just a mere combination of semi-supervised\ntechniques with a noisy label \xef\xac\x81ltering method.We call our approach self-ensemble label \xef\xac\x81ltering (SELF) - that establishes model ensemble learning\nas a backbone to form a solid consensus of the self-ensemble predictions to \xef\xac\x81lter out the noisy labels\nprogressively.Our framework allows to compute supervised loss on cleaner subsets rather than the\nentire noisy labeled data as in previous works.'
+<EOS>
+b'It further leverages the entire dataset, including the\n\xef\xac\x81ltered out erroneous samples in the unsupervised loss.To best of our knowledge, we are the \xef\xac\x81rst\nto identify and propose self-ensemble as a principled technique against learning under noisy labels.Our motivation stems from the observation that DNNs start to learn from easy samples in initial\nphases and gradually adapt to hard ones during training.'
+<EOS>
+b'When trained on wrongly labeled data,\nDNNs learn from clean labels at ease and receive inconsistent error signals from the noisy labels\nbefore over-\xef\xac\x81tting to the dataset.The network\xe2\x80\x99s prediction is likely to be consistent on clean samples\nand inconsistent or oscillates strongly on wrongly labeled samples over different training iterations.Based on this observation, we record the outputs of a single network made on different training\nepochs and treat them as an ensemble of predictions obtained from different individual networks.'
+<EOS>
+b'We\ncall these ensembles that are evolved from a single network self-ensemble predictions.Subsequently,\nwe identify the correctly labeled samples via the agreement between the provided label set and our\nrunning average of self-ensemble predictions.The samples of ensemble predictions that agree with\nthe provided labels are likely to be consistent and treated as clean samples.'
+<EOS>
+b'In summary, our SELF framework stabilizes the training process and improves the generalization\nability of DNNs.We evaluate the proposed technique on image classi\xef\xac\x81cation tasks using CI-FAR10, CIFAR100 & ImageNet.'
+<EOS>
+b'We demonstrate that SELF consistently outperforms the existing\napproaches on asymmetric and symmetric noise at all noise levels, as shown in Fig.1.Besides,\nSELF remains robust towards the choice of the network architecture.'
+<EOS>
+b'Our work is transferable toother tasks without the need to modify the architecture or the primary learning objective.2'
+<EOS>
+b'Published as a conference paper at ICLR 2020Figure 2: Overview of the self-ensemble label \xef\xac\x81ltering (SELF) framework.The model starts in\niteration 0 with training from the noisy label set.'
+<EOS>
+b'During training, the model maintains a self-ensemble, a running average of itself (Tarvainen & Valpola, 2017) to provide a stable learning signal.Also, the model collects a self-ensemble prediction (moving-average) for the subsequent \xef\xac\x81ltering.'
+<EOS>
+b'Once the best model is found, these predictions identify and \xef\xac\x81lter out noisy labels using the original\nlabel set L0.The model performs this progressive \xef\xac\x81ltering until there is no more better model.For\ndetails see Algorithm 1.'
+<EOS>
+b'2 SELF-ENSEMBLE LABEL FILTERING2.1 OVERVIEWFig. 2 shows an overview of our proposed approach.'
+<EOS>
+b'In the beginning, we assume that the labels\nof the training set are noisy.The model attempts to identify correct labels progressively using self-\nforming ensembles of models and predictions.Since wrong labels cause strong \xef\xac\x82uctuations in the\nmodel\xe2\x80\x99s predictions, using ensembles is a natural way to counteract noisy labels.'
+<EOS>
+b'Concretely, in each iteration, the model learns from a detected set of potentially correct labels and\nmaintains a running average of model snapshots (realized by the Mean Teacher model Tarvainen &\nValpola (2017)).This ensemble model is evaluated on the entire dataset and provides an additional\nlearning signal for training the single models.Additionally, our framework maintains the running-\naverage of the model\xe2\x80\x99s predictions for the \xef\xac\x81ltering process.'
+<EOS>
+b'The model is trained until we \xef\xac\x81nd the\nbest modelw.r.t.the performance on the validation set (e.g., by early-stopping).'
+<EOS>
+b'The set of correct\nlabels is detected based on the strategy de\xef\xac\x81ned in Sec.2.2.In the next iteration, we again use all data\nand the new \xef\xac\x81ltered label set as input for the model training.'
+<EOS>
+b'The iterative training procedure stops\nwhen no better model can be found.In the following, we give more details about the combination\nof this training and \xef\xac\x81ltering procedure.2.2 PROGRESSIVE'
+<EOS>
+b'LABEL FILTERINGProgressive detection of correctly labeled samples Our frameworkSelf-Ensemble Label Filter-'
+<EOS>
+b'ing (Algorithm 1) focuses on the detection of certainly correct labels from the provided label set L0.In each iteration i, the model is trained using the label set of potentially correct labels Li.At the end\nof each iteration, the model determines the next correct label set Li+1 using the \xef\xac\x81ltering strategy\ndescribed in 2.2'
+<EOS>
+b'The model stops learning when no improvement was achieved after training on the\nre\xef\xac\x81ned label set Li+1.In other words, in each iteration, the model attempts to learn from the easy, in some sense, obviously\ncorrect labels.However, learning from easy samples also affects similar but harder samples from the\nsame classes.'
+<EOS>
+b'Therefore, by learning from these easy samples, the network can gradually distinguish\nbetween hard and wrongly-labeled samples.3Published as a conference paper at ICLR 2020'
+<EOS>
+b'Algorithm 1 SELF:Self-Ensemble Label Filtering pseudocodeRequire:'
+<EOS>
+b'Dtrain= noisy labeled training setRequire:'
+<EOS>
+b'Dval = noisylabeled validation setRequire: (x, y) ='
+<EOS>
+b'training stimuli and labelRequire: \xce\xb1 = ensembling momentum, 0 \xe2\x89\xa4 \xce\xb1 \xe2\x89\xa4 1while acc(Mi, Dval) \xe2\x89\xa5'
+<EOS>
+b'acc(Mbest, Dval) do\n\ni \xe2\x86\x90 0Mi\xe2\x86\x90 train(Dtrain, Dval)'
+<EOS>
+b'Mbest \xe2\x86\x90Mizi'
+<EOS>
+b'\xe2\x86\x90 0Mbest \xe2\x86\x90Mi'
+<EOS>
+b'Df ilter\xe2\x86\x90Dtrain'
+<EOS>
+b'i\xe2\x86\x90i + 1'
+<EOS>
+b'for (x, y) in Df ilterdo\n\n\xcb\x86zi \xe2\x86\x90 Mbest(x)zi'
+<EOS>
+b'\xe2\x86\x90\xce\xb1zi\xe2\x88\x921 + (1\xe2\x88\x92 \xce\xb1)\xcb\x86zi'
+<EOS>
+b'if y(cid:54)= argmax(zi)then\n\ny \xe2\x86\x90 \xe2\x88\x85 in Df ilter'
+<EOS>
+b'endif\nend forMi \xe2\x86\x90 train(Df ilter, Dval)\n\nend while\nreturn Mbest\n\n(cid:46) counter to track iterations'
+<EOS>
+b'(cid:46) initial Mean-Teacher ensemble model training\n(cid:46) set initial model as best model(cid:46) initialize ensemble predictions of all samples\n(ignored sample index for simplicity)(cid:46) iterate until no best model is found on Dval\n(cid:46) save the best model'
+<EOS>
+b'(cid:46) set \xef\xac\x81ltereddataset as initial label set\n\n(cid:46)evaluate model output \xcb\x86zi\n(cid:46) accumulate ensemble predictions zi'
+<EOS>
+b'(cid:46) verify agreement of ensemble predictions & label(cid:46) identify it as noisy label & remove from label set\n\n(cid:46)train'
+<EOS>
+b'Mean-Teacher model on \xef\xac\x81ltered label setOur framework does not focus on repairing all noisy labels.Although the detection of wrong labels is\nsometimes easy, \xef\xac\x81nding their correct hidden label might be extremely challenging in case of having\nmany classes.'
+<EOS>
+b'If the noise is suf\xef\xac\x81ciently random, the set of correct labels will be representative to\nachieve high model performance.Further, in our framework, the label \xef\xac\x81ltering is performed on the\noriginal label set L0 from iteration 0.Clean labels erroneously removed in an earlier iteration (e.g.'
+<EOS>
+b',\nlabels of hard to classify samples) can be reconsidered for model training again in later iterations.Filtering strategyThe model can determine the set of potentially correct labels'
+<EOS>
+b'Li based on agree-\nment between the label y and its maximal likelihood prediction \xcb\x86y|x with Li ={(y, x) | \xcb\x86yx =y; \xe2\x88\x80(y, x) \xe2\x88\x88 L0}.'
+<EOS>
+b'L0 is the label set provided in the beginning, (y, x) are the samples and their\nrespective noisy labels in the iteration i.In other words, the labels are only used for supervised\ntraining if in the current epoch, the model predicts the respective label to be the correct class with\nthe highest likelihood.In practice, our framework does not use \xcb\x86y(x) of model snapshots for \xef\xac\x81ltering\nbut a moving-average of the ensemble models and predictions to improve the \xef\xac\x81ltering decision.'
+<EOS>
+b'2.3 SELF-ENSEMBLE LEARNINGThe model\xe2\x80\x99s predictions for noisy samples tend to \xef\xac\x82uctuate.For example, take a cat wrongly labeled\nas a tiger.'
+<EOS>
+b'Other cat samples would encourage the model to predict the given cat image as a cat.Contrary, the wrong label tiger regularly pulls the model back to predict the cat as a tiger.Hence,\nusing the model'
+<EOS>
+b'\xe2\x80\x99s predictions gathered in one single training epoch for \xef\xac\x81lteringis sub-optimal.Therefore, in our framework SELF, our model relies on ensembles of models and predictions.'
+<EOS>
+b'Model ensemble with Mean Teacher A natural way to form a model ensemble is by using an\nexponential running average of model snapshots (Fig. 3a).This idea was proposed in Tarvainen\n& Valpola (2017) for semi-supervised learning and is known as the Mean Teacher model.In our\nframework, both the mean teacher model and the normal model are evaluated on all data to preserve\nthe consistency between both models.'
+<EOS>
+b'The consistency loss between student and teacher output\ndistribution can be realized with Mean-Square-Error loss or Kullback-Leibler-divergence.More\ndetails for training with the model ensemble can be found in Appendix A.1Prediction ensemble'
+<EOS>
+b'Additionally, we propose to collect the sample predictions over multiple\ntraining epochs:zj = \xce\xb1zj\xe2\x88\x921 +(1 \xe2\x88\x92 \xce\xb1)\xcb\x86zj , whereby zj depicts the moving-average prediction\nof sample k at epoch j,'
+<EOS>
+b'\xce\xb1 is a momentum, \xcb\x86zj is the model prediction for sample k in epoch j.This scheme is displayed in Fig.3b.'
+<EOS>
+b'For each sample, we store the moving-average predictions,\naccumulated over the past iterations.Besides having a more stable basis for the \xef\xac\x81ltering step, our\nproposed procedure also leads to negligible memory and computation overhead.4'
+<EOS>
+b'Published as a conference paper at ICLR 2020(a) Model ensemble(Mean teacher)'
+<EOS>
+b'(b) Predictions ensembleFigure 3:Maintaining the (a) model and (b) predictions ensembles is very effective against noisy\nmodel updates.'
+<EOS>
+b'These ensembles are self-forming during the training process as a moving-average\nof (a) model snapshots or (b) class predictions from previous training steps.Further, due to continuous training of the best model from the previous model, computation time can\nbe signi\xef\xac\x81cantly reduced, compared to re-training the model from scratch.On the new \xef\xac\x81ltered dataset,\nthe model must only slowly adapt to the new noise ratio contained in the training set.'
+<EOS>
+b'Depending on\nthe computation budget, a maximal number of iterations for \xef\xac\x81ltering can be set to save time.3 RELATED WORKSReed et al.'
+<EOS>
+b'(2014); Azadi et al.(2015) performed early works on learning robustly under label\nnoise for deep neural networks.Recently, Rolnick et al.'
+<EOS>
+b'(2017) have shown for classi\xef\xac\x81cation that\ndeep neural networks come with natural robustness to label noise following a particular random\ndistribution.No modi\xef\xac\x81cation of the network or the training procedure is required to achieve this\nrobustness.Following this insight, our framework SELF relies on this natural robustness to kickstart'
+<EOS>
+b'the self-ensemble \xef\xac\x81ltering process to extend the robust behavior to more challenging scenarios.Laine & Aila (2016); Luo et al.(2018) proposed to apply semi-supervised techniques on the data to\ncounteract noise.'
+<EOS>
+b'These and other semi-supervised learning techniques learn from a static, initial set\nof noisy labels and have no mechanisms to repair labels.Therefore, the supervised losses in their\nlearning objective are typically high until the model strongly over\xef\xac\x81ts to the label noise.Compared\nto these works, our framework performs a variant of self-supervised label corrections.'
+<EOS>
+b'The network\nlearns from a dynamic, variable set of labels, which is determined by the network itself.Progressive\n\xef\xac\x81ltering allows the network to (1) focus on a label set with a signi\xef\xac\x81cantly lower noise ratio and(2)\nrepair wrong decisions made by itself in an earlier iteration.'
+<EOS>
+b'Other works assign weights to potentially wrong labels to reduce the learning signal (Jiang et al.,\n2017; Ren et al., 2018; Jenni & Favaro, 2018).These approaches tend to assign less extreme weights\nor hyperparameters that are hard to set.Since the typical classi\xef\xac\x81cation loss is highly non-linear,'
+<EOS>
+b'a\nlower weight might still lead to learning from wrong labels.Compared to these works, the samples\nin SELF only receive extreme weights: either they are zero or one.Further, SELF focuses only on\nself-detecting the correct samples, instead of repairing the wrong labels.'
+<EOS>
+b'Typically, the set of correct\nsamples are much easier to detect and are suf\xef\xac\x81ciently representative to achieve high performance.Hanet al.'
+<EOS>
+b'(2018b); Jiang et al.(2017) employ two collaborating and simultaneously learning net-'
+<EOS>
+b'works to determine which samples to learn from and which not.However, the second network is\nfree in its predictions and hence hard to tune.Compared to these works, we use ensemble learning as\na principled approach to counteract model \xef\xac\x82uctuations.'
+<EOS>
+b'In SELF, the second network is extremely\nrestricted and is only composed of running averages of the \xef\xac\x81rst network.To realize the second\nnetwork, we use the mean-teacher model (Tarvainen & Valpola, 2017) as a backbone.Compared\nto their work, our self-ensemble label \xef\xac\x81ltering gradually detects the correct labels and learns from\nthem, so the label set is variable.'
+<EOS>
+b'Further, we do use not only model ensembles but also an ensemble\nof predictions to detect correct labels.Other works modify the primary loss function of the classi\xef\xac\x81cation tasks.Patrini et al.'
+<EOS>
+b'(2017) es-timates the noise transition matrix to correct the loss, Han et al.(2018a)'
+<EOS>
+b'uses human-in-the-loop,\nZhang & Sabuncu (2018);Thulasidasan et al.(2019) propose other forms of cross-entropy losses.'
+<EOS>
+b'The loss modi\xef\xac\x81cation impedes the transfer of these ideas to other tasks than classi\xef\xac\x81cation.Compared\nto these works, our framework SELF does not modify the primary loss.However, many tasks rely on\nthe presence of clean labels such as anomaly detection'
+<EOS>
+b'(Nguyen et al., 2019a) or self-supervised andunsupervised learning (Nguyen et al., 2019b).The progressive \xef\xac\x81ltering procedure and self-ensemble'
+<EOS>
+b'learning proposed are also applicable in these tasks to counteract noise effectively.5Published as a conference paper at ICLR 2020'
+<EOS>
+b'Table 1: Comparison of classi\xef\xac\x81cation accuracy when learning under uniform label noise on CIFAR-\n10 and CIFAR-100.Following previous works, we compare two evaluation scenarios: with a noisy\nvalidation set (top) and with 1000 clean validation samples (bottom).The best model is marked in\nbold.'
+<EOS>
+b'Having a small clean validation set improves the model but is not necessary.NOISE RATIOCIFAR-10'
+<EOS>
+b'CIFAR-10040% 60% 80% 40% 60% 80 %USING NOISY VALIDATION SET'
+<EOS>
+b'69.66\n70.64\n78.1586.0689.00'
+<EOS>
+b'89.0087.13\n87.62\n83.25\n81.8583.36\n85.34'
+<EOS>
+b'83.2793.7090.93'
+<EOS>
+b'78.0086.55\n86.9295.10\n\n-'
+<EOS>
+b'-\n-\n-\n-\n-\n82.54\n82.70\n74.96\n74.0472.8480.07\n74.39'
+<EOS>
+b'93.1587.58\n--\n-\n93.77\n\n-\n-\n-\n-\n20.00\n49.00'
+<EOS>
+b'64.0767.9254.64'
+<EOS>
+b'29.22-\n53.8140.09'
+<EOS>
+b'69.9170.80\n-\n--'
+<EOS>
+b'79.9351.3449.10\n-\n58.01'
+<EOS>
+b'61.0068.0061.77'
+<EOS>
+b'62.6431.0555.95\n52.01'
+<EOS>
+b'53.6952.8871.98'
+<EOS>
+b'68.2059.0058.34\n61.31'
+<EOS>
+b'74.76\n\n--\n-\n-\n-\n-\n53.1654.04'
+<EOS>
+b'19.1247.9842.27\n41.47'
+<EOS>
+b'42.6466.21\n\n59.44-\n-\n-\n68.35\n\n-'
+<EOS>
+b'-\n-\n-\n13.00\n35.0029.1629.60'
+<EOS>
+b'08.9023.2215.00\n18.46'
+<EOS>
+b'42.0934.06-\n-\n-\n46.43'
+<EOS>
+b'REED-HARD (REED ET AL., 2014)S-MODEL (GOLDBERGER & BEN-REUVEN, 2016)OPEN'
+<EOS>
+b'-SET WANG ET AL.(2018)\nRAND.WEIGHTS (REN ET AL., 2018)'
+<EOS>
+b'BI-LEVEL-MODEL (JENNI & FAVARO, 2018)MENTORNET (JIANG ET AL., 2017)Lq'
+<EOS>
+b'(ZHANG & SABUNCU, 2018)TRUNCLq'
+<EOS>
+b'(ZHANG & SABUNCU, 2018)FORWARD\xcb\x86T'
+<EOS>
+b'(PATRINI ET AL., 2017)CO-TEACHING (HAN ET AL., 2018B)D2L (MA ET AL., 2018)'
+<EOS>
+b'SL (WANG ET AL., 2019)\nJOINTOPT (TANAKA ET AL., 2018)\nSELF (OURS)\n\nDAC (THULASIDASAN ET AL., 2019)MENTORNET (JIANG ET AL., 2017)\nRAND.WEIGHTS (REN ET AL., 2018)'
+<EOS>
+b'REN ET AL (REN ET AL., 2018)SELF*(OURS)'
+<EOS>
+b'4 EVALUATION4.1 EXPERIMENTS DESCRIPTIONS4.1.1 STRUCTURE OF THE ANALYSIS'
+<EOS>
+b'USING CLEAN VALIDATION SET (1000 IMAGES)We evaluate our approach on CIFAR-10, CIFAR-100, an ImageNet-ILSVRC on different noisesce-\nnarios.'
+<EOS>
+b'For CIFAR-10, CIFAR-100, and ImageNet, we consider the typical situation with symmetric\nand asymmetric label noise.In the case of the symmetric noise, a label is randomly \xef\xac\x82ipped to another\nclass with probability'
+<EOS>
+b'p.Following previous works, we also consider label \xef\xac\x82ips of semantically sim-ilar classes on CIFAR-10, and pair-wise label \xef\xac\x82ips on CIFAR-100.'
+<EOS>
+b'Finally, we perform studies on\nthe choice of the network architecture and the ablation of the components in our framework.Tab.6'
+<EOS>
+b'(Appendix) shows the in-deep analysis of semi-supervised learning strategies combined with recent\nworks.Overall, the proposed framework SELF outperforms all these combinations.4.1.2 COMPARISONS TO PREVIOUS WORKS'
+<EOS>
+b'We compare our work to previous methods from Reed-Hard(Reed et al., 2014), S-model (Gold-\nberger & Ben-Reuven, 2016), Wang et al.(2018)'
+<EOS>
+b', Rand.weights (Ren et al., 2018), Bi-level-model(Jenni & Favaro, 2018), D2L (Ma et al., 2018), SL (Wang et al., 2019), Lq (Zhang & Sabuncu,\n2018), Trunc Lq'
+<EOS>
+b'(Zhang & Sabuncu, 2018),Forward \xcb\x86T(Patrini et al., 2017), DAC (Thulasidasan\net al., 2019),'
+<EOS>
+b'Random reweighting (Ren et al., 2018), and Learning to reweight (Ren et al., 2018).For co-teaching (Han et al., 2018b), MentorNet (Jiang et al., 2017), JointOpt (Tanaka et al., 2018),\nthe source codes are available and hence used for evaluation.(Ren et al., 2018) and DAC (Thulasidasan et al., 2019) considered the setting of having a small clean\nvalidation set of 1000 and 5000 images respectively.'
+<EOS>
+b'For comparison purposes, we also experiment\nwith a small clean set of 1000 images additionally.Further, we abandon oracle experiments or\nmethods using additional information to keep the evaluation comparable.For instance, Forward T\n(Patrini et al., 2017) uses the true underlying confusion matrix to correct the loss.'
+<EOS>
+b'This information\nis neither known in typical scenarios nor used by other methods.6Published as a conference paper at ICLR 2020'
+<EOS>
+b'Table 2: Asymmetric noise on CIFAR-10, CIFAR-100.All methods use Resnet34.CIFAR-10: \xef\xac\x82ip\nTRUCK \xe2\x86\x92 AUTOMOBILE, BIRD \xe2\x86\x92 AIRPLANE, DEER'
+<EOS>
+b'\xe2\x86\x92 HORSE, CAT\xe2\x86\x94DOG with prob.p.CIFAR-100:'
+<EOS>
+b'\xef\xac\x82ip classi to (i + 1)%100 with prob.'
+<EOS>
+b'p. SELF retains high performances across all\nnoise ratios and outperforms all previous works.CIFAR-10NOISE RATIO'
+<EOS>
+b'10%\n\n20%\n\n30%\n\n40%\n\nCCEMAEFORWARD'
+<EOS>
+b'\xcb\x86TLqTRUNC'
+<EOS>
+b'LqSL\nJOINTOPTSELF (OURS)\n\n90.69'
+<EOS>
+b'82.6190.5290.91'
+<EOS>
+b'90.4388.2490.12'
+<EOS>
+b'93.7588.5952.93\n89.09\n89.33\n89.45\n85.36'
+<EOS>
+b'89.45\n92.7686.14\n50.36\n86.79\n85.4587.10\n80.64'
+<EOS>
+b'87.1892.4280.11'
+<EOS>
+b'45.5283.55\n76.7482.28'
+<EOS>
+b'-87.9789.07\n\n10%'
+<EOS>
+b'66.5413.3845.96\n68.36'
+<EOS>
+b'68.8665.5869.61'
+<EOS>
+b'72.45CIFAR-10020%\n\n30%\n\n59.20'
+<EOS>
+b'11.50\n42.4666.5966.59'
+<EOS>
+b'65.1468.9470.53'
+<EOS>
+b'51.4008.9138.13'
+<EOS>
+b'61.4561.8763.10\n63.99\n65.09'
+<EOS>
+b'40%\n\n42.7408.2034.44\n47.22'
+<EOS>
+b'47.66\n\n-\n\n53.7153.83Whenever possible, we adopt the reported performance from the corresponding publications.'
+<EOS>
+b'The\ntesting scenarios are kept as similar as possible to enable a fair comparison.All tested scenarios use\na noisy validation set with the same noise distribution as the training set unless stated otherwise.All\nmodel performances are reported on the clean test set.'
+<EOS>
+b'Table 3: Effect of the choice of network architecture on classi\xef\xac\x81cation accuracy on CIFAR-10 &\n-100 with uniform label noise.SELF is compatible with all tested architectures.Here * represents\nbaseline accuracy of the architectures that are trained on fully supervised setting at 0% label noise.'
+<EOS>
+b'CIFAR-10\n\nCIFAR-100CIFAR-10CIFAR-100'
+<EOS>
+b'RESNET10193.89*'
+<EOS>
+b'81.14*RESNET34'
+<EOS>
+b'93.5*76.76'
+<EOS>
+b'*NOISE\n\n40% 80% 40% 80%\n\nNOISE\n\n40% 80% 40% 80%\n\nMENTORNETCO-T.\nSELF'
+<EOS>
+b'89.0062.5892.77'
+<EOS>
+b'49.00\n21.7964.5268.00\n39.58'
+<EOS>
+b'69.0035.00\n16.7939.73'
+<EOS>
+b'LqTRUNCLq'
+<EOS>
+b'FORWARD\xcb\x86TSELF'
+<EOS>
+b'87.13\n87.62\n83.2591.1364.07'
+<EOS>
+b'67.92\n54.6463.5961.77'
+<EOS>
+b'62.64\n31.0566.7129.16\n29.60\n8.90'
+<EOS>
+b'35.56WRN 28-10'
+<EOS>
+b'96.21*81.02'
+<EOS>
+b'*NOISE\n\n40% 80% 40% 80%\n\nMENTORNETREWEIGHT'
+<EOS>
+b'SELF\n\n88.786.0293.34'
+<EOS>
+b'46.30-67.41'
+<EOS>
+b'67.50\n58.0172.4830.10'
+<EOS>
+b'-\n42.06RESNET2696.37'
+<EOS>
+b'*81.20*'
+<EOS>
+b'NOISECO-T.\nSELF40% 80% 40% 80%\n\n81.85'
+<EOS>
+b'93.7029.2269.91'
+<EOS>
+b'55.9571.9823.22\n42.09\n\n4.1.3 NETWORKS CONFIGURATION AND TRAINING'
+<EOS>
+b'For the basic training of self-ensemble model, we use the Mean Teacher model (Tarvainen &\nValpola, 2017) available on GitHub 1 .The students and teacher networks are residual networks(He\net al., 2016) with 26 layers with Shake-Shake-regularization (Gastaldi, 2017).'
+<EOS>
+b'We use the Py-Torch(Paszke et al., 2017) implementation of the network and keep the training settings close\nto (Tarvainen & Valpola, 2017).'
+<EOS>
+b'The network is trained with Stochastic Gradient Descent.In each\n\xef\xac\x81ltering iteration, the model is trained for a maximum of 300 epochs, with patience of 50 epochs.For more training details, see the appendix.'
+<EOS>
+b'4.2 EXPERIMENTS RESULTS\n\n4.2.1SYMMETRIC LABEL NOISE\n\nCIFAR-10 and 100 Results for typical uniform noise scenarios with noise ratios on CIFAR-10\nand CIFAR-100 are shown in Tab.1.'
+<EOS>
+b'More results are visualized in Fig.1a (CIFAR-10) and Fig.1b\n(CIFAR-100).'
+<EOS>
+b'Our approach SELF performs robustly in the case of lower noise ratios with up to 60%\nand outperforms previous works.Although a strong performance loss occurs at 80% label noise,\n\n1https://github.com/CuriousAI/mean-teacher7'
+<EOS>
+b'Published as a conference paper at ICLR 2020Table 4:Classi\xef\xac\x81cation accuracy on clean'
+<EOS>
+b'ImageNet validation dataset.The mod-\nels are trained at 40% label noise and the\nbest model is picked based on the evalu-\nation on noisy validation data.Mentornet\nshows the best previously reported results.'
+<EOS>
+b'Mentornet* is based on Resnet-101.We\nchose the smaller Resnext50 model to re-duce the run-time.'
+<EOS>
+b'AccurracyMentornet*'
+<EOS>
+b'ResNextMean-T.\nSELF (Ours)Resnext18 Resnext50'
+<EOS>
+b'P@1 P@5P@1 P@5-'
+<EOS>
+b'65.10 85.90\n-\n50.675.99 56.25 80.9058.04 81.82 62.96 85.72'
+<EOS>
+b'66.92 86.65 71.31 89.92\n\nTable 5:Ablation study on CIFAR-10 and CIFAR-\n100.The Resnet baseline was trained on the full\nnoisy label set.'
+<EOS>
+b'Adding progressive \xef\xac\x81ltering im-proves over this baseline.The Mean Teacher main-'
+<EOS>
+b'tains an ensemble of model snapshots, which helps\ncounteract noise.Having progressive \xef\xac\x81ltering and\nmodel ensembles (-MVA-pred.) makes the model\nmore robust but still fails at 80% noise.The full\nSELF framework additionally uses the prediction\nensemble for detection of correct labels.'
+<EOS>
+b'NOISE RATIORESNET26FILTERING'
+<EOS>
+b'MEAN-T.\n- MVA-PRED.\nSELF (OURS)\n\nCIFAR-10\n\nCIFAR-10040% 80% 40% 80%\n\n83.20\n87.3593.70'
+<EOS>
+b'93.7793.70\n\n41.3749.58'
+<EOS>
+b'52.5057.4069.91'
+<EOS>
+b'53.1861.4065.85'
+<EOS>
+b'71.6971.9819.92'
+<EOS>
+b'23.42\n26.3138,61\n42.09\n\nSELF still outperforms most of the previous approaches.The experiment SELF*'
+<EOS>
+b'using a 1000 clean\nvalidation images shows that the performance loss mostly originates from the progressive \xef\xac\x81ltering\nrelying too strongly on the extremely noisy validation set.ImageNet-ILSVRC Tab.4 shows the precision@1 and @5 of various models, given 40% label\nnoise in the training set.'
+<EOS>
+b'Our networks are based on ResNext18 and Resnext50.Note that MentorNet\n(Jiang et al., 2017) uses Resnet101 (P@1: 78.25)(Goyal et al., 2017), which has higher performance\ncompared to Resnext50'
+<EOS>
+b'(P@1: 77.8)(Xie et al., 2017) on the standard ImageNet validation set.Despite the weaker model, SELF (ResNext50) surpasses the best previously reported results by\nmore than 5% absolute improvement.'
+<EOS>
+b'Even the signi\xef\xac\x81cantly weaker model ResNext18 outperforms\nMentorNet, which is based on a more powerful ResNet101 network.4.2.2ASYMMETRIC LABEL NOISE'
+<EOS>
+b'Tab.2 shows more challenging noise scenarios when the noise is not class-symmetric and uniform.Concretely, labels are \xef\xac\x82ipped among semantically similar classes such as CAT and DOG on CIFAR-\n10.'
+<EOS>
+b'On CIFAR-100, each label is \xef\xac\x82ipped to the next class with a probabilityp.In these scenarios, our\nframework SELF also retains high performance and only shows a small performance drop at 40%\nnoise.'
+<EOS>
+b'The high label noise resistance of our framework indicates that the proposed self-ensemble\n\xef\xac\x81ltering process helps the network identify correct samples, even under extreme noise ratios.4.2.3 EFFECTS OF DIFFERENT ARCHITECTURESPrevious works utilize a various set of different architectures, which hinders a fair comparison.\nTab.'
+<EOS>
+b'3 shows the performance of our framework SELF compared to previous approaches.SELFoutperforms other works in all scenarios except for CIFAR-10 with 80% noise.'
+<EOS>
+b'Typical robustlearning approaches lead to signi\xef\xac\x81cant accuracy losses at 40% noise, while SELF still retains high\nperformance.Further, note that SELF allows the network\xe2\x80\x99s performance to remain consistent across\nthe different underlying architectures.'
+<EOS>
+b'4.2.4 ABLATION STUDY\nTab.5 shows the importance of each component in our framework.See Fig.'
+<EOS>
+b'4a, Fig.4b for experi-ments on more noise ratios.'
+<EOS>
+b'As expected, the Resnet-baseline rapidly breaks down with increasing\nnoise ratios.Adding self-supervised \xef\xac\x81ltering increases the performance slightly in lower noise ratios.However, the model has to rely on extremely noisy snapshots.'
+<EOS>
+b'Contrary, using a model ensemble\nalone such as in Mean-Teacher can counteract noise on the noisy dataset CIFAR-10.On the more\nchallenging CIFAR-100, however, the performance decreases strongly.With self-supervised \xef\xac\x81lter-'
+<EOS>
+b'ing and model ensembles, SELF (without MVA-pred) is more robust and only impairs performance\nat 80% noise.The last performance boost is given by using moving-average predictions so that the\nnetwork can reliably detect correctly labeled samples gradually.Fig. 4 shows the ablation experiments on more noise ratios.'
+<EOS>
+b'The analyses shows that each component\nin SELF is essential for the model to learn robustly.8Published as a conference paper at ICLR 2020'
+<EOS>
+b'(a) Ablation exps.on CIFAR-10\n\n(b) Ablation exps.on CIFAR-100'
+<EOS>
+b'Figure 4:Ablation study on the importance of the components in our framework SELF, evaluated\non (a) Cifar-10 and (b) Cifar-100 with uniform noise.Please refer Tab.'
+<EOS>
+b'5 for details of components.Table 6:Analysis of semi-supervised learning (SSL) strategies: entropy learning, mean-teacher'
+<EOS>
+b'combined with recent works.Our progressive \xef\xac\x81ltering strategy is shown to be effective and per-forms well regardless of the choice of the semi-supervised learning backbone.'
+<EOS>
+b'Overall, the proposed\nmethod SELF outperforms all these combinations.Best model in each SSL-category is marked\nin bold.Running mean-teacher+ co-teaching using the same con\xef\xac\x81guration is not possible due to\nmemory constraints.'
+<EOS>
+b'NOISE RATIOCIFAR-10CIFAR-100'
+<EOS>
+b'40%\n\n60%\n\n80%40%\n\n60%\n\n80%BASELINE MODELS'
+<EOS>
+b'RESNET26(GASTALDI, 2017)CO-TEACHING (HAN ET AL., 2018B)'
+<EOS>
+b'JOINTOPT (TANAKA ET AL., 2018)PROGRESSIVE FILTERING (OURS)ENTROPY'
+<EOS>
+b'ENTROPY + CO-TEACHINGENTROPY + JOINT-OPTENTROPY+FILTERING (OURS)\n\n83.20'
+<EOS>
+b'81.8583.27\n87.3579.13\n84.94'
+<EOS>
+b'84.4490.0472.35'
+<EOS>
+b'74.04\n74.3975.47\n\n85.9874.28'
+<EOS>
+b'75.8683.8841.37'
+<EOS>
+b'29.22\n40.0949.5846.93'
+<EOS>
+b'35.16\n39.1652.46\n\n53.1855.95\n52.88'
+<EOS>
+b'61.4054.6555.68'
+<EOS>
+b'56.7359.9744.31\n47.98'
+<EOS>
+b'42.6450.6041.34'
+<EOS>
+b'43.5243.2746.45'
+<EOS>
+b'19.9223.2218.46'
+<EOS>
+b'23.4221.2920.5\n17.24\n23.53\n\nSEMI-SUPERVISED LEARNING WITH ENTROPY LEARNING\n\nSEMI-SUPERVISED LEARNING WITH MEAN-TEACHER'
+<EOS>
+b'MEANTEACHER\nMEAN-TEACHER +JOINTOPT'
+<EOS>
+b'MEAN-TEACHER +FILTERING - SELF (OURS)93.70'
+<EOS>
+b'91.4093.7090.40'
+<EOS>
+b'83.6292.8552.5'
+<EOS>
+b'45.1269.9165.85'
+<EOS>
+b'60.09\n71.9854.4845.92'
+<EOS>
+b'66.21\n\n26.31\n23.54\n42.584.2.5 SEMI-SUPERVISED LEARNING FOR PROGRESSIVE FILTERINGTab.'
+<EOS>
+b'6 shows different semi-supervised learning strategies: entropy learning, mean-teacher com-\nbined with recent works.Note that Co-Teaching+Mean-Teacher cannot be implemented and run in\nthe same con\xef\xac\x81guration as other experiments, due to memory constraints.The analysis indicates the semi-supervised losses mostly stabilize the baselines, compared to the\nmodel without semi-supervised learning.'
+<EOS>
+b'However, Co-teaching and JointOpt sometimes perform\nworse than the purely semi-supervised model.This result indicates that their proposed frameworks\nare not always compatible with semi-supervised losses.The progressive \xef\xac\x81ltering technique is seamlessly compatible with different semi-supervised losses.'
+<EOS>
+b'The \xef\xac\x81ltering outperforms its counterparts when combined with Entropy Learning or Mean-teacher\nmodel.Overall, SELF outperforms all considered combinations.9'
+<EOS>
+b'Published as a conference paper at ICLR 20205 CONCLUSIONWe propose a simple and easy to implement a framework to train robust deep learning models under\nincorrect or noisy labels.'
+<EOS>
+b'We \xef\xac\x81lter out the training samples that are hard to learn (possibly noisy\nlabeled samples) by leveraging ensemble of predictions of the single network\xe2\x80\x99s output over different\ntraining epochs.Subsequently, we allow clean supervision from the non-hard samples and further\nleverage additional unsupervised loss from the entire dataset.We show that our framework results in\nDNN models with superior generalization performance on CIFAR-10, CIFAR-100 & ImageNet and\noutperforms all previous works under symmetric (uniform) and asymmetric noises.'
+<EOS>
+b'Furthermore,\nour models remain robust despite the increasing noise ratio and change in network architectures.REFERENCESSamaneh Azadi, Jiashi Feng, Stefanie Jegelka, and Trevor Darrell.'
+<EOS>
+b'Auxiliary image regularization\n\nfor deep cnns with noisy labels.arXiv preprint arXiv:1511.07069, 2015.Beno\xcb\x86\xc4\xb1t Fr\xc2\xb4enay and Michel Verleysen.'
+<EOS>
+b'Classi\xef\xac\x81cation in the presence of label noise: a survey.IEEEtransactions on neural networks and learning systems, 25(5):845\xe2\x80\x93869, 2013.'
+<EOS>
+b'Xavier Gastaldi.Shake-shake regularization.arXiv preprint arXiv:1705.07485, 2017.'
+<EOS>
+b'Jacob Goldberger and Ehud Ben-Reuven.Training deep neural-networks using a noise adaptation\n\nlayer.2016.'
+<EOS>
+b'Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley, Sherjil Ozair,\n\nAaron Courville, and Yoshua Bengio.Generative Adversarial Nets.pp. 9.'
+<EOS>
+b'Priya Goyal, Piotr Doll\xc2\xb4ar, Ross Girshick, Pieter Noordhuis, Lukasz Wesolowski, Aapo Kyrola,An-drew Tulloch, Yangqing Jia, and Kaiming He.'
+<EOS>
+b'Accurate, large minibatch sgd:Training imagenet\nin 1 hour.arXiv preprint arXiv:1706.02677, 2017.'
+<EOS>
+b'Bo Han, Jiangchao Yao, Gang Niu, Mingyuan Zhou, Ivor Tsang, Ya Zhang, and Masashi Sugiyama.\nMasking:A new perspective of noisy supervision.In Advances in Neural Information Processing\nSystems, pp.'
+<EOS>
+b'5836\xe2\x80\x935846, 2018a.Bo Han, Quanming Yao, Xingrui Yu, Gang Niu, Miao Xu, Weihua Hu, Ivor Tsang, and Masashi\nSugiyama.Co-teaching:'
+<EOS>
+b'Robust training of deep neural networks with extremely noisy labels.In\nNeurIPS, pp.8535\xe2\x80\x938545, 2018b.'
+<EOS>
+b'Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun.Deep residual learning for image recog-\nnition.In Proceedings of the IEEE conference on computer vision and pattern recognition, pp.\n770\xe2\x80\x93778, 2016.'
+<EOS>
+b'Simon Jenni and Paolo Favaro.Deep bilevel learning.In ECCV, 2018.'
+<EOS>
+b'Lu Jiang, Zhengyuan Zhou, Thomas Leung, Li-Jia Li, and Li Fei-Fei.MentorNet:Learning Data-'
+<EOS>
+b'Driven Curriculum for Very Deep Neural Networks on Corrupted Labels.arXiv:1712.05055[cs],\nDecember 2017.'
+<EOS>
+b'URL http://arxiv.org/abs/1712.05055.arXiv: 1712.05055.Samuli Laine and Timo Aila.'
+<EOS>
+b'Temporal ensembling for semi-supervised learning.arXiv preprintarXiv:1610.02242, 2016.'
+<EOS>
+b'Ilya Loshchilov and Frank Hutter.Sgdr:Stochastic gradient descent with warm restarts.'
+<EOS>
+b'arXivpreprint arXiv:1608.03983, 2016.Yucen Luo, Jun Zhu, Mengxi Li, Yong Ren, and Bo Zhang.'
+<EOS>
+b'Smooth neighbors on teacher graphs\nfor semi-supervised learning.In Proceedings of the IEEE Conference on Computer Vision and\nPattern Recognition, pp. 8896\xe2\x80\x938905, 2018.Xingjun Ma, Yisen Wang, Michael E Houle, Shuo Zhou, Sarah M Erfani, Shu-Tao Xia, Sudan-\nthi Wijewickrema, and James Bailey.'
+<EOS>
+b'Dimensionality-driven learning with noisy labels.arXivpreprint'
+<EOS>
+b'arXiv:1806.02612, 2018.10Published as a conference paper at ICLR 2020'
+<EOS>
+b'Duc Tam Nguyen, Zhongyu Lou, Michael Klar, and Thomas Brox.Anomaly detection with\nmultiple-hypotheses predictions.In Kamalika Chaudhuri and Ruslan Salakhutdinov (eds.), Pro-\nceedings of the 36th International Conference on Machine Learning, volume 97 of Proceedings\nof Machine Learning Research, pp.'
+<EOS>
+b'4800\xe2\x80\x934809, Long Beach, California, USA, 09\xe2\x80\x9315 Jun 2019a.\nPMLR.URL http://proceedings.mlr.press/v97/nguyen19b.html.Tam Nguyen, Maximilian Dax, Chaithanya Kumar Mummadi, Nhung Ngo, Thi Hoai Phuong\nNguyen, Zhongyu Lou, and Thomas Brox.'
+<EOS>
+b'Deepusps:Deep robust unsupervised saliency predic-\ntion via self-supervision.In Advances in Neural Information Processing Systems, pp.'
+<EOS>
+b'204\xe2\x80\x93214,\n2019b.Adam Paszke, Sam Gross, Soumith Chintala, Gregory Chanan, Edward Yang, Zachary DeVito,Zeming Lin, Alban Desmaison, Luca Antiga, and Adam Lerer.'
+<EOS>
+b'Automatic differentiation in\npytorch.2017.Giorgio Patrini, Alessandro Rozza, Aditya Krishna Menon, Richard Nock, and Lizhen Qu.'
+<EOS>
+b'Making\ndeep neural networks robust to label noise: A loss correction approach.In Proceedings of the\nIEEE Conference on Computer Vision and Pattern Recognition, pp. 1944\xe2\x80\x931952, 2017.Scott Reed, Honglak Lee, Dragomir Anguelov, Christian Szegedy, Dumitru Erhan, and Andrew'
+<EOS>
+b'Rabinovich.Training deep neural networks on noisy labels with bootstrapping.arXiv preprint'
+<EOS>
+b'arXiv:1412.6596, 2014.Mengye Ren, Wenyuan Zeng, Bin Yang, and Raquel Urtasun.Learning to Reweight Examples for\nRobust Deep Learning.'
+<EOS>
+b'arXiv:1803.09050[cs, stat], March 2018.URL http://arxiv.org/'
+<EOS>
+b'abs/1803.09050.arXiv: 1803.09050.David Rolnick, Andreas Veit, Serge Belongie, and Nir Shavit.'
+<EOS>
+b'Deep learning is robust to massive\n\nlabel noise.arXiv preprint arXiv:1705.10694, 2017.Ilya Sutskever, James Martens, George E Dahl, and Geoffrey E Hinton.'
+<EOS>
+b'On the importance of\n\ninitialization and momentum in deep learning.ICML (3), 28(1139-1147):5, 2013.Daiki Tanaka, Daiki Ikami, Toshihiko Yamasaki, and Kiyoharu Aizawa.'
+<EOS>
+b'Joint optimizationframe-work for learning with noisy labels.'
+<EOS>
+b'In Proceedings of the IEEE Conference on Computer Vision\nand Pattern Recognition, pp.5552\xe2\x80\x935560, 2018.Antti Tarvainen and Harri Valpola.'
+<EOS>
+b'Mean teachers are better role models:Weight-averaged consis-tency targets improve semi-supervised deep learning results.'
+<EOS>
+b'In Advances in neural information\nprocessing systems, pp. 1195\xe2\x80\x931204, 2017.Sunil Thulasidasan, Tanmoy Bhattacharya, Jeff Bilmes, Gopinath Chennupati, and JamalMohd-'
+<EOS>
+b'Yusof.Combating label noise in deep learning using abstention.arXiv preprint arXiv:1905.10964,\n2019.'
+<EOS>
+b'Yisen Wang, Weiyang Liu, Xingjun Ma, James Bailey, Hongyuan Zha, Le Song, and Shu-Tao Xia.Iterative learning with open-set noisy labels.arXiv preprint arXiv:1804.00092, 2018.'
+<EOS>
+b'Yisen Wang, Xingjun Ma, Zaiyi Chen, Yuan Luo, Jinfeng Yi, and James Bailey.Symmetric cross en-tropy for robust learning with noisy labels.'
+<EOS>
+b'In Proceedings of the IEEE International Conference\non Computer Vision, pp. 322\xe2\x80\x93330, 2019.Saining Xie, Ross Girshick, Piotr Doll\xc2\xb4ar, Zhuowen Tu, and Kaiming He.Aggregated residual trans-\nformations for deep neural networks.'
+<EOS>
+b'In Proceedings of the IEEE Conference on Computer Vision\nand Pattern Recognition, pp. 1492\xe2\x80\x931500, 2017.Chiyuan Zhang, Samy Bengio, Moritz Hardt, Benjamin Recht, and Oriol Vinyals.Understanding\ndeep learning requires rethinking generalization.'
+<EOS>
+b'In International Conference on Learning Rep-\nresentations, 2017.URL https://openreview.net/forum?id=Sy8gdB9xx.Zhilu Zhang and Mert Sabuncu.'
+<EOS>
+b'Generalized cross entropy loss for training deep neural networks\nwith noisy labels.In Advances in Neural Information Processing Systems, pp. 8778\xe2\x80\x938788, 2018.11'
+<EOS>
+b'Published as a conference paper at ICLR 2020A APPENDIXA.1 MEAN TEACHER MODEL FOR ITERATIVE FILTERING'
+<EOS>
+b'We apply the Mean Teacher algorithm in each iteration i in the train(Df ilter, Dval) procedure as\nfollows.\xe2\x80\xa2 Input: examples with potentially clean labelsDf ilter from the \xef\xac\x81ltering procedure.'
+<EOS>
+b'In the\n\nbeginning (i = 0), here Df ilter refers to entire labeled dataset.\xe2\x80\xa2 Initialize a supervised neural network as the student modelM s'
+<EOS>
+b'i .\xe2\x80\xa2 Initialize the Mean Teacher modelM t'
+<EOS>
+b'i as a copy of the student model with all weights\n\ndetached.\xe2\x80\xa2Let the loss function be the sum of normal classi\xef\xac\x81cation loss of M s'
+<EOS>
+b'i and the consistency\n\nloss between the outputs of M ti and M ti'
+<EOS>
+b'\xe2\x80\xa2Select an optimizer\xe2\x80\xa2'
+<EOS>
+b'In each training iteration:\n\n\xe2\x80\x93 Update the weights of M s\n\xe2\x80\x93 Update the weights of M t\n\xe2\x80\x93Evaluate performance of M si using the selected optimizer'
+<EOS>
+b'i as an exponential moving-average of the student weightsi over Dval to verify the early stopping criteria.i and M t'
+<EOS>
+b'\xe2\x80\xa2 Return the best M tiA.2'
+<EOS>
+b'ASSUMPTIONS DICUSSIONSOur method performs best when the following assumptions are hold.Natural robustness assumption of deep networks\n(Rolnick et al., 2017):'
+<EOS>
+b'The networks attempt\nto learn the easiest way to explain most of the data.SELF uses this assumption to kickstart the\nlearning process.Correct samples dominate over wrongly labeled samples At 80% noise on CIFAR-10, the cor-\nrectly labeled cats (20% out of all cat images) still dominates over samples wrongly labeled as cat\n(8.8% for each class).'
+<EOS>
+b'Independence results in less over\xef\xac\x81tting SELF performs best if the noises on the validation set\nand training set are i.i.d. .SELF uses the validation data for early stopping.Hence, a high correlation\nof label noise between train and valid increases the chance of model over\xef\xac\x81tting.'
+<EOS>
+b'Suf\xef\xac\x81cient label randomness assumptionThe subset of all correctly labeled samples capture all\nsamples clusters.In fact, many works from the active learning literature show that less than 100\n% of the labeled samples are required to achieve the highest model performance.'
+<EOS>
+b'SELF performs\nprogressive expansion of the correct labels sets.At larger noise ratios, not all clusters are covered\nby the identi\xef\xac\x81ed samples.Therefore on task containing many classes, e.g., CIFAR-100, the model'
+<EOS>
+b'performance decreases faster than on CIFAR-10.The model performance reduces when these assumptions are strongly violated.Each assumption\nshould have its own \xe2\x80\x9dcritical\xe2\x80\x9d threshold for violation.'
+<EOS>
+b'A future in-depth analysis to challenge the\nassumptions is an interesting future research direction.A.3TRAINING DETAILS'
+<EOS>
+b'A.3.1 CIFAR-10 AND CIFAR-100Dataset Tab.7 shows the details of CIFAR-10 and 100 datasets in our evaluation pipeline.'
+<EOS>
+b'The\nvalidation set is contaminated with the same noise ratio as the training data unless stated otherwise.12Published as a conference paper at ICLR 2020'
+<EOS>
+b'Network training For the training our model SELF, we use the standard con\xef\xac\x81guration provided\nby Tarvainen & Valpola (2017)2.Concretely, we use the SGD-optimizer with Nesterov Sutskever'
+<EOS>
+b'et al.(2013) momentum, a learning rate of 0.05 with cosine learning rate annealing Loshchilov &\nHutter (2016), a weight decay of 2e-4, max iteration per \xef\xac\x81ltering step of 300, patience of 50 epochs,\ntotal epochs count of 600.Table 7:'
+<EOS>
+b'Dataset description.Classi\xef\xac\x81cation tasks on CIFAR-10 and CIFAR-100 with uniform noise.Note that the noise on the training and validation set is not correlated.'
+<EOS>
+b'Hence, maximizing the\naccuracy on the noisy set provides a useful (but noisy) estimate for the generalization ability on\nunseen test data.TASKRESOLUTION\n\nDATA'
+<EOS>
+b'TYPECIFAR-10CIFAR-100'
+<EOS>
+b'CLASSIFICATION100-WAYTRAIN (NOISY)'
+<EOS>
+b'VALID (NOISY)TEST (CLEAN)\n\n10-WAY32X32'
+<EOS>
+b'45000\n500010000\n\n450005000'
+<EOS>
+b'10000For basic training of baselines models without semi-supervised learning, we had to set the learning\nrate to 0.01.In the case of higher learning rates, the loss typically explodes.'
+<EOS>
+b'Every other option is\nkept the same.Semi-supervised learning For the mean teacher training, additional hyperparameters are required.'
+<EOS>
+b'In both cases of CIFAR-10 and CIFAR-100, we again take the standard con\xef\xac\x81guration with the con-\nsistency loss to mean-squared-error and a consistency weight: 100.0, logit distance cost: 0.01,\nconsistency-ramp-up:5.The total batch-size is 512, with 124 samples being reserved for labeled\nsamples, 388 for unlabeled data.Each epoch is de\xef\xac\x81ned as a complete processing of all unlabeled\ndata.'
+<EOS>
+b'When training without semi-supervised-learning, the entire batch is used for labeled data.Data augmentationThe data are normalized to zero-mean and standard-variance of one.'
+<EOS>
+b'Further,\nwe use real-time data augmentation with random translation and re\xef\xac\x82ection, subsequently randomhorizontal \xef\xac\x82ip.The standard PyTorch-library provides these transformations.'
+<EOS>
+b'A.3.2\n\nIMAGENET-ILSVRC-2015Network Training'
+<EOS>
+b'The network used for evaluation were ResNetHeet al.'
+<EOS>
+b'(2016) and Resnext Xieet al.(2017) for training.'
+<EOS>
+b'All ResNext variants use a cardinality of 32 and base width of 4 (32x4d).ResNext models follow the same structure as their Resnet counterparts, except for the cardinality\nand base width.All other con\xef\xac\x81gurations are kept as close as possible to Tarvainen & Valpola (2017).'
+<EOS>
+b'The initial\nlearning rate to handle large batches Goyal et al.(2017) is set to 0.1; the base learning rate is 0.025\nwith a single cycle of cosine annealing.Semi-supervised learning Due to the large images, the batch size is set to 40 in total with 20/20\nfor labeled and unlabeled samples, respectively.'
+<EOS>
+b'We found the Kullback-divergence leads to no\nmeaningful network training.Hence, we set the consistency loss to mean-squared-error, with a\nweight of 1000.We use consistency ramp up of 5 epochs to give the mean teacher more time in\nthe beginning.'
+<EOS>
+b'Weight decay is set to 5e-5; patience is four epochs to stop training in the current\n\xef\xac\x81ltering iteration.FilteringWe \xef\xac\x81lter noisy samples with the topk=5 strategy, instead of taking the maximum-\nlikelihood (ML) prediction as on CIFAR-10 and CIFAR-100.'
+<EOS>
+b'That means the samples are kept for\nsupervised training if their provided label lies within the top 5 predictions of the model.The main2https://github.com/CuriousAI/mean-teacher'
+<EOS>
+b'13Published as a conference paper at ICLR 2020(a)'
+<EOS>
+b'(b)\n\nFigure 5: Simple training losses to counter label noise.(a) shows the prediction of a sample given\na model.The red bar indicates the noisy label, blue the correct one.'
+<EOS>
+b'Arrows depict the magnitude\nof the gradients(b) Typical losses reweighting schemes are not wrong but suffer from the gradient\nvanishing problem.Non-linear losses such as Negative-log-likelihood are not designed for gradient\nascent.'
+<EOS>
+b'reason is that each image of ImageNet might contain multiple objects.Filtering with ML-predictions\nis too strict and would lead to a small recall of the detection of the correct sample.Data Augmentation'
+<EOS>
+b'For all data, we normalize the RGB-images by the mean: (0.485, 0.456,\n0.406) and the standard variance (0.229, 0.224, 0.225).For training data, we perform a random\nrotation of up to 10 degrees, randomly resize images to 224x224, apply random horizontal \xef\xac\x82ip\nand random color jittering.This noise is needed in regular mean-teacher training.'
+<EOS>
+b'The jitteringsetting are: brightness=0.4, contrast=0.4, saturation=0.4, hue=0.1.The validation data are resized\nto 256x256 and randomly cropped to 224x224'
+<EOS>
+b'A.3.3 SEMI-SUPERVISED LOSSESFor the learning of wrongly labeled samples, Fig. 6 shows the relationship between the typical\nreweighting scheme and our baseline push-away-loss.Typically, reweighting is applied directly to\nthe losses with samples weights w(k) for each sample k as shown in Eq.'
+<EOS>
+b'4min w(k)i N'
+<EOS>
+b'LL(y(k)label|x(k), D)D is the dataset, x(k) and y(k)'
+<EOS>
+b'the sample k at stepi. Negative samples weights w(k)\nfrom the wrong labels.Let w(k)'
+<EOS>
+b'i with c(k)i =\xe2\x88\x92c(k)'
+<EOS>
+b'ilabel are the samples k and its noisy label.w(k)'
+<EOS>
+b'i > 0, then we have:is'
+<EOS>
+b'the samples weight for\nare often assigned to push the network awayiWhich results in:\n\nmin'
+<EOS>
+b'\xe2\x88\x92c(k)i NLL(y(k)'
+<EOS>
+b'label|x(k), D)\n\nmax c(k)i NLL(y(k)'
+<EOS>
+b'label|x(k), D)In other words, we perform gradient ascent for wrongly labeled samples.However, the Negative-\nlog-likelihood is not designed for gradient ascent.'
+<EOS>
+b'Hence the gradients of wrongly labeled samples\nvanish if the prediction is too close to the noisy label.This effect is similar to the training of\nGenerative Adversarial Network (GAN)Goodfellow et al..'
+<EOS>
+b'In the GAN-framework, the generator\nloss is not simply set to the negated version of the discriminator\xe2\x80\x99s loss for the same reason.Therefore, to provide a fair comparison with our framework, we suggest the push-away-loss\nLP ush\xe2\x88\x92away(y(k)\n\nlabel, x(k), D) with improved gradients as follows:(1)'
+<EOS>
+b'(2)(3)(4)\n\n1'
+<EOS>
+b'(cid:88)min|Y'
+<EOS>
+b'|\xe2\x88\x921\n\ny,y(cid:54)=y(k)label\n\nc(k)i N LL(y|x(k)'
+<EOS>
+b', D)Whereby Y is the set of all classes in the training set.This loss has improved gradients to push the\nmodel away from the potentially wrong labels.'
+<EOS>
+b'14Published as a conference paper at ICLR 2020(a)'
+<EOS>
+b'(b)\n\n(a) Extreme predictions such as [0, 1]Figure 6:The entropy loss for semi-supervised learning.\nare encouraged by minimizing the entropy on each prediction.'
+<EOS>
+b'(b)Additionally, maximizing the\nentropy of the mean prediction on the entire dataset or a large batch forces the model to balance its\npredictions over multiple samples.Table 8: Accuracy of the complete removal of samples during iterative \xef\xac\x81ltering on CIFAR-10 and\nCIFAR-100.'
+<EOS>
+b'The underlying model is the MeanTeacher based on Resnet26.When samples are com-\npletely removed from the training set, they are no longer used for either supervised-or-unsupervised\nlearning.This common strategy from previous works leads to rapid performance breakdown.'
+<EOS>
+b'NOISE RATIOCIFAR-10\n\n40%\n\n80 %CIFAR-100'
+<EOS>
+b'40%\n80 %USING NOISY DATAONLY'
+<EOS>
+b'DATA REMOVALSELF (OURS)\n\n93.493.7'
+<EOS>
+b'59.9869.9168.99'
+<EOS>
+b'71.9835.5342.09'
+<EOS>
+b'WITH CLEAN VALIDATION SET\n\nCOMPL.REMOVAL\nSELF (OURS)94.39'
+<EOS>
+b'95.170.9379.93'
+<EOS>
+b'71.8674.7636.61'
+<EOS>
+b'46.43Entropy minimizationThe typical entropy loss for semi-supervised learning is shown in Fig.'
+<EOS>
+b'6.It encourages the model to provide extreme predictions (such as 0 or 1) for each sample.Over a\nlarge number of samples, the model should balance its predictions over all classes.'
+<EOS>
+b'The entropy loss can easily be applied to all samples to express the uncertainty about the provided\nlabels.Alternatively, the loss can be combined with a strict \xef\xac\x81ltering strategy, as in our work, which\nremoves the labels of potentially wrongly labeled samples.For a large noise ratio, predictions of wrongly labeled samples \xef\xac\x82uctuate strongly over previous\ntraining iterations.'
+<EOS>
+b'Amplifying these network decisions could lead to even noisier models model.Combined with iterative \xef\xac\x81ltering, the framework will have to rely on a single noisy model snapshot.In the case of an unsuitable snapshot, the \xef\xac\x81ltering step will make many wrong decisions.'
+<EOS>
+b'A.4 MORE EXPERIMENTS RESULTSA.4.1COMPLETE REMOVAL OF SAMPLES'
+<EOS>
+b'Tab. 8 shows the results of deleting samples from the training set.It leads to signi\xef\xac\x81cant performancesgaps compared to our strategy (SELF), which considers the removed samples as unlabeled data.'
+<EOS>
+b'In\ncase of a considerable label noise of 80%, the gap is close to 9%.Continuously using the \xef\xac\x81ltered samples lead to signi\xef\xac\x81cantly better results.The unsupervised-loss\nprovides meaningful learning signals, which should be used for better model training.'
+<EOS>
+b'15Published as a conference paper at ICLR 2020(a)'
+<EOS>
+b'(b)\n\nFigure 7:Sample training curves of our approach SELF on CIFAR-100 with (a) 60% and (b) 80%\nnoise, using noisy validation data.Note that with our approach, the training loss remains close to 0.'
+<EOS>
+b'Further, note that the mean-teacher continously outperforms the noisy student models.This shows\nthe positive effect of temporal emsembling to counter label noise.A.4.2 SAMPLE'
+<EOS>
+b'TRAINING PROCESSFig. 7 shows the sample training processes of SELF under 60% and 80% noise on CIFAR-100.The\nmean-teacher always outperform the student models.'
+<EOS>
+b'Further, note that regular training leads to\nrapid over-\xef\xac\x81tting to label noise.Contrary, with our effective \xef\xac\x81ltering strategy, both models slowly increase their performance while\nthe training accuracy approaches 100%.Hence, by using progressive \xef\xac\x81ltering, our model could\nerase the inconsistency in the provided labels set.'
+<EOS>
+b'16'
 <EOS>
