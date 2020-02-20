@@ -1,0 +1,2310 @@
+b'Published as a conference paper at ICLR 2020\n\nLEARNING'
+<EOS>
+b'DEEP GRAPH'
+<EOS>
+b'MATCHING VIA CHANNEL-'
+<EOS>
+b'INDEPENDENT EMBEDDING AND HUNGARIAN'
+<EOS>
+b'ATTEN-'
+<EOS>
+b'TION'
+<EOS>
+b'Tianshu Yu, Runzhong Wang, Junchi Yan, Baoxin Li'
+<EOS>
+b'Arizona State University'
+<EOS>
+b'Shanghai Jiao Tong University\ntianshuy,baoxin.liasu.edu'
+<EOS>
+b'runzhong.wang,yanjunchisjtu.edu.cn\n\nABSTRACT'
+<EOS>
+b'Graph matching aims to establishing node-wise correspondence between two\ngraphs, which is a classic combinatorial problem and in general NP-complete.'
+<EOS>
+b'Un-'
+<EOS>
+b'til very recently, deep graph matching methods start to resort to deep networks to\nachieve unprecedented matching accuracy.'
+<EOS>
+b'Along this direction, this paper makes\ntwo complementary contributions which can also be reused as plugin in existing\nworks i a novel node and edge embedding strategy which stimulates the multi-\nhead strategy in attention models and allows the information in each channel to\nbe merged independently.'
+<EOS>
+b'In contrast, only node embedding is accounted in pre-'
+<EOS>
+b'vious works ii'
+<EOS>
+b'a general masking mechanism over the loss function is devised to\nimprove the smoothness of objective learning for graph matching.'
+<EOS>
+b'Using Hungar-'
+<EOS>
+b'ian algorithm'
+<EOS>
+b', it dynamically constructs a structured and sparsely connected layer,\ntaking into account the most contributing matching pairs as hard attention.'
+<EOS>
+b'Our\napproach performs competitively, and can also improve state-of-the-art methods\nas plugin, regarding with matching accuracy on three public benchmarks.'
+<EOS>
+b'1'
+<EOS>
+b'INTRODUCTION'
+<EOS>
+b'Without loss of generality, we consider the bijection problem for graph matching given graph G1\nand G2 of equal size'
+<EOS>
+b'n'
+<EOS>
+b', graph matching seeks to \xef\xac\x81nd the one-vs-one node correspondence1'
+<EOS>
+b'max'
+<EOS>
+b'xcid62Kx'
+<EOS>
+b'x'
+<EOS>
+b's.t.'
+<EOS>
+b'Px  1\n\n1'
+<EOS>
+b'where x  vecX  0, 1n2'
+<EOS>
+b'which is the column-wise vectorized form of the permutation ma-'
+<EOS>
+b'trix X that encodes the node-to-node correspondence between two graphs, and'
+<EOS>
+b'K  Rn2n2'
+<EOS>
+b'is\nthe so-called af\xef\xac\x81nity matrix2, respectively.'
+<EOS>
+b'Note P is a selection matrix encoding the one-to-one\ncorrespondence constraint.'
+<EOS>
+b'This problem is called Lawlers QAP Lawler, 1963 and has attracted\nenormous attention for its generally NP-complete Hartmanis, 1982 challenge, as well as a wide\nspectrum of applications in computer vision, graphics, machine learning and operational research\netc.'
+<EOS>
+b'In particular, Koopmans-Beckmanns QAP Loiola et al., 2007 with objective trXcid62F1XF2\nis a special case of Eq. 1, which can be converted to Lawlers QAP by K  F2'
+<EOS>
+b'F1 and Fi refers\nto the weighted adjacency matrix.'
+<EOS>
+b'A series of solvers haven been developed to solve graph match-'
+<EOS>
+b'ing problem'
+<EOS>
+b'Leordeanu  Hebert, 2005 Cho et al., 2010 Bernard et al.,'
+<EOS>
+b'2018'
+<EOS>
+b'Yan et al., 2015'
+<EOS>
+b'Yu et al., 2018.'
+<EOS>
+b'All these methods are based on deterministic optimization, which are conditioned\nwith pre-de\xef\xac\x81ned af\xef\xac\x81nity matrix and no learning paradigm is involved.'
+<EOS>
+b'This fact greatly limits the\nperformance and broad application'
+<EOS>
+b'w.r.t.'
+<EOS>
+b'different problem settings considering its NP-hard nature.'
+<EOS>
+b'Recently, the seminal work namely deep graph matching DGM Zan\xef\xac\x81r  Sminchisescu, 2018 is\nproposed to exploit the high capacity of deep networks for graph matching, which achieves state-\nof-the-art performance.'
+<EOS>
+b'This is in contrast to some early works which incorporate learning strategy'
+<EOS>
+b'1We assume graphs are of equal size for narrative simplicity.'
+<EOS>
+b'One can easily handle unbalanced graph size\n\nby adding dummy nodes as a common protocol in graph matching literature Cho et al., 2010.'
+<EOS>
+b'2Aiajb'
+<EOS>
+b'typically encodes the af\xef\xac\x81nity between pair i, j and a, b'
+<EOS>
+b'where node'
+<EOS>
+b'i, j  G1 and a, b  G2.'
+<EOS>
+b'1'
+<EOS>
+b'Published as a conference paper at ICLR 2020\n\nseparately in local stages'
+<EOS>
+b'Caetano et al., 2009 Cho et al., 2013.'
+<EOS>
+b'On the other hand, Graph Convolu-'
+<EOS>
+b'tional Networks'
+<EOS>
+b'GCN Kipf'
+<EOS>
+b'Welling, 2017 brings about new capability on tasks over graph-like\ndata, as it naturally integrates the intrinsic graph structure in a general updating rule\n\nHl1'
+<EOS>
+b'\xcf\x83'
+<EOS>
+b'cid16'
+<EOS>
+b'\xcb\x86AHlWlcid17\n\n2'
+<EOS>
+b'where \xcb\x86A is the normalized connectivity matrix.'
+<EOS>
+b'Hl and Wl are the features and weights at layer\nl, respectively.'
+<EOS>
+b'Node embedding is updated by aggregation from 1-neighboring nodes, which is akin\nto the convolution operator in CNN.'
+<EOS>
+b'By taking advantages of both DGM and GCN, Wang et al.'
+<EOS>
+b'2019 and Zhang  Lee 2019 incorporate permutation loss instead of displacement loss in Zan\xef\xac\x81r\n Sminchisescu, 2018, with notable improvement across both synthetic and real data.'
+<EOS>
+b'Note that Eq. 1 involves both node and edge information, which exactly correspond to the diag-\nonal and off-diagonal elements in K, respectively.'
+<EOS>
+b'Edges can carry informative multi-dimensional\nattributes namely weights which are fundamental to graph matching.'
+<EOS>
+b'However existing embed-\nding based graph matching methods Wang et al., 2019'
+<EOS>
+b'Xu et al., 2019 are focused on the explicit\nmodeling of node level features, whereby the edges are only used as topological node connection for\nmessage passing in GCN.'
+<EOS>
+b'Besides, edge attributes are neither well modeled in the embedding-free\nmodel Zan\xef\xac\x81r  Sminchisescu, 2018 since the edge information is derived from the concatena-\ntion of node features.'
+<EOS>
+b'To our best knowledge, there is no deep graph matching method explicitly\nincorporating edge attributes.'
+<EOS>
+b'In contrast, edge attributes e.g.'
+<EOS>
+b'length and orientation are widely\nused in traditional graph matching models Cho et al., 2010'
+<EOS>
+b'Yan et al., 2015 Yu et al.,'
+<EOS>
+b'2018 for\nconstructing'
+<EOS>
+b'the af\xef\xac\x81nity matrix K. Such a gap shall be \xef\xac\x81lled in the deep graph matching pipeline.'
+<EOS>
+b'Another important consideration refers to the design of loss function.'
+<EOS>
+b'There are mainly two forms in\nexisting deep graph matching works'
+<EOS>
+b'i displacement loss'
+<EOS>
+b'Zan\xef\xac\x81r  Sminchisescu, 2018 similar to'
+<EOS>
+b'the use in optical \xef\xac\x82ow estimation Ren et al.,'
+<EOS>
+b'2017 ii'
+<EOS>
+b'the so-called permutation loss Wang et al.,'
+<EOS>
+b'2019 involving iterative Sinkhorn procedure followed by a cross-entropy loss.'
+<EOS>
+b'Results in Wang'
+<EOS>
+b'et al., 2019 show the latter is an effective improvement against the former regression based loss.'
+<EOS>
+b'However, we argue that the continuous Sinkhorn procedure in training stage is yet an unnatural\napproximation to Hungarian sampling in testing stage for discretization.'
+<EOS>
+b'If the network is equipped\nwith a continuous loss function e.g. cross-entropy, we argue that the training process will make a\ngreat meaningless effort to enforce some network output digits of the \xef\xac\x81nal matching matrix into\nbinary and neglect the resting digits which might have notable impact on accuracy.'
+<EOS>
+b'This paper strikes an endeavor on the above two gaps and makes the following main contributions'
+<EOS>
+b'i'
+<EOS>
+b'We propose a new approach for edge embedding via channel-wise operation, namely channel-\nindependent embedding CIE.'
+<EOS>
+b'The hope is to effectively explore the edge attribute and simulate\nthe multi-head strategy in attention models Veli\xcb\x87ckovic et al.,'
+<EOS>
+b'2018 by decoupling the calculations\nparallel and orthogonal to channel direction.'
+<EOS>
+b'In fact, edge attribute information has not been consid-\nered in existing embedding based graph matching methods Wang et al., 2019 Xu et al., 2019.'
+<EOS>
+b'ii'
+<EOS>
+b'We devise a new mechanism to adjust the loss function based on the Hungarian method which is\nwidely used for linear assignment problem, as termed by Hungarian attention.'
+<EOS>
+b'It resorts to dynami-\ncally generating sparse matching mask according to Hungarian sampling during training, rather than\napproximating Hungarian sampling with a differentiable function.'
+<EOS>
+b'As such, the Hungarian attention\nintroduces higher smoothness against traditional loss functions to ease the training.'
+<EOS>
+b'iii'
+<EOS>
+b'The empirical results on three public benchmarks shows that the two proposed techniques are\northogonal and bene\xef\xac\x81cial to existing techniques.'
+<EOS>
+b'Speci\xef\xac\x81cally, on the one hand, our CIE module\ncan effectively boost the accuracy by exploring the edge attributes which otherwise are not consid-'
+<EOS>
+b'ered in state-of-the-art deep graph matching methods on the other hand, our Hungarian attention\nmechanism also shows generality and it is complementary to existing graph matching loss.'
+<EOS>
+b'2'
+<EOS>
+b'RELATED WORKS'
+<EOS>
+b'Graph embedding.'
+<EOS>
+b'To handle graph-like data, early works adopt recursive neural networks RNNs\ntreating input as directed acyclic graphs Sperduti  Starita, 1997'
+<EOS>
+b'Frasconi et al., 1998.'
+<EOS>
+b'Gori et al.'
+<EOS>
+b'2005'
+<EOS>
+b'Scarselli et al. 2008 generalized early models to graph neural networks GNNs so as to be\ndirectly applied on cyclic, directed or undirected graphs.'
+<EOS>
+b'Li et al. 2016 further improved this line'
+<EOS>
+b'2'
+<EOS>
+b'Published as a conference paper at ICLR 2020\n\nof model by replacing standard RNNs with gated recurrent units GRUs Cho et al., 2013.'
+<EOS>
+b'Inspired\nby the great success of convolutional neural networks'
+<EOS>
+b'CNNs Simonyan  Zisserman, 2014'
+<EOS>
+b'He'
+<EOS>
+b'et al., 2016, researchers have made tremendous effort on applying convolution operator to graphs'
+<EOS>
+b'Bruna et al., 2014'
+<EOS>
+b'Kipf  Welling, 2017 Gong  Cheng, 2019.'
+<EOS>
+b'Bruna et al.'
+<EOS>
+b'2014 de\xef\xac\x81ned\na convolution operator in Fourier domain which is obtained by performing eigen-decomposition\non graph Laplacian.'
+<EOS>
+b'However, such convolution will affect the whole spatial domain once taking\ninverse Fourier transformation.'
+<EOS>
+b'This method was improved by Chebyshev expansion to approximate'
+<EOS>
+b'\xef\xac\x81lters Defferrard et al., 2016.'
+<EOS>
+b'Kipf  Welling 2017 propose a graph convolutional operator\nover 1-neighbor nodes derived from graph spectral theory, which is invariant to node permutation\nand achieved signi\xef\xac\x81cant performance on semi-supervised learning tasks.'
+<EOS>
+b'There are series of works\nfollowing GCN, such as GraphSAGE Hamilton et al., 2017, GAT Veli\xcb\x87ckovic et al., 2018'
+<EOS>
+b'and\nMPNN Gilmer'
+<EOS>
+b'et al., 2017.'
+<EOS>
+b'Refer to Cai et al., 2018 for a more comprehensive survey.'
+<EOS>
+b'While the aforementioned models are focused on learning node stateembedding, a parallel line of\nwork seek to learn edge embedding by taking into account the information carried on edges Li et al.,\n2016'
+<EOS>
+b'Gilmer et al., 2017 Gong  Cheng, 2019.'
+<EOS>
+b'Edges are intrinsic portion of graphs, and thus\nedge embedding can be essential to reveal the relation among nodes.'
+<EOS>
+b'Gilmer'
+<EOS>
+b'et al. 2017 introduce'
+<EOS>
+b'a general embedding network incorporating edge information and node-edge information merging,\nand a serious of works fall into this framework'
+<EOS>
+b'e.g. Gated GNN Li et al., 2016, Tensor GNN'
+<EOS>
+b'Schutt et al., 2017 and EGNN Gong  Cheng, 2019.'
+<EOS>
+b'An improved version is devised in Chen'
+<EOS>
+b'et al.'
+<EOS>
+b'2019'
+<EOS>
+b'by interpreting this framework as maximizing mutual information across layers.'
+<EOS>
+b'Loss for combinatorial learning.'
+<EOS>
+b'For the relatively easy linear assignment problem, it has been\nknown that Sinkhorn algorithm Sinkhorn, 1964 is the approximate and differentiable version of\nHungarian algorithm Mena et al., 2017.'
+<EOS>
+b'The Sinkhorn Network Adams  Zemel, 2011 is de-'
+<EOS>
+b'veloped given known assignment cost, whereby doubly-stochastic regulation is performed on input\nnon-negative square matrix.'
+<EOS>
+b'Patrini et al.'
+<EOS>
+b'2018 devise the Sinkhorn AutoEncoder to minimize\nWasserstein distance, and Emami  Ranka 2018 propose to learning a linear assignment solver\nvia reinforcement learning.'
+<EOS>
+b'For permutation prediction, DeepPermNet Santa Cruz et al., 2018\nadopts the Sinkhorn layer on top of a deep convolutional network.'
+<EOS>
+b'However this method cannot be\ndirectly applied for graph matching as it is not invariant to input permutations which is conditioned\non a prede\xef\xac\x81ned node permutation as reference.'
+<EOS>
+b'In particular, existing supervised methods on combi-'
+<EOS>
+b'natorial learning are generally cross-entropy-based.'
+<EOS>
+b'Pointer Net Vinyals et al., 2015 incorporates\ncross-entropy loss on learning heuristics for combinatorial problems.'
+<EOS>
+b'Milan'
+<EOS>
+b'et al.'
+<EOS>
+b'2017 propose an\nobjective-based loss, where the gradients are only updated if the objective improves after update.'
+<EOS>
+b'Learning for graph matching.'
+<EOS>
+b'The early effort Caetano et al., 2009 aims to incorporate learning\nto graph matching.'
+<EOS>
+b'The key is to learn a more effective af\xef\xac\x81nity function with given correspon-\ndence as supervision.'
+<EOS>
+b'While the ability by only learning af\xef\xac\x81nity is limited,'
+<EOS>
+b'Cho et al. 2013'
+<EOS>
+b'pro-'
+<EOS>
+b'pose a matching function learning paradigm using histogram-based attributes with Structured-SVM\nTsochantaridis et al., 2005.'
+<EOS>
+b'A recent work Zan\xef\xac\x81r  Sminchisescu, 2018 is a breakthrough to\nintroduce deep learning paradigm into graph matching task, which utilizes a neural network to learn\nthe af\xef\xac\x81nity function.'
+<EOS>
+b'The learning procedure is explicitly derived from the factorization of af\xef\xac\x81nity\nmatrix Zhou  De la Torre, 2012, which makes the interpretation of the network behavior possible.'
+<EOS>
+b'However, the displacement loss in Zan\xef\xac\x81r  Sminchisescu, 2018 measures the pixel-wise transla-\ntion which is similar to optical-\xef\xac\x82ow Dosovitskiy et al., 2015, being essentially a regression task\ninstead of combinaotiral optimization.'
+<EOS>
+b'Seeing this limitation, Wang et al. 2019 employ element-'
+<EOS>
+b'wise binary cross-entropy, termed as permutation loss.'
+<EOS>
+b'This loss has proved capable of capturing'
+<EOS>
+b'the combinatorial nature rather than pixel offset, and achieves improvement over displacement loss.'
+<EOS>
+b'Node embedding is also used in Wang et al., 2019 to explore the structure information.'
+<EOS>
+b'3'
+<EOS>
+b'THE PROPOSED LEARNING APPROACH FOR GRAPH MATCHING'
+<EOS>
+b'3.1 APPROACH OVERVIEW'
+<EOS>
+b'An overall structure of our approach is illustrated in Fig.'
+<EOS>
+b'1.'
+<EOS>
+b'In line with Wang et al., 2019, we em-'
+<EOS>
+b'ploy VGG16 Simonyan'
+<EOS>
+b'Zisserman, 2014 to extract features from input images and bi-linearly\ninterpolate the features at key points provided by datasets.'
+<EOS>
+b'We concatenate lower-level Relu4 2\nand higher-level Relu5 1 features to incorporate local and contextual information.'
+<EOS>
+b'For an image\nwith k key points, the feature is denoted as H  Rkd, where d is the feature dimension.'
+<EOS>
+b'Unless\n\n3\n\n\x0cPublished as a conference paper at ICLR 2020'
+<EOS>
+b'Figure 1 Architecture overview of the proposed deep graph matching networks that consist of the\nproposed channel-independent embedding and Hungarian attention layer over the loss function.'
+<EOS>
+b'otherwise speci\xef\xac\x81ed, the adjacency matrix'
+<EOS>
+b'A  Rkk is consequentially constructed via Delaunay\ntriangulation Delaunay et al., 1934, which is a widely adopted strategy to produce sparsely con-\nnected graph.'
+<EOS>
+b'To introduce more rich edge information, we also generate k'
+<EOS>
+b'k m-dimensional edge'
+<EOS>
+b'features E  Rmkk.'
+<EOS>
+b'E can be initialized with some basic edge information e.g.\nlength and\nangle and other attributes or a commutative function'
+<EOS>
+b'Eij  pHi,'
+<EOS>
+b'Hj  pHj,'
+<EOS>
+b'Hi  Rm, where\nHi refers to the feature of node i. Note for directed graph'
+<EOS>
+b', the commutative property is not required.'
+<EOS>
+b'The features H and E, together with the adjacency A, are then fed into GNN module.'
+<EOS>
+b'Pairs of\nfeatures are processed in a Siamese fashion Bromley et al., 1994.'
+<EOS>
+b'Standard GCNs message passing'
+<EOS>
+b'rule simply updates node embedding as shown in Eq. 2.'
+<EOS>
+b'In contrast, each GNN layer in our model\ncomputes a new pair of node and edge embeddings simultaneously\n\n0 and W l\n\nHl1'
+<EOS>
+b'fiHl, El, A W'
+<EOS>
+b'l\n\n3'
+<EOS>
+b'where W l\n1 are the learnable parameters at layer l.'
+<EOS>
+b'The edge information is essential to\nprovide structural feature enhancing graph matching.'
+<EOS>
+b'We initialize H0  H and E0  E in\nour setting.'
+<EOS>
+b'We will discuss the details of functions f and g in Sec. 3.2.'
+<EOS>
+b'Following state-of-the-art\nwork Wang et al., 2019, we also compute the cross-graph af\xef\xac\x81nity followed by a columnrow-wise\nsoftmax activation and a Sinkhorn layer Adams  Zemel, 2011\n\n0, El1  gHl, El, A W l\n1'
+<EOS>
+b'Mij'
+<EOS>
+b'exp\n\n\xcf\x84 Hcid62'
+<EOS>
+b'1i\xce\x9bH2j'
+<EOS>
+b', S  SinkhornM'
+<EOS>
+b'cid16'
+<EOS>
+b'cid17'
+<EOS>
+b'Note here'
+<EOS>
+b'M  Rkk is the node-level similarity matrix encoding similarity between two graphs,\ndiffering from the edege-level af\xef\xac\x81nity matrix K in Eq'
+<EOS>
+b'.'
+<EOS>
+b'1.'
+<EOS>
+b'\xcf\x84 is the weighting parameter of similarity,\n\xce\x9b contains learnable parameters and H1i'
+<EOS>
+b'is the node is embedding from graph G1.'
+<EOS>
+b'The output'
+<EOS>
+b'S  0, 1kk, S1  1,'
+<EOS>
+b'Scid621'
+<EOS>
+b'1 is a so-called doubly-stochastic matrix.'
+<EOS>
+b'Here Sinkhorn denotes'
+<EOS>
+b'the following update iteratively to project M into doubly stochastic polygon'
+<EOS>
+b'Mt1'
+<EOS>
+b'Mt'
+<EOS>
+b'Mt11cid62'
+<EOS>
+b'11cid62Mt'
+<EOS>
+b'1'
+<EOS>
+b'n'
+<EOS>
+b'1'
+<EOS>
+b'n2'
+<EOS>
+b'11cid62Mt11cid62 \n\n1'
+<EOS>
+b'n'
+<EOS>
+b'11cid62'
+<EOS>
+b'1'
+<EOS>
+b'n'
+<EOS>
+b'The Sinkhorn layer is shown to be an approximation of Hungarian algorithm which produces discrete\nmatching output Kuhn, 1955.'
+<EOS>
+b'As there are only matrix multiplication and normalization operators\ninvolved in Sinkhorn layer, it is differentiable.'
+<EOS>
+b'In practice, Eq. 5 converges rapidly within 10\niterations for decades of nodes.'
+<EOS>
+b'Less iterations involved, more precise back-propagated gradients\ncan be achieved.'
+<EOS>
+b'We employ a cross-graph node embedding strategy following Wang et al., 2019'
+<EOS>
+b'Hl\n\n1'
+<EOS>
+b'fc'
+<EOS>
+b'cid16'
+<EOS>
+b'catHl'
+<EOS>
+b'cid17\n1, SHl'
+<EOS>
+b'2'
+<EOS>
+b', Hl\n\n2  fc'
+<EOS>
+b'catHl\n\n2,'
+<EOS>
+b'Scid62Hl'
+<EOS>
+b'2'
+<EOS>
+b'cid16'
+<EOS>
+b'cid17'
+<EOS>
+b'where fc is a network and cat,  is the concatenation operator.'
+<EOS>
+b'Hi is the node feature of graph i.'
+<EOS>
+b'This procedure seeks to merge similar features from another graph into the node feature in current\ngraph.'
+<EOS>
+b'It is similar to the feature transfer strategy in Aberman et al., 2018 for sparse correspon-\ndence, which employs a feature merging method analogous to style transfer Li et al., 2017.'
+<EOS>
+b'As Sinkhorn layer does not necessarily output binary digits, we employ Hungarian algorithm Kuhn,\n1955 to discretize matching output S in testing.'
+<EOS>
+b'The testing differs from the training due to the\nHungarian discretization.'
+<EOS>
+b'We introduce a novel attention-like mechanism termed as Hungarian\nattention, along with existing loss functions will be detailed in Sec. 3.3.'
+<EOS>
+b'The \xef\xac\x81nal training loss is\nas follows, where SG and H correspond to binary true matching and Hungarian attention loss.'
+<EOS>
+b'4'
+<EOS>
+b'5'
+<EOS>
+b'6'
+<EOS>
+b'7'
+<EOS>
+b'min HS, SG\n\n4\n\nCNNGaussian\tkernelimage'
+<EOS>
+b'1initial'
+<EOS>
+b'node\tembeddinginitial\tedge\tembeddingCIEnode\tembeddingedge'
+<EOS>
+b'embeddingcross\tgraphnode\tembeddingedge\tembeddingnode\tembeddingedge'
+<EOS>
+b'embeddingCIECNNGaussian\tkernelinitial\tnode\tembeddinginitial\tedge\tembeddingCIEnode\tembeddingedge'
+<EOS>
+b'embeddingcross\tgraphnode\tembeddingedge\tembeddingCIEnode\tembeddingedge\tembeddingaffinityaffinityimage'
+<EOS>
+b'2similarity'
+<EOS>
+b'matrixdoubly-stochastic\tmatrixSinkhornHungarian\tattentionground\ttruth\tmatchingloss\x0cPublished as a conference paper at ICLR 2020\n\nFigure 2 Illustration of the proposed CIE layer for embedding based deep graph matching.'
+<EOS>
+b'The\noperation Linear refers to the linear mapping, e.g. Hl\n\nw'
+<EOS>
+b'Wl'
+<EOS>
+b'w in Eq 9.'
+<EOS>
+b'2 Hl\n\n3.2 CHANNEL-INDEPENDENT EMBEDDING'
+<EOS>
+b'We detail the updating rule in Eq. 3.'
+<EOS>
+b'We propose a method to merge edge features into node\nfeatures and perform matching on nodes.'
+<EOS>
+b'Edge information acts an important role in modeling\nrelational data, whereby such relation can be complex thus should be encoded with high-dimensional\nfeature.'
+<EOS>
+b'To this end, Gilmer et al. 2017 introduce a general embedding layer, which takes node and'
+<EOS>
+b'edge features and outputs a message to node v, then fuses the message and the current embedding'
+<EOS>
+b'ml'
+<EOS>
+b'v'
+<EOS>
+b'\xcf\x83'
+<EOS>
+b'ft Evw Hl'
+<EOS>
+b'w'
+<EOS>
+b'WlHl\n\n, Ht1'
+<EOS>
+b'v'
+<EOS>
+b'ut'
+<EOS>
+b'Ht'
+<EOS>
+b'v , ml'
+<EOS>
+b'v'
+<EOS>
+b'8'
+<EOS>
+b'cid16'
+<EOS>
+b'cid17'
+<EOS>
+b'cid33'
+<EOS>
+b'cid32'
+<EOS>
+b'cid88'
+<EOS>
+b'wNv'
+<EOS>
+b'v and Hl'
+<EOS>
+b'where Evw is the feature corresponding to edge v, w.'
+<EOS>
+b'In the realization of Eq. 8 Gilmer et al.,\n2017,'
+<EOS>
+b'ml\nv are fed to GRU Cho et al., 2014 as a sequential input.'
+<EOS>
+b'There are several\nvariants which take into account speci\xef\xac\x81c tasks'
+<EOS>
+b'Li et al., 2016'
+<EOS>
+b'Schutt et al., 2017'
+<EOS>
+b'Chen et al., 2019.'
+<EOS>
+b'Among these, Li et al. 2016 generates a transformation matrix for each edge and Schutt et al.'
+<EOS>
+b'2017 resorts to merge embedding via fully connected neural networks.'
+<EOS>
+b'While edge-wise merging\nis straightforward, the representation ability is also limited.'
+<EOS>
+b'On the other hand, fully connected\nmerging strategy will result in high computational cost and instability for back-propagation.'
+<EOS>
+b'To\naddress these issues, we propose to merge embedding in a channel-wise fashion, which is termed as\nChannel-Independent Embedding CIE.'
+<EOS>
+b'Concretely, the updating rule is written as\n\nHl1'
+<EOS>
+b'v'
+<EOS>
+b'\xcf\x83'
+<EOS>
+b'cid16'
+<EOS>
+b'cid88'
+<EOS>
+b'cid16'
+<EOS>
+b'wNv'
+<EOS>
+b'\xce\x93N'
+<EOS>
+b'cid124'
+<EOS>
+b'Wl'
+<EOS>
+b'vw'
+<EOS>
+b'Wl\n1'
+<EOS>
+b'El\ncid123cid122'
+<EOS>
+b'2'
+<EOS>
+b'Hl'
+<EOS>
+b'w'
+<EOS>
+b'channel-wise operatorfunction'
+<EOS>
+b'cid17'
+<EOS>
+b'cid17'
+<EOS>
+b'cid125\n\nEl1'
+<EOS>
+b'vw'
+<EOS>
+b'\xcf\x83'
+<EOS>
+b'Wl\n\n1'
+<EOS>
+b'El'
+<EOS>
+b'vw'
+<EOS>
+b'cid16'
+<EOS>
+b'\xcf\x83'
+<EOS>
+b'Wl\n\n0'
+<EOS>
+b'Hl'
+<EOS>
+b'v'
+<EOS>
+b'cid17'
+<EOS>
+b'9'
+<EOS>
+b'10'
+<EOS>
+b'where \xce\x93N   is a channel-wise operatorfunction above the underbrace, and it performs calcu-\nlation per-channel and the output channel dimension is the same as input.'
+<EOS>
+b'The second \xcf\x83 term is\nthe message a node passes to itself, which is necessary in keeping the node information contextually\nconsistent through each CIE layer.'
+<EOS>
+b'In this fashion, CIE is thus a procedure to aggregate node and'
+<EOS>
+b'2 Hl\nedge embedding in each channel independently, which requires the dimensions of node'
+<EOS>
+b'Wl\nw \nand'
+<EOS>
+b'edge Wl'
+<EOS>
+b'vw representations to be equal.'
+<EOS>
+b'Similarly, we also propose an corresponding up-\ndating rule of edge embedding by substituting Eq.'
+<EOS>
+b'10'
+<EOS>
+b'1'
+<EOS>
+b'El'
+<EOS>
+b'El1'
+<EOS>
+b'vw'
+<EOS>
+b'\xcf\x83'
+<EOS>
+b'cid16'
+<EOS>
+b'cid16'
+<EOS>
+b'\xce\x93E'
+<EOS>
+b'Wl\n\n1'
+<EOS>
+b'El'
+<EOS>
+b'vw'
+<EOS>
+b'h'
+<EOS>
+b'Hl'
+<EOS>
+b'v , Hl'
+<EOS>
+b'w'
+<EOS>
+b'cid16'
+<EOS>
+b'cid17cid17cid17'
+<EOS>
+b'cid16'
+<EOS>
+b'\xcf\x83'
+<EOS>
+b'cid17'
+<EOS>
+b'Wl\n\n1'
+<EOS>
+b'El'
+<EOS>
+b'vw'
+<EOS>
+b'11'
+<EOS>
+b'where h,  is commutative hX, Y  hY,'
+<EOS>
+b'X. Eq.'
+<EOS>
+b'11 is supplementary to Eq. 9.'
+<EOS>
+b'Fig.'
+<EOS>
+b'2 shows a schematic diagram of CIE layer, which is motivated from two perspectives.'
+<EOS>
+b'First,\nCIE is motivated by counterparts in CNN Qiu et al., 2017'
+<EOS>
+b'Tran et al., 2018 which decouple a 3D\nconvolution into two 2D ones'
+<EOS>
+b'e.g. a 3  3  3 convolution can be decomposed to a 1  3  3 and\na 3  1  1 convolutions.'
+<EOS>
+b'In this sense, the number of parameters can be signi\xef\xac\x81cantly reduced.'
+<EOS>
+b'As shown in Fig. 2, node and edge embedding'
+<EOS>
+b'is \xef\xac\x81rst manipulated along the channel direction via\na linear layer, then operated via \xce\x93N and \xce\x93E orthogonal to the channel direction.'
+<EOS>
+b'Instead of merging'
+<EOS>
+b'node and edge as a whole, CIE layer decouples it into two operations.'
+<EOS>
+b'Second, CIE is also motivated\nby the triumph of multi-head structure e.g. graph attention Veli\xcb\x87ckovic et al., 2018, the key of\n\n5'
+<EOS>
+b'\xf0\x9d\x90\x84\xf0\x9d\x90\x87LinearLinear\xce\x93\xce\x93\xf0\x9d\x90\x84\xf0\x9d\x90\x87\xf0\x9d\x91\x9a\xf0\x9d\x91\x98\xf0\x9d\x91\x98\xf0\x9d\x91\x9a\xf0\x9d\x91\x98\xf0\x9d\x91\x9achannels\xf0\x9d\x9c\x8e\xf0\x9d\x9c\x8e\x0cPublished as a conference paper at ICLR 2020'
+<EOS>
+b'Figure 3'
+<EOS>
+b'A working example illustrating of our proposed Hungarian attention pipeline starting from\nsimilarity matrix.'
+<EOS>
+b'Sinkhorn algorithm solves similarity matrix into a doubly-stochastic matrix in a\ndifferentiable way.'
+<EOS>
+b'A discrete permutation matrix is further obtained via Hungarian algorithm.'
+<EOS>
+b'Our\nproposed Hungarian attention, taking the ground truth matching matrix into account, focuses on\nthe important digits either labeled true or being mis-classi\xef\xac\x81ed.'
+<EOS>
+b'The output matrix is obtained by\nattention pooling from doubly-stochastic matrix, where we compute a loss on it.'
+<EOS>
+b'which is to conduct unit calculation multiple times and concatenate the results.'
+<EOS>
+b'Multi-head proved\neffective to further improve the performance since it is capable of capturing information at different\nscales or aspects.'
+<EOS>
+b'Traditional neural node-edge message passing algorithms Gilmer et al.,'
+<EOS>
+b'2017 Li'
+<EOS>
+b'et al., 2016'
+<EOS>
+b'Schutt et al., 2017 typically produce a uni\xef\xac\x81ed transformation matrix for all the channels.'
+<EOS>
+b'On the other hand, in Eq. 9 10 and 11, one can consider that the basic operator in each channel\nis repeated d times in a multi-head fashion.'
+<EOS>
+b'The cross-channel information exchange, as signi\xef\xac\x81ed in'
+<EOS>
+b'Eq.'
+<EOS>
+b'9 10 and 11, only happens before the channel-wise operator'
+<EOS>
+b'i.e. weights'
+<EOS>
+b'Wl'
+<EOS>
+b'i as the cross-\nchannel matrices.'
+<EOS>
+b'The main difference between CIE and traditional multi-head approaches'
+<EOS>
+b'e.g.'
+<EOS>
+b'Veli\xcb\x87ckovic et al., 2018 is that CIE assumes the channel-independence of two embedded features\nnode and edge, while traditional ones only take one input under head-independence assumption.'
+<EOS>
+b'3.3 HUNGARIAN ATTENTION MECHANISM'
+<EOS>
+b'For most graph matching algorithms, the output is in a continuous domain.'
+<EOS>
+b'Though there are some\nalternatives that deliver discrete solutions by adding more constraints or introducing numerical con-'
+<EOS>
+b'tinuation'
+<EOS>
+b'Zhou'
+<EOS>
+b'De la Torre, 2012'
+<EOS>
+b'Yu et al., 2018, the main line of methods is to incorporate a\nsampling procedure'
+<EOS>
+b'e.g. winner-take-all and Hungarian.'
+<EOS>
+b'Among them, the Hungarian algorithm\nKuhn, 1955 is a widely adopted, for its ef\xef\xac\x81ciency and theoretical optimality.'
+<EOS>
+b'However, the Hungarian algorithm incurs a gap between training loss function and testing stages'
+<EOS>
+b'Hungarian sampling.'
+<EOS>
+b'We compare the permutation loss Wang et al., 2019 for concrete analysis'
+<EOS>
+b'LCE  \n\ncid88\n\ncid0SG'
+<EOS>
+b'ij log Sij'
+<EOS>
+b'cid01'
+<EOS>
+b'SG'
+<EOS>
+b'ij'
+<EOS>
+b'cid1 log 1'
+<EOS>
+b'Sijcid1'
+<EOS>
+b'12'
+<EOS>
+b'iG1,jG2'
+<EOS>
+b'Note'
+<EOS>
+b'Eq.'
+<EOS>
+b'12 is an element-wise version of binary cross-entropy.'
+<EOS>
+b'During training, this loss tends\nto drag the digits in S into binary format and is likely trapped to local optima.'
+<EOS>
+b'This is because this\nloss will back-propagate the gradients of training samples that are easy to learn in the early training\nstage.'
+<EOS>
+b'In later iterations, this loss is then hard to give up the digits that have become binary.'
+<EOS>
+b'In fact,\nthe similar phenomenon is also investigated in the focal loss Lin et al., 2017 in comparison to the\ntraditional cross-entropy loss.'
+<EOS>
+b'During the testing stage, however, the Hungarian algorithm has no\npreference on the case if digits in S are close to 0  1 or not.'
+<EOS>
+b'It binarizes S anyway.'
+<EOS>
+b'Therefore, the\neffort of Eq. 12 to drag S into binary might be meaningless.'
+<EOS>
+b'This issue is likely to be solved by integrating Hungarian algorithm during the training stage.'
+<EOS>
+b'Un-'
+<EOS>
+b'fortunately, Hungarian algorithm is undifferentiable and its behavior is dif\xef\xac\x81cult to mimic with a\ndifferentiable counterpart.'
+<EOS>
+b'In this paper, instead of \xef\xac\x81nding a continuous approximation of Hungar-\nian algorithm, we treat it as a black box and dynamically generate network structure sparse link\n\n6\n\n012345abcdef1.41.73.83.80.80.81.33.60.90.82.16.72.50.44.31.20.71.00.41.81.91.12.73.81.11.50.50.40.63.60.80.72.72.15.51.0similarity'
+<EOS>
+b'matrix012345abcdef0.20.10.20.40.10.00.10.30.10.10.10.30.30.00.30.10.10.10.10.20.10.10.20.20.20.20.10.10.10.30.10.10.20.20.40.0doubly-stochastic matrix012345abcdef0.00.00.01.00.00.00.01.00.00.00.00.01.00.00.00.00.00.00.00.01.00.00.00.00.00.00.00.00.01.00.00.00.00.01.00.0permutation matrix012345abcdef0.00.00.01.00.00.01.00.00.00.00.00.00.01.00.00.00.00.00.00.01.00.00.00.00.00.00.00.00.01.00.00.00.00.01.00.0ground truth matrix012345abcdef0.00.00.01.00.00.01.01.00.00.00.00.01.01.00.00.00.00.00.00.01.00.00.00.00.00.00.00.00.01.00.00.00.00.01.00.0attention'
+<EOS>
+b'activation012345abcdef0.00.00.00.40.00.00.10.30.00.00.00.00.30.00.00.00.00.00.00.00.10.00.00.00.00.00.00.00.00.30.00.00.00.00.40.0output matrixSinkhornHungarianAttention PoolingHungarian Attention\x0cPublished as a conference paper at ICLR 2020'
+<EOS>
+b'Table 1 Accuracy on Pascal VOC best in bold.'
+<EOS>
+b'White and gray background refer to results on test-'
+<EOS>
+b'ing and training, respectively.'
+<EOS>
+b'Compared methods include GMN Zan\xef\xac\x81r  Sminchisescu, 2018,\nGAT Veli\xcb\x87ckovic et al., 2018, EPN Gong  Cheng, 2019, PCAPIA Wang et al., 2019.'
+<EOS>
+b'method aero bike bird boat bottle bus car cat chair cow table dog horse mbike person plant sheep'
+<EOS>
+b'sofa train'
+<EOS>
+b'tv Ave'
+<EOS>
+b'GMN-D 31.9'
+<EOS>
+b'47.2 51.9 40.8'
+<EOS>
+b'68.7 72.2'
+<EOS>
+b'53.6 52.8 34.6 48.6 72.3'
+<EOS>
+b'47.7 54.8'
+<EOS>
+b'51.0'
+<EOS>
+b'38.6 75.1 49.5 45.0 83.0 86.3 55.3'
+<EOS>
+b'34.1 77.5'
+<EOS>
+b'57.1 53.6 83.2 88.6 57.9'
+<EOS>
+b'GMN-P 31.1 46.2 58.2 45.9'
+<EOS>
+b'70.6 76.4'
+<EOS>
+b'61.2 61.7 35.5 53.7 58.9 57.5 56.9 49.3'
+<EOS>
+b'39.5 82.0'
+<EOS>
+b'66.9 50.1 78.5'
+<EOS>
+b'90.3 63.6\nGAT-P 46.4 60.5 60.9 51.8 79.0 70.9 62.7 70.1'
+<EOS>
+b'39.7 63.9 66.2 63.8 65.8 62.8'
+<EOS>
+b'GAT-H 47.2'
+<EOS>
+b'61.6 63.2 53.3 79.7 70.1 65.3 70.5'
+<EOS>
+b'38.4 64.7 62.9 65.1 66.2 62.5\n41.1 78.8 67.1 61.6 81.4 91.0 64.6\n39.9 80.5 66.7 45.5 77.6 90.6 63.2'
+<EOS>
+b'EPN-P 47.6'
+<EOS>
+b'65.2'
+<EOS>
+b'62.2 52.7'
+<EOS>
+b'77.8 69.5 63.4 69.6'
+<EOS>
+b'37.8 62.8 63.6 63.9 64.6 61.9'
+<EOS>
+b'PIA-D 39.7 57.7 58.6 47.2 74.0 74.5'
+<EOS>
+b'62.1 66.6'
+<EOS>
+b'33.6'
+<EOS>
+b'61.7 65.4 58.0 67.1 58.9'
+<EOS>
+b'41.9'
+<EOS>
+b'77.7 64.7 50.5 81.8 89.9 61.6'
+<EOS>
+b'PIA-P 41.5'
+<EOS>
+b'55.8 60.9 51.9'
+<EOS>
+b'75.0'
+<EOS>
+b'75.8 59.6'
+<EOS>
+b'65.2 33.3'
+<EOS>
+b'65.9 62.8 62.7 67.7 62.1'
+<EOS>
+b'42.9'
+<EOS>
+b'80.2 64.3 59.5 82.7 90.1 63.0'
+<EOS>
+b'44.9 77.5'
+<EOS>
+b'67.4 57.5 86.7 90.9 63.8'
+<EOS>
+b'PCA-P 40.9 55.0'
+<EOS>
+b'65.8 47.9 76.9 77.9 63.5 67.4 33.7'
+<EOS>
+b'65.5'
+<EOS>
+b'63.6 61.3'
+<EOS>
+b'68.9 62.8'
+<EOS>
+b'40.5 84.7 66.1 47.9 80.5 91.1 64.6'
+<EOS>
+b'PCA-H 49.8'
+<EOS>
+b'60.7 63.9'
+<EOS>
+b'52.6 79.8'
+<EOS>
+b'72.5 63.8'
+<EOS>
+b'71.2 38.4'
+<EOS>
+b'62.5 71.7'
+<EOS>
+b'65.4'
+<EOS>
+b'66.6 62.5'
+<EOS>
+b'PCA-P 46.6 61.0'
+<EOS>
+b'62.3'
+<EOS>
+b'53.9 78.2'
+<EOS>
+b'72.5 64.4'
+<EOS>
+b'70.5 39.0 63.5 74.8'
+<EOS>
+b'65.2 65.0 61.6'
+<EOS>
+b'40.8 83.2 67.1'
+<EOS>
+b'50.5 79.6 91.6 64.6'
+<EOS>
+b'CIE2-P 50.9 65.5'
+<EOS>
+b'68.0 57.0 81.0 75.9 70.3'
+<EOS>
+b'73.4 41.1 66.7 53.2'
+<EOS>
+b'68.3 68.4 63.5'
+<EOS>
+b'45.3 84.8 69.7 57.2 79.8 91.6 66.9'
+<EOS>
+b'CIE2-H 51.2'
+<EOS>
+b'68.4 69.5'
+<EOS>
+b'57.3 82.5 73.5'
+<EOS>
+b'69.5 74.0'
+<EOS>
+b'40.3 67.8 60.0'
+<EOS>
+b'69.7 70.3 65.1'
+<EOS>
+b'44.7 86.9 70.7'
+<EOS>
+b'57.3 84.2 92.2 67.4'
+<EOS>
+b'46.1 85.1 70.4 61.6 80.7 91.7 68.1'
+<EOS>
+b'CIE1-P 52.1'
+<EOS>
+b'69.4 69.9'
+<EOS>
+b'58.9 80.6'
+<EOS>
+b'76.3 71.0 74.2'
+<EOS>
+b'41.1 68.0 60.4'
+<EOS>
+b'69.7 70.7 65.1'
+<EOS>
+b'44.8'
+<EOS>
+b'85.2 69.9'
+<EOS>
+b'65.4 85.2 92.4'
+<EOS>
+b'68.9'
+<EOS>
+b'CIE1-H 51.2 69.2 70.1 55.0 82.8 72.8 69.0 74.2 39.6 68.8 71.8 70.0 71.8 66.8'
+<EOS>
+b'66.5'
+<EOS>
+b'99.1 80.7 99.7 98.2 97.0 88.2'
+<EOS>
+b'PCA-P 75.8 99.2'
+<EOS>
+b'83.3 74.7 98.7 96.3 74.3'
+<EOS>
+b'87.8 80.9 85.7 100.0 83.7 83.8 98.7'
+<EOS>
+b'46.1 94.8 72.7 93.6 93.7 91.6 76.2'
+<EOS>
+b'CIE1-P 56.5 84.0'
+<EOS>
+b'73.5 58.0 91.5 81.1 67.8 76.8'
+<EOS>
+b'46.4 72.2 98.0 73.9 73.6 77.9'
+<EOS>
+b'CIE1-H 59.4'
+<EOS>
+b'88.1 75.9'
+<EOS>
+b'58.0 94.3 81.9'
+<EOS>
+b'69.4 78.9 49.5 78.2'
+<EOS>
+b'99.7 78.1'
+<EOS>
+b'78.0 82.1\n47.4 95.8 75.7 97.6 96.0'
+<EOS>
+b'91.1 78.7'
+<EOS>
+b'according to its output.'
+<EOS>
+b'Concretely, the sparse link is calculated as\n\nZ'
+<EOS>
+b'Atten cid0HungarianS, SGcid1  P'
+<EOS>
+b'Q'
+<EOS>
+b'13'
+<EOS>
+b'where the attention mechanism Atten is ful\xef\xac\x81lled by an element-wise logic OR function.'
+<EOS>
+b'Fig.'
+<EOS>
+b'3\nshows an example of Hungarian attention procedure, and Eq.'
+<EOS>
+b'13 highlights the most contributing\ndigit locations'
+<EOS>
+b'positive digits'
+<EOS>
+b'P  S where Hungarian agrees with the ground-truth negative digits'
+<EOS>
+b'Q  HungarianS  SG where Hungarian differs from ground-truth.'
+<EOS>
+b'While GT positive digits\nnaturally points out the digits that must be considered, negative ones indicate the digits that most\nhinder the matching most impeding ones among all mis-matchings.'
+<EOS>
+b'Thus we need only minimize'
+<EOS>
+b'the loss at Z, without considering the rest of digits.'
+<EOS>
+b'As we note that this mechanism only focuses on\na small portion of the matching matrix which is analogous to producing hard attention, we term it\nHungarian attention.'
+<EOS>
+b'Now that with the attention mask Z, the Hungarian attention loss becomes\n\nHCE'
+<EOS>
+b'cid88'
+<EOS>
+b'Zij'
+<EOS>
+b'cid0SG'
+<EOS>
+b'ij log Sij'
+<EOS>
+b'cid01'
+<EOS>
+b'SG'
+<EOS>
+b'ij'
+<EOS>
+b'cid1 log 1'
+<EOS>
+b'Sijcid1'
+<EOS>
+b'14'
+<EOS>
+b'iG1,jG2'
+<EOS>
+b'Note that Hungarian attention mechanism can also be applied to other loss functions once the match-\ning score is calculated in an element-wise fashion.'
+<EOS>
+b'Our experiment also studies Hungarian attention\nloss when casted on focal loss Lin et al., 2017 and a speci\xef\xac\x81cally designed margin loss.'
+<EOS>
+b'Finally we give a brief qualitative analysis on why Hungarian attention can improve matching loss.'
+<EOS>
+b'As discrete graph matching problem is actually built upon Delta function over permutation vertices\n1 at ground-truth matching and 0'
+<EOS>
+b'otherwise Yu et al., 2018, learning of graph'
+<EOS>
+b'matching with per-\nmutation loss is actually to approximate such functions with continuous counterparts.'
+<EOS>
+b'Unfortunately,\nmore precise approximation to Delta function will result in higher non-smoothness, as discussed in'
+<EOS>
+b'Yu'
+<EOS>
+b'et al. 2018.'
+<EOS>
+b'For highly non-smooth objective, the network is more likely trapped at local optima.'
+<EOS>
+b'Hungarian attention, however, focuses on a small portion of the output locations, thus does not care\nabout if most of the output digits are in 0, 1.'
+<EOS>
+b'In this sense, Hungarian attention allows moderate\nsmoothness of the objective, thus optimizer with momentum is likely to avoid local optima.'
+<EOS>
+b'4'
+<EOS>
+b'EXPERIMENTS'
+<EOS>
+b'Experiments are conducted on three benchmarks widely used for learning-based graph matching'
+<EOS>
+b'CUB2011 dataset Welinder et al., 2010 following the protocol in Choy et al., 2016, Pascal VOC\nkeypoint matching Everingham et al.,'
+<EOS>
+b'2010 Bourdev'
+<EOS>
+b'Malik, 2009 which is challenging and\nWillow Object Class dataset'
+<EOS>
+b'Cho et al., 2013.'
+<EOS>
+b'Mean matching accuracy is adopted for evaluation'
+<EOS>
+b'Acc \n\n1'
+<EOS>
+b'k'
+<EOS>
+b'iG1,jG2'
+<EOS>
+b'cid88'
+<EOS>
+b'AND cid0HungarianSij, SG'
+<EOS>
+b'cid1'
+<EOS>
+b'ij'
+<EOS>
+b'15'
+<EOS>
+b'The algorithm abbreviation is in the form X-Y, where X and Y refer to the network structure'
+<EOS>
+b'e.g. CIE and loss function'
+<EOS>
+b'e.g. Hungarian attention loss, respectively.'
+<EOS>
+b'Speci\xef\xac\x81cally, D, P and H\n\n7'
+<EOS>
+b'Published as a conference paper at ICLR 2020'
+<EOS>
+b'correspond to displacement used in Zan\xef\xac\x81r  Sminchisescu, 2018, permutation as adopted in Wang'
+<EOS>
+b'et al., 2019 and Hungarian attention over permutation loss devised by this paper, respectively.'
+<EOS>
+b'Peer methods.'
+<EOS>
+b'We compare our method with the following selected counterparts 1 HARG Cho\net al., 2013.'
+<EOS>
+b'This shallow learning method is based on hand-crafted feature and Structured SVM'
+<EOS>
+b'2 GMN Zan\xef\xac\x81r  Sminchisescu, 2018.'
+<EOS>
+b'This is a seminal work incorporating graph matching and\ndeep learning, and the solver is upon spectral matching Leordeanu  Hebert, 2005.'
+<EOS>
+b'While the\nloss of this method is displacement loss, we also report the results of GMN by replacing its loss\nwith permutation loss'
+<EOS>
+b'GMN-P 3 PIAPCA Wang et al., 2019.'
+<EOS>
+b'PCA and PIA correspond to'
+<EOS>
+b'the algorithms with and without cross-graph node embedding, respectively.'
+<EOS>
+b'Readers are referred\nto Wang et al. 2019 for more details We further replace the GNN layer in our framework with\n4 GAT Veli\xcb\x87ckovic et al., 2018.'
+<EOS>
+b'Graph attention network is an attention mechanism on graphs,\nwhich reweights the embedding according to attention score 5'
+<EOS>
+b'EPN Gong  Cheng, 2019.'
+<EOS>
+b'This\nmethod exploits multi-dimensional edge embedding and can further be applied on directed graphs.'
+<EOS>
+b'The edge dimension is set to 32 in our experiments.'
+<EOS>
+b'Finally, we term our network structure CIE for\nshort.'
+<EOS>
+b'To investigate the capacity of edge embedding update, we also devise a version without edge\nembedding, in which connectivity is initialized as reciprocal of the edge length then normalized,\nrather than A.'
+<EOS>
+b'This model is called PCA since the node embedding strategy follows PCA.'
+<EOS>
+b'Implementation details.'
+<EOS>
+b'As the node number of each graph might vary, we add dummy nodes for\neach graph pair such that the node number reaches the maximal graph size in a mini-batch in line\nwith the protocol in Wang et al., 2019.'
+<EOS>
+b'In either training or testing stages, these dummy nodes will\nnot be updated or counted.'
+<EOS>
+b'The activation function in Eq.'
+<EOS>
+b'9 10 and 11 is set as Relu Nair'
+<EOS>
+b'Hinton, 2010 in all experiments.'
+<EOS>
+b'Speci\xef\xac\x81cally, the node and edge embedding is implemented by\n\nHl1'
+<EOS>
+b'q'
+<EOS>
+b'\xcf\x83'
+<EOS>
+b'cid18cid18'
+<EOS>
+b'A cid12'
+<EOS>
+b'cid16'
+<EOS>
+b'Wl\n\n1'
+<EOS>
+b'Elcid17'
+<EOS>
+b'cid19'
+<EOS>
+b'cid16'
+<EOS>
+b'q'
+<EOS>
+b'El1'
+<EOS>
+b'q'
+<EOS>
+b'\xcf\x83'
+<EOS>
+b'cid18cid12\ncid16'
+<EOS>
+b'cid12'
+<EOS>
+b'cid12'
+<EOS>
+b'cid12'
+<EOS>
+b'Wl\n\n0'
+<EOS>
+b'Hlcid17'
+<EOS>
+b'cid16'
+<EOS>
+b'Wl\n\n0'
+<EOS>
+b'Hlcid17cid62'
+<EOS>
+b'cid9'
+<EOS>
+b'q'
+<EOS>
+b'Wl'
+<EOS>
+b'2 Hlcid17'
+<EOS>
+b'cid12\ncid12'
+<EOS>
+b'cid12'
+<EOS>
+b'cid12'
+<EOS>
+b'cid12 El'
+<EOS>
+b'q'
+<EOS>
+b'q'
+<EOS>
+b'q'
+<EOS>
+b'cid19'
+<EOS>
+b'cid19'
+<EOS>
+b'cid18cid16'
+<EOS>
+b'Wl\n\n0'
+<EOS>
+b'Hlcid17'
+<EOS>
+b'\xcf\x83'
+<EOS>
+b'cid19'
+<EOS>
+b'cid18cid16'
+<EOS>
+b'Wl\n\n1 Elcid17'
+<EOS>
+b'\xcf\x83'
+<EOS>
+b'q'
+<EOS>
+b'cid19'
+<EOS>
+b'q'
+<EOS>
+b'16a'
+<EOS>
+b'16b'
+<EOS>
+b'where cid12 and cid9 refer to element-wise product and pairwise difference, respectively.'
+<EOS>
+b'Hq is the\nqth channel of H. In CIE1 setting, only node-level merging'
+<EOS>
+b'Eq.'
+<EOS>
+b'16a is considered and the edge'
+<EOS>
+b'feature is updated as Eq. 10.'
+<EOS>
+b'In CIE2 setting, we also replace the edge update Eq. 11 with Eq.\n16b.'
+<EOS>
+b'Note edge embedding is used in both CIE1 and CIE2 and note PCA-H can be regarded as\nthe pure node embedding version of our approach.'
+<EOS>
+b'The edge feature is initiated as reciprocal of the\nedge length.'
+<EOS>
+b'For training, batch size is set to 8.'
+<EOS>
+b'We employ SGD optimizer Bottou, 2010 with\nmomentum 0.9.'
+<EOS>
+b'Two CIE layers are stacked after VGG16.'
+<EOS>
+b'CUB2011'
+<EOS>
+b'test CUB2011 consists of 11,788 images from 200 kinds of birds with 15 annotated\nparts.'
+<EOS>
+b'We randomly sample image pairs from the dataset following the implementation released by'
+<EOS>
+b'Choy et al.'
+<EOS>
+b'2016.'
+<EOS>
+b'We do not use the pre-alignment of poses during testing, because their alignment\nresult is not publicly available.'
+<EOS>
+b'Therefore, there exists signi\xef\xac\x81cant variation in pose, articulation and\nappearance across images, in both training and testing phase.'
+<EOS>
+b'Images are cropped around bounding\nbox and resized to 256  256 before fed into the network.'
+<EOS>
+b'Instead of evaluating the performance\nin a retrieval fashion Zan\xef\xac\x81r  Sminchisescu, 2018, we directly evaluate the matching accuracy\nsince the semantic key-points are pre-given.'
+<EOS>
+b'We test two settings 1 intra-class.'
+<EOS>
+b'During training,\nwe randomly sample images, with each pair sampled from the same category out of 200 bird cate-\ngories.'
+<EOS>
+b'In testing, 2,000 image pairs 100 pairs for each category are sampled 2 cross-class.'
+<EOS>
+b'We\nanalogously sample image pairs without considering the category information and 5,000 randomly\nsampled image pairs are employed for testing.'
+<EOS>
+b'While the \xef\xac\x81rst setting is for a class-aware situation,\nthe second setting is considered for testing the class-agnostic case.'
+<EOS>
+b'Results are shown in Table 3.'
+<EOS>
+b'We see our method surpasses all the competing methods in terms of matching accuracy.'
+<EOS>
+b'Besides,\nalmost all the selected algorithms can reach over 90 accuracy, indicating that this dataset contains\nmostly easy learning samples.'
+<EOS>
+b'In this case, the Hungarian attention can slightly improve the\nperformance since easy gradients agree with descending trend of the loss on the whole dataset.'
+<EOS>
+b'Pascal VOC test The Pascal VOC dataset with Key-point annotation Bourdev  Malik, 2009'
+<EOS>
+b'contains 7,020 training images and 1,682 testing images with 20 classes in total.'
+<EOS>
+b'To the best of\nour knowledge, this is the largest and most challenging dataset for graph matching in computer'
+<EOS>
+b'vi-'
+<EOS>
+b'sion.'
+<EOS>
+b'Each image is cropped around its object bounding box and is resized to 256  256.'
+<EOS>
+b'The node'
+<EOS>
+b'8'
+<EOS>
+b'Published as a conference paper at ICLR 2020\n\na Accuracyloss vs. training epoch.'
+<EOS>
+b'b Ablation study by Hungarian attention.'
+<EOS>
+b'Figure 4 Performance study on Pascal VOC.'
+<EOS>
+b'Note in'
+<EOS>
+b'a the loss is calculated on all matching digits\nfor both CIE1-P and CIE1-H. Note around 10th epoch, the accuracy of CIE1-P almost reaches the\nhighest, but the loss keeps descending until 30th epoch.'
+<EOS>
+b'This indicates that in most of the latter\nepochs, P-loss performs meaningless back-propagation to drag the output to binary.'
+<EOS>
+b'H-loss, by\naccommodating smoothness, can emphasize most contributing digits and achieves higher accuracy.'
+<EOS>
+b'size of this dataset varies from 6 to 23'
+<EOS>
+b'and there are various scale, pose and illumination'
+<EOS>
+b'perturba-\ntions.'
+<EOS>
+b'Experimental results are summarized in Table 1.'
+<EOS>
+b'We see in either setting, CIE signi\xef\xac\x81cantly\noutperforms all peer algorithms.'
+<EOS>
+b'Speci\xef\xac\x81cally, CIE1-H achieves the best performance and has 0.8\nimprovement w.r.t. average accuracy over CIE1-P. For each class, CIE1-H and CIE1-P carve up most\nof the top performance.'
+<EOS>
+b'We also note that CIE1-H has a close performance on table compared\nwith GMN-D. Since P-loss is naturally not as robust as D-loss on symmetric objects, P-loss showed\ngreat degradation over D-loss on table as discussed in Wang et al., 2019.'
+<EOS>
+b'However, with the\nhelp of Hungarian link, H-loss can maintain relatively high accuracy despite natural \xef\xac\x82aw of P-loss.'
+<EOS>
+b'This observation indicates that H-loss can focus on dif\xef\xac\x81cult examples.'
+<EOS>
+b'We also note that CIE1\nproduces better results against CIE2, which implies that updating edge embedding is less effective\ncompared to a singleton node updating strategy.'
+<EOS>
+b'We can also see from Table 1 that PCA-P has much\nhigher performance on training samples than CIE1-H, which is to the contrary of the result on testing\nsamples.'
+<EOS>
+b'This might indicate that PCA-P over\xef\xac\x81ts the training samples.'
+<EOS>
+b'Accuracyloss vs. training epoch.'
+<EOS>
+b'We further show the typical training behavior of P-loss and H-\nloss on Pascal VOC dataset in Fig.'
+<EOS>
+b'4.'
+<EOS>
+b'30 epochs are involved in a whole training process.'
+<EOS>
+b'Accuracy\nis evaluated on testing samples after each epoch while loss is the average loss value within each\nepoch.'
+<EOS>
+b'In the early training stage, the loss of CIE1-P immediately drops.'
+<EOS>
+b'On the other hand, CIE1-H\nhesitates for several epochs to \xef\xac\x81nd the most effective descending direction.'
+<EOS>
+b'On the late stage, we\nobserve that even though P-loss'
+<EOS>
+b'Eq.'
+<EOS>
+b'12 calculates much more digits than H-loss'
+<EOS>
+b'Eq.'
+<EOS>
+b'14, the\nloss values are opposite.'
+<EOS>
+b'This counter-intuitive fact strongly indicates that P-loss makes meaningless\neffort, which is not helpful to improve the performance, at late stage.'
+<EOS>
+b'The proposed H-loss, on the\nother hand, is capable of avoiding easy but meaningless gradients.'
+<EOS>
+b'Effect of Hungarian attention mechanism.'
+<EOS>
+b'We also conduct experiments to show the improve-\nment of Hungarian attention over several loss functions with and without Hungarian attention'
+<EOS>
+b'Hungarian attention is applied on Focal loss Focal Lin et al., 2017 as\n\ncid40'
+<EOS>
+b'Lfocal'
+<EOS>
+b'\xce\xb1Zij1'
+<EOS>
+b'Sij\xce\xb3 logSij,\n1'
+<EOS>
+b'\xce\xb1ZijS\xce\xb3'
+<EOS>
+b'SG\nij log1  Sij, SG'
+<EOS>
+b'ij  1'
+<EOS>
+b'ij  0'
+<EOS>
+b'where controlling parameters \xce\xb1  0.75 and \xce\xb3  2 in our setting.'
+<EOS>
+b'We also design a margin loss\nMargin with Hungarian attention under a max-margin rule.'
+<EOS>
+b'Note we insert the Hungarian attention\nmask Zij into Eq. 17 and Eq. 18 based on the vanilla forms.'
+<EOS>
+b'Lmargin'
+<EOS>
+b'cid26Zij'
+<EOS>
+b'max1'
+<EOS>
+b'Sij  \xce\xb2, 0, SG'
+<EOS>
+b'SG'
+<EOS>
+b'Zij  maxSij  \xce\xb2, 0,'
+<EOS>
+b'ij  1\nij  0\n\n17'
+<EOS>
+b'18'
+<EOS>
+b'where we set the margin value \xce\xb2  0.2.'
+<EOS>
+b'Loss of Eq.'
+<EOS>
+b'18 is valid because after Softmax and\nSinkhorn operations, Sij  0, 1.'
+<EOS>
+b'We also show permutation loss Perm Wang et al., 2019.'
+<EOS>
+b'Result can be found in Fig.'
+<EOS>
+b'4 b whereby the average accuracy on Pascal VOC is reported.'
+<EOS>
+b'All the\nsettings are under CIE1.'
+<EOS>
+b'For either loss, the proposed Hungarian attention can further enhance the\naccuracy, which is further visualized by a pair of matching results under P-loss and H-loss in Fig.'
+<EOS>
+b'5.'
+<EOS>
+b'9\n\n051015202530Epoch0.20.250.30.350.40.450.50.550.60.650.7Accuracy0.511.522.53LossAcc'
+<EOS>
+b'CIE1-PAcc'
+<EOS>
+b'CIE1-HLoss CIE1-PLoss CIE1-HFocalMarginPerm0.60.620.640.660.680.7Accuracyno Hungwith Hung\x0cPublished as a conference paper at ICLR 2020'
+<EOS>
+b'a Reference Image'
+<EOS>
+b'b P-loss 710\n\nc H-loss 810'
+<EOS>
+b'Figure 5 Visualization of a matching result'
+<EOS>
+b'10 key points in each image with 7 and 8 correct\nmatchings dispalyed, respectively.'
+<EOS>
+b'Different colors across images indicate node correspondence.'
+<EOS>
+b'The larger size of dot, the larger is the predicted value Sij.'
+<EOS>
+b'a The reference image.'
+<EOS>
+b'b Result on\nthe target image from CIE1-P. c Result on the target image from CIE1-H.'
+<EOS>
+b'We see though H-loss'
+<EOS>
+b'i.e. Hungarian attention loss outputs smaller predicted values, it delivers a more accurate matching.'
+<EOS>
+b'Table 2 Accuracy  on Willow Object.'
+<EOS>
+b'face\nmethod'
+<EOS>
+b'91.2'
+<EOS>
+b'HARG'
+<EOS>
+b'GMN-V'
+<EOS>
+b'98.1\nGMN-W 99.3'
+<EOS>
+b'100.0'
+<EOS>
+b'PCA-V'
+<EOS>
+b'PCA-W 100.0'
+<EOS>
+b'CIE-V\n99.9'
+<EOS>
+b'CIE-W 100.0'
+<EOS>
+b'mbike'
+<EOS>
+b'44.4\n65.0'
+<EOS>
+b'71.4'
+<EOS>
+b'69.8'
+<EOS>
+b'76.7'
+<EOS>
+b'71.5'
+<EOS>
+b'90.0'
+<EOS>
+b'car'
+<EOS>
+b'58.4'
+<EOS>
+b'72.9\n74.3\n78.6\n84.0'
+<EOS>
+b'75.4'
+<EOS>
+b'82.2\n\nduck wbottle'
+<EOS>
+b'55.2\n74.3'
+<EOS>
+b'82.8'
+<EOS>
+b'82.4'
+<EOS>
+b'93.5'
+<EOS>
+b'73.2'
+<EOS>
+b'81.2'
+<EOS>
+b'66.6'
+<EOS>
+b'70.5'
+<EOS>
+b'76.7'
+<EOS>
+b'95.1'
+<EOS>
+b'96.9'
+<EOS>
+b'97.6'
+<EOS>
+b'97.6'
+<EOS>
+b'intra-class\n\nTable 3 Accuracy  on CUB.'
+<EOS>
+b'method'
+<EOS>
+b'cross-class\nGMN-D'
+<EOS>
+b'GMN-P'
+<EOS>
+b'GAT-P'
+<EOS>
+b'PCA-P'
+<EOS>
+b'PCA-H'
+<EOS>
+b'CIE-P'
+<EOS>
+b'CIE-H'
+<EOS>
+b'89.9'
+<EOS>
+b'90.8'
+<EOS>
+b'93.4'
+<EOS>
+b'93.5'
+<EOS>
+b'93.5'
+<EOS>
+b'93.8'
+<EOS>
+b'94.2'
+<EOS>
+b'89.6'
+<EOS>
+b'90.4'
+<EOS>
+b'93.2'
+<EOS>
+b'92.9'
+<EOS>
+b'93.7'
+<EOS>
+b'94.1'
+<EOS>
+b'94.4'
+<EOS>
+b'Willow Object Class test'
+<EOS>
+b'We test the transfer ability on Willow Object Class Cho et al., 2013.'
+<EOS>
+b'It contains 256 images3 of 5 categories in total, with three categories face, duck and winebottle\ncollected from Caltech-256 and resting two car and motorbike from Pascal VOC 2007.'
+<EOS>
+b'This dataset\nis considered to have bias compared with Pascal VOC since images in the same category are with\nrelatively \xef\xac\x81xed pose and background is much cleaner.'
+<EOS>
+b'We crop the object inside its bounding box and\nresize it to 256  256 as CNN input.'
+<EOS>
+b'While HARG is trained from scratch following the protocol\nin Cho et al., 2013, all the resting counterparts are either directly pre-trained from the previous\nsection or \xef\xac\x81ne-tuned upon the pre-trained models.'
+<EOS>
+b'We term the method X-V or X-W to indicate\npre-trained model on Pascal VOC or \xef\xac\x81ne-tuned on Willow, respectively.'
+<EOS>
+b'CIE refers to CIE1-H for\nshort.'
+<EOS>
+b'Results in Table 2 suggest that our method is competitive to state-of-the-art.'
+<EOS>
+b'5 CONCLUSION'
+<EOS>
+b'We have presented a novel and effective approach for learning based graph matching.'
+<EOS>
+b'On one hand,\nthe novelty of our method partially lies in the development of the Hungarian attention, which in-\ntrinsically adapts the matching problem.'
+<EOS>
+b'It is further observed from the experiments that Hungarian\nattention can improve several matching-oriented loss functions, which might bring about potential\nfor a series of combinatorial problems.'
+<EOS>
+b'On the other hand, we also devise the channel independent\nembedding CIE technique for deep graph matching, which decouples the basic merging opera-\ntions and is shown robust in learning effective graph representation.'
+<EOS>
+b'Extensive experimental results\non multiple matching benchmarks show the leading performance of our solver, and highlight the\northogonal contribution of the two proposed components on top of existing techniques.'
+<EOS>
+b'ACKNOWLEDGMENTS'
+<EOS>
+b'Tianshu Yu and Baoxin Li were supported in part by a grant from ONR.'
+<EOS>
+b'Any opinions expressed\nin this material are those of the authors and do not necessarily re\xef\xac\x82ect the views of ONR.'
+<EOS>
+b'Runzhong\nWang and Junchi Yan were supported in part by NSFC 61972250 and U19B2035.'
+<EOS>
+b'3The data size is too small to train a deep model.'
+<EOS>
+b'Hence we only evaluate the transfer ability on this dataset.'
+<EOS>
+b'10'
+<EOS>
+b'Published as a conference paper at ICLR 2020'
+<EOS>
+b'REFERENCES\n\n2011.'
+<EOS>
+b'K\xef\xac\x81r Aberman, Jing Liao, Mingyi Shi, Dani Lischinski, Baoquan Chen, and Daniel Cohen-'
+<EOS>
+b'Or.'
+<EOS>
+b'Neural\n\nbest-buddies Sparse cross-domain correspondence.'
+<EOS>
+b'SIGGRAPH, 2018.'
+<EOS>
+b'Ryan Prescott Adams and Richard S Zemel.'
+<EOS>
+b'Ranking via sinkhorn propagation.'
+<EOS>
+b'arXiv1106.1925,\n\nFlorian Bernard, Christian Theobalt, and Michael Moeller.'
+<EOS>
+b'Ds Tighter lifting-free convex relax-'
+<EOS>
+b'ations for quadratic matching problems.'
+<EOS>
+b'In CVPR, 2018.'
+<EOS>
+b'Leon Bottou.'
+<EOS>
+b'Large-scale machine learning with stochastic gradient descent.'
+<EOS>
+b'In COMPSTAT.'
+<EOS>
+b'2010.'
+<EOS>
+b'Lubomir Bourdev and Jitendra Malik.'
+<EOS>
+b'Poselets Body part detectors trained using 3d human pose\n\nannotations.'
+<EOS>
+b'In ICCV, 2009.'
+<EOS>
+b'Jane Bromley, Isabelle Guyon, Yann LeCun, Eduard Sackinger, and Roopak Shah.'
+<EOS>
+b'Signature veri\xef\xac\x81-'
+<EOS>
+b'cation using a siamese time delay neural network.'
+<EOS>
+b'In NIPS, 1994.'
+<EOS>
+b'Joan Bruna, Wojciech Zaremba, Arthur Szlam, and Yann LeCun.'
+<EOS>
+b'Spectral networks and locally\n\nconnected networks on graphs.'
+<EOS>
+b'In ICLR, 2014.'
+<EOS>
+b'Tiberio S Caetano, Julian J McAuley, Li Cheng, Quoc V Le, and Alex J Smola.'
+<EOS>
+b'Learning graph'
+<EOS>
+b'matching.'
+<EOS>
+b'PAMI, 31610481058, 2009.'
+<EOS>
+b'Hongyun Cai, Vincent W Zheng, and Kevin Chen-Chuan Chang.'
+<EOS>
+b'A comprehensive survey of graph\n\nembedding Problems, techniques, and applications.'
+<EOS>
+b'TKDE, 30916161637, 2018.'
+<EOS>
+b'Pengfei Chen, Weiwen Liu, Chang-Yu Hsieh, Guangyong Chen, and Shengyu Zhang.'
+<EOS>
+b'Utilizing\nedge features in graph neural networks via variational information maximization.'
+<EOS>
+b'arXiv preprint'
+<EOS>
+b'arXiv1906.05488, 2019.'
+<EOS>
+b'Kyunghyun Cho, Bart Van Merrienboer, Dzmitry Bahdanau, and Yoshua Bengio.'
+<EOS>
+b'On the properties\nof neural machine translation Encoder-decoder approaches.'
+<EOS>
+b'arXiv preprint arXiv1409.1259,\n2014.'
+<EOS>
+b'Minsu Cho, Jungmin Lee, and Kyoung Mu Lee.'
+<EOS>
+b'Reweighted random walks for graph matching.'
+<EOS>
+b'In\n\nECCV, 2010.'
+<EOS>
+b'Minsu Cho, Karteek Alahari, and Jean Ponce.'
+<EOS>
+b'Learning graphs to match.'
+<EOS>
+b'In CVPR, 2013.'
+<EOS>
+b'Christopher B Choy, JunYoung Gwak, Silvio Savarese, and Manmohan Chandraker.'
+<EOS>
+b'Universal\n\ncorrespondence network.'
+<EOS>
+b'In NIPS, 2016.'
+<EOS>
+b'Michael Defferrard, Xavier Bresson, and Pierre Vandergheynst.'
+<EOS>
+b'Convolutional neural networks on\n\ngraphs with fast localized spectral \xef\xac\x81ltering.'
+<EOS>
+b'In NIPS, 2016.'
+<EOS>
+b'Boris Delaunay et al.'
+<EOS>
+b'Sur la sphere vide.'
+<EOS>
+b'Izv.'
+<EOS>
+b'Akad.'
+<EOS>
+b'Nauk SSSR, Otdelenie Matematicheskii'
+<EOS>
+b'i'
+<EOS>
+b'Estestvennyka Nauk, 7793-80012, 1934.'
+<EOS>
+b'Alexey Dosovitskiy, Philipp Fischer, Eddy Ilg, Philip Hausser, Caner Hazirbas, Vladimir Golkov,\nPatrick Van Der Smagt, Daniel Cremers, and Thomas Brox.'
+<EOS>
+b'Flownet Learning optical \xef\xac\x82ow with\nconvolutional networks.'
+<EOS>
+b'In ICCV, 2015.'
+<EOS>
+b'Patrick Emami and Sanjay Ranka.'
+<EOS>
+b'Learning permutations with sinkhorn policy gradient.'
+<EOS>
+b'arXiv1805.07010, 2018.'
+<EOS>
+b'Mark Everingham, Luc Van Gool, Christopher KI Williams, John Winn, and Andrew Zisserman.'
+<EOS>
+b'The pascal visual object classes voc challenge.'
+<EOS>
+b'IJCV, 882303338, 2010.'
+<EOS>
+b'Paolo Frasconi, Marco Gori, and Alessandro Sperduti.'
+<EOS>
+b'A general framework for adaptive processing\n\nof data structures.'
+<EOS>
+b'TNN, 95768786, 1998.'
+<EOS>
+b'Justin Gilmer, Samuel S Schoenholz, Patrick F Riley, Oriol Vinyals, and George E Dahl.'
+<EOS>
+b'Neural\n\nmessage passing for quantum chemistry.'
+<EOS>
+b'In ICML, 2017.'
+<EOS>
+b'11'
+<EOS>
+b'Published as a conference paper at ICLR 2020'
+<EOS>
+b'Liyu Gong and Qiang Cheng.'
+<EOS>
+b'Exploiting edge features for graph neural networks.'
+<EOS>
+b'In CVPR, 2019.'
+<EOS>
+b'Marco Gori, Gabriele Monfardini, and Franco Scarselli.'
+<EOS>
+b'A new model for learning in graph domains.'
+<EOS>
+b'Will Hamilton, Zhitao Ying, and Jure Leskovec.'
+<EOS>
+b'Inductive representation learning on large graphs.'
+<EOS>
+b'Juris Hartmanis.'
+<EOS>
+b'Computers and intractability a guide to the theory of np-completeness michael r.\n\ngarey and david s. johnson.'
+<EOS>
+b'Siam Review, 24190, 1982.'
+<EOS>
+b'Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun.'
+<EOS>
+b'Deep residual learning for image recog-'
+<EOS>
+b'In IJCNN, 2005.'
+<EOS>
+b'In NIPS, 2017.'
+<EOS>
+b'nition.'
+<EOS>
+b'In CVPR, 2016.'
+<EOS>
+b'works.'
+<EOS>
+b'In ICLR, 2017.'
+<EOS>
+b'Thomas N Kipf and Max Welling.'
+<EOS>
+b'Semi-supervised classi\xef\xac\x81cation with graph convolutional net-'
+<EOS>
+b'Harold W Kuhn.'
+<EOS>
+b'The hungarian method for the assignment problem.'
+<EOS>
+b'Naval research logistics'
+<EOS>
+b'quarterly, 21-28397, 1955.'
+<EOS>
+b'Eugene L Lawler.'
+<EOS>
+b'The quadratic assignment problem.'
+<EOS>
+b'Management science, 94586599, 1963.'
+<EOS>
+b'Marius Leordeanu and Martial Hebert.'
+<EOS>
+b'A spectral technique for correspondence problems using\n\npairwise constraints.'
+<EOS>
+b'In ICCV, 2005.'
+<EOS>
+b'Yijun Li, Chen Fang, Jimei Yang, Zhaowen Wang, Xin Lu, and Ming-Hsuan Yang.'
+<EOS>
+b'Universal style\n\ntransfer via feature transforms.'
+<EOS>
+b'In NIPS, 2017.'
+<EOS>
+b'Yujia Li, Daniel Tarlow, Marc Brockschmidt, and Richard Zemel.'
+<EOS>
+b'Gated graph sequence neural\n\nnetworks.'
+<EOS>
+b'In ICLR, 2016.'
+<EOS>
+b'detection.'
+<EOS>
+b'In ICCV, 2017.'
+<EOS>
+b'Tsung-Yi Lin, Priya Goyal, Ross Girshick, Kaiming He, and Piotr Dollar.'
+<EOS>
+b'Focal loss for dense object'
+<EOS>
+b'Eliane Maria Loiola, Nair Maria Maia de Abreu, Paulo Oswaldo Boaventura-Netto, Peter Hahn, and\nTania Querido.'
+<EOS>
+b'A survey for the quadratic assignment problem.'
+<EOS>
+b'European journal of operational\nresearch, 1762657690, 2007.'
+<EOS>
+b'Gonzalo Mena, David Belanger, Gonzalo Munoz, and Jasper Snoek.'
+<EOS>
+b'Sinkhorn networks Using\noptimal transport techniques to learn permutations.'
+<EOS>
+b'NIPS Workshop in Optimal Transport and\nMachine Learning, 2017.'
+<EOS>
+b'Anton Milan, Seyed Hamid Rezato\xef\xac\x81ghi, Ravi Garg, Anthony R. Dick, and Ian D. Reid.'
+<EOS>
+b'Data-driven\n\napproximations to np-hard problems.'
+<EOS>
+b'In AAAI, 2017.'
+<EOS>
+b'Vinod Nair and Geoffrey E Hinton.'
+<EOS>
+b'Recti\xef\xac\x81ed linear units improve restricted boltzmann machines.'
+<EOS>
+b'In ICML, 2010.'
+<EOS>
+b'Giorgio Patrini, Marcello Carioni, Patrick Forre, Samarth Bhargav, Max Welling, Rianne van den\n\nBerg, Tim Genewein, and Frank Nielsen.'
+<EOS>
+b'Sinkhorn autoencoders.'
+<EOS>
+b'arXiv1810.01118, 2018.'
+<EOS>
+b'Zhaofan Qiu, Ting Yao, and Tao Mei.'
+<EOS>
+b'Learning spatio-temporal representation with pseudo-3d\n\nresidual networks.'
+<EOS>
+b'In ICCV, 2017.'
+<EOS>
+b'Zhe Ren, Junchi Yan, Bingbing Ni, Bin Liu, Xiaokang Yang, and Hongyuan Zha.'
+<EOS>
+b'Unsupervised'
+<EOS>
+b'deep learning for optical \xef\xac\x82ow estimation.'
+<EOS>
+b'In AAAI, 2017.'
+<EOS>
+b'Rodrigo Santa Cruz, Basura Fernando, Anoop Cherian, and Stephen Gould.'
+<EOS>
+b'Visual permutation\n\nlearning.'
+<EOS>
+b'TPAMI, 2018.'
+<EOS>
+b'Franco Scarselli, Marco Gori, Ah Chung Tsoi, Markus Hagenbuchner, and Gabriele Monfardini.'
+<EOS>
+b'The graph neural network model.'
+<EOS>
+b'TNN, 2016180, 2008.'
+<EOS>
+b'Kristof T Schutt, Farhad Arbabzadah, Stefan Chmiela, Klaus R Muller, and Alexandre Tkatchenko.\nQuantum-chemical insights from deep tensor neural networks.'
+<EOS>
+b'Nature communications, 813890,\n2017.'
+<EOS>
+b'12'
+<EOS>
+b'Published as a conference paper at ICLR 2020'
+<EOS>
+b'Karen Simonyan and Andrew Zisserman.'
+<EOS>
+b'Very deep convolutional networks for large-scale image\n\nrecognition.'
+<EOS>
+b'arXiv preprint arXiv1409.1556, 2014.'
+<EOS>
+b'Richard Sinkhorn.'
+<EOS>
+b'A relationship between arbitrary positive matrices and doubly stochastic'
+<EOS>
+b'matri-'
+<EOS>
+b'ces.'
+<EOS>
+b'AoMS, 1964.'
+<EOS>
+b'Alessandro Sperduti and Antonina Starita.'
+<EOS>
+b'Supervised neural networks for the classi\xef\xac\x81cation of\n\nstructures.'
+<EOS>
+b'TNN, 83714735, 1997.'
+<EOS>
+b'Du Tran, Heng Wang, Lorenzo Torresani, Jamie Ray, Yann LeCun, and Manohar Paluri.'
+<EOS>
+b'A closer\n\nlook at spatiotemporal convolutions for action recognition.'
+<EOS>
+b'In CVPR, 2018.'
+<EOS>
+b'Ioannis Tsochantaridis, Thorsten Joachims, Thomas Hofmann, and Yasemin Altun.'
+<EOS>
+b'Large margin'
+<EOS>
+b'methods for structured and interdependent output variables.'
+<EOS>
+b'JMLR, 6Sep14531484, 2005.'
+<EOS>
+b'Petar Veli\xcb\x87ckovic, Guillem Cucurull, Arantxa Casanova, Adriana Romero, Pietro Lio, and Yoshua\n\nBengio.'
+<EOS>
+b'Graph attention networks.'
+<EOS>
+b'In ICLR, 2018.'
+<EOS>
+b'Oriol Vinyals, Meire Fortunato, and Navdeep Jaitly.'
+<EOS>
+b'Pointer networks.'
+<EOS>
+b'In NIPS, 2015.'
+<EOS>
+b'Runzhong Wang, Junchi Yan, and Xiaokang Yang.'
+<EOS>
+b'Learning combinatorial embedding networks for\n\ndeep graph matching.'
+<EOS>
+b'In ICCV, 2019.'
+<EOS>
+b'P. Welinder, S. Branson, T. Mita, C. Wah, F. Schroff, S. Belongie, and P. Perona.'
+<EOS>
+b'Caltech-UCSD'
+<EOS>
+b'Birds 200.'
+<EOS>
+b'Technical Report CNS-TR-2010-001, California Institute of Technology, 2010.'
+<EOS>
+b'Hongteng Xu, Dixin Luo, and Lawrence Carin.'
+<EOS>
+b'Gromov-wasserstein learning for graph matching\n\nand node embedding.'
+<EOS>
+b'In ICML, 2019.'
+<EOS>
+b'Junchi Yan, Chao Zhang, Hongyuan Zha, Wei Liu, Xiaokang Yang, and Stephen M Chu.'
+<EOS>
+b'Discrete\n\nhyper-graph matching.'
+<EOS>
+b'In CVPR, 2015.'
+<EOS>
+b'Tianshu Yu, Junchi Yan, Yilin Wang, Wei Liu, and Baoxin Li.'
+<EOS>
+b'Generalizing graph matching beyond\n\nquadratic assignment model.'
+<EOS>
+b'In NIPS, 2018.'
+<EOS>
+b'Andrei Zan\xef\xac\x81r and Cristian Sminchisescu.'
+<EOS>
+b'Deep learning of graph matching.'
+<EOS>
+b'In CVPR, 2018.'
+<EOS>
+b'Zhen Zhang and Wee Sun Lee.'
+<EOS>
+b'Deep graphical feature learning for the feature matching problem.'
+<EOS>
+b'In ICCV, 2019.'
+<EOS>
+b'Feng Zhou and Fernando De'
+<EOS>
+b'la Torre.'
+<EOS>
+b'Factorized graph matching.'
+<EOS>
+b'In CVPR, 2012.'
+<EOS>
+b'A APPENDIX'
+<EOS>
+b'A.1 SYNTHETIC'
+<EOS>
+b'TEST'
+<EOS>
+b'Synthetic graphs are generated for training and testing following the protocol in Cho et al., 2010.'
+<EOS>
+b'Speci\xef\xac\x81cally, Kpt keypoints are generated for a pair of graphs with a 1024-dimensional random\nfeature for each node, which is sampled from uniform distribution U1, 1.'
+<EOS>
+b'Disturbance is also\napplied to graph pairs including Gaussian node feature noise from N 0, \xcf\x832'
+<EOS>
+b'f t random af\xef\xac\x81ne trans-'
+<EOS>
+b'formation'
+<EOS>
+b'cid34s'
+<EOS>
+b'cos \xce\xb8 s sin'
+<EOS>
+b'\xce\xb8\ns'
+<EOS>
+b'cos \xce\xb8'
+<EOS>
+b's'
+<EOS>
+b'sin \xce\xb8\n\n0'
+<EOS>
+b'0'
+<EOS>
+b'cid35'
+<EOS>
+b'tx'
+<EOS>
+b'ty'
+<EOS>
+b'1'
+<EOS>
+b'with s'
+<EOS>
+b'U0.8, 1.2, \xce\xb8'
+<EOS>
+b'U60, 60, tx,'
+<EOS>
+b'ty  U10, 10\n\nfollowed by Gaussian coordinate position noise N 0,'
+<EOS>
+b'\xcf\x832\nco.'
+<EOS>
+b'By default we assign Kpt  25, \xcf\x83f t \n1.5, \xcf\x83co  5.'
+<EOS>
+b'Two graphs share the same structure.'
+<EOS>
+b'We generate 10 random distributions for each\ntest.'
+<EOS>
+b'Results are shown in Fig.'
+<EOS>
+b'6.'
+<EOS>
+b'The performance of PCA and CIE is reported.'
+<EOS>
+b'We see our\nmethod signi\xef\xac\x81cantly outperformed PCA.'
+<EOS>
+b'It can further be noticed that Hungarian attention can help\nto achieve an even higher accuracy.'
+<EOS>
+b'Readers are referred to Wang et al. 2019 for some other results\non synthetic test.'
+<EOS>
+b'However, we also notice that the way to generate synthetic graphs is much different from the dis-\ntribution of real-world data.'
+<EOS>
+b'For real-world data, on one hand, there is strong correlation on the\n\n13\n\n\x0cPublished as a conference paper at ICLR 2020\n\nFigure 6 Results on synthetic test where two different loss functions are compared in ablative study.'
+<EOS>
+b'neighboring node features.'
+<EOS>
+b'This is the reason why the message passing from nearby node features\nworks.'
+<EOS>
+b'However, the features of synthetic data are randomly generated and there is no correlation\nbetween neighboring node features.'
+<EOS>
+b'Therefore, message passing mechanism is not very effective to\nreveal the relation or pattern among local nodes for synthetic data.'
+<EOS>
+b'On the other hand, features of\nreal-world data typically lie on a manifold embedded in high dimensional space, hence is low di-'
+<EOS>
+b'mensional.'
+<EOS>
+b'However, randomly generated features will span the whole space and show no patterns.'
+<EOS>
+b'Taking into account the aforementioned factors, we believe there is a demand for a novel strategy to\ngenerate more reasonable synthetic data.'
+<EOS>
+b'This can be one of the future works.'
+<EOS>
+b'A.2 COMPARISON OF PASCAL VOC AND WILLOW'
+<EOS>
+b'As we claim that Willow dataset is biased compared with Pascal VOC dataset, we qualitatively show\nsome randomly selected examples in Fig.'
+<EOS>
+b'7.'
+<EOS>
+b'We select several images with the same class car from\nboth datasets.'
+<EOS>
+b'We also choose images with bird from Pascal VOC and duck from Willow since\nthey somewhat share similar semantic information.'
+<EOS>
+b'We see in either case, Pascal VOC contains more\nvariation and degradation compared with Willow in terms of pose, scale, appearance, etc.'
+<EOS>
+b'In general,\nWillow dataset is easier for algorithms to learn.'
+<EOS>
+b'While there is a signi\xef\xac\x81cant performance gap of PCA\nover these two datasets, the performance of CIE on Willow without \xef\xac\x81ne-tune Table 2 is consistent\nto the performance on Pascal VOC Table 1.'
+<EOS>
+b'As such, we infer the performance degradation of CIE\non duck in Willow test Table 2 is due to such bias.'
+<EOS>
+b'The pre-trained CIE on Pascal VOC tends\nto produce more stable and higher average accuracy on all types of images, rather than focusing on\neasy-to-learn samples by PCA.'
+<EOS>
+b'This is a different learning strategy from PCA.'
+<EOS>
+b'14'
+<EOS>
+b'1.21.251.31.351.41.451.51.551.6Noise0.550.60.650.70.750.80.850.90.951AccuracyPCA-PCIE1-PCIE1-H51015202530354045Node size0.60.650.70.750.80.850.90.951AccuracyPCA-PCIE1-PCIE1-H\x0cPublished as a conference paper at ICLR 2020\n\na Car images from Pascal VOC\n\nb Car images from Willow\n\nc Bird images from Pascal VOC\n\nd Duck images from Willow\n\nFigure 7 Image examples from Pascal VOC and Willow.'
+<EOS>
+b'15'
+<EOS>

@@ -1,0 +1,1948 @@
+b'Under review as a conference paper at ICLR 2020'
+<EOS>
+b'REINFORCEMENT LEARNING BASED'
+<EOS>
+b'GRAPH-TO-SEQUENCE MODEL FOR'
+<EOS>
+b'NATURAL QUESTION GENERATION'
+<EOS>
+b'Anonymous authors'
+<EOS>
+b'Paper under double-blind review'
+<EOS>
+b'ABSTRACT'
+<EOS>
+b'Natural question generation QG aims to generate questions from a passage and\nan answer.'
+<EOS>
+b'Previous works on QG'
+<EOS>
+b'either i ignore the rich structure informa-'
+<EOS>
+b'tion hidden in text, ii solely rely on cross-entropy loss that leads to issues like\nexposure bias and inconsistency between traintest measurement, or iii fail to\nfully exploit the answer information.'
+<EOS>
+b'To address these limitations, in this paper,\nwe propose a reinforcement learning RL based graph-to-sequence Graph2Seq\nmodel for QG.'
+<EOS>
+b'Our model consists of a Graph2Seq generator with a novel Bidi-\nrectional Gated Graph Neural Network based encoder to embed the passage, and\na hybrid evaluator with a mixed objective function that combines both the cross-\nentropy and RL loss to ensure the generation of syntactically and semantically\nvalid text.'
+<EOS>
+b'We also introduce an effective Deep Alignment Network for incorpo-\nrating the answer information into the passage at both the word and contextual\nlevel.'
+<EOS>
+b'Our model is end-to-end trainable and achieves new state-of-the-art scores,\noutperforming existing methods by a signi\xef\xac\x81cant margin on the standard SQuAD\nbenchmark for QG.'
+<EOS>
+b'1'
+<EOS>
+b'INTRODUCTION'
+<EOS>
+b'Natural question generation QG has many useful applications such as improving the question'
+<EOS>
+b'an-'
+<EOS>
+b'swering task Chen et al., 2017 2019a by providing more training data Tang et al.,'
+<EOS>
+b'2017 Yuan\net al., 2017, generating practice exercises and assessments for educational purposes'
+<EOS>
+b'Heilman \nSmith, 2010'
+<EOS>
+b'Danon'
+<EOS>
+b'Last, 2017, and helping dialog systems to kick-start and continue a conver-\nsation with human users Mostafazadeh et al., 2016.'
+<EOS>
+b'While many existing works focus on QG from\nimages'
+<EOS>
+b'Fan et al., 2018'
+<EOS>
+b'Li et al., 2018 or knowledge bases'
+<EOS>
+b'Serban et al.,'
+<EOS>
+b'2016 Elsahar et al.,\n2018, in this work, we focus on QG from text.'
+<EOS>
+b'Conventional methods'
+<EOS>
+b'Mostow  Chen, 2009'
+<EOS>
+b'Heilman  Smith, 2010 Heilman, 2011 for QG rely\non heuristic rules or hand-crafted templates, leading to the issues of low generalizability and'
+<EOS>
+b'scal-'
+<EOS>
+b'ability.'
+<EOS>
+b'Recent attempts have been focused on exploiting Neural Network NN based approaches'
+<EOS>
+b'that do not require manually-designed rules and are end-to-end trainable.'
+<EOS>
+b'Encouraged by the huge\nsuccess of neural machine translation, these approaches formulate the QG task as a sequence-to-\nsequence Seq2Seq learning problem.'
+<EOS>
+b'Speci\xef\xac\x81cally, attention-based Seq2Seq models Bahdanau'
+<EOS>
+b'et al., 2014 Luong et al., 2015 and their enhanced versions with copy Vinyals et al.,'
+<EOS>
+b'2015 Gu'
+<EOS>
+b'et al., 2016 and coverage Tu et al.,'
+<EOS>
+b'2016 mechanisms have been widely applied and show promis-'
+<EOS>
+b'ing results on this task Du et al., 2017 Zhou et al.,'
+<EOS>
+b'2017 Song et al., 2018a'
+<EOS>
+b'Kumar et al., 2018a.'
+<EOS>
+b'However, these methods typically ignore the hidden structural information associated with a word\nsequence such as the syntactic parsing tree.'
+<EOS>
+b'Failing to utilize the rich text structure information\nbeyond the simple word sequence may limit the effectiveness of these models for QG.'
+<EOS>
+b'It has been observed that in general, cross-entropy based sequence training has several limitations\nlike exposure bias and inconsistency between traintest measurement Ranzato et al.,'
+<EOS>
+b'2015 Wu'
+<EOS>
+b'et al., 2016.'
+<EOS>
+b'As a result, they do not always produce the best results on discrete evaluation metrics\non sequence generation tasks such as text summerization Paulus et al., 2017 or question'
+<EOS>
+b'gener-'
+<EOS>
+b'ation Song et al., 2017.'
+<EOS>
+b'To cope with these issues, some recent QG approaches Song et al.,'
+<EOS>
+b'2017'
+<EOS>
+b'Kumar et al.,'
+<EOS>
+b'2018b directly optimize evaluation metrics using Reinforcement Learning'
+<EOS>
+b'1'
+<EOS>
+b'Under review as a conference paper at ICLR 2020'
+<EOS>
+b'RL Williams, 1992.'
+<EOS>
+b'However, existing approaches usually only employ evaluation metrics like\nBLEU and ROUGE-L as rewards for RL optimization.'
+<EOS>
+b'More importantly, they fail to exploit other\nimportant metrics such as syntactic and semantic constraints for guiding high-quality text genera-\ntion.'
+<EOS>
+b'Early works on neural QG did not take into account the answer information when generating a\nquestion.'
+<EOS>
+b'Recent works have started to explore various means of utilizing the answer information.'
+<EOS>
+b'When question generation is guided by the semantics of an answer, the resulting questions become\nmore relevant and readable.'
+<EOS>
+b'Conceptually, there are three different ways to incorporate the answer\ninformation by simply marking the answer location in the passage Zhou et al., 2017 Zhao et al.,'
+<EOS>
+b'2018'
+<EOS>
+b'Liu et al., 2019, or using complex passage-answer matching strategies Song et al., 2017,\nor separating answers from passages when applying a Seq2Seq model Kim et al., 2018'
+<EOS>
+b'Sun et al.,\n2018.'
+<EOS>
+b'However, they neglect potential semantic relations between passage words and answer words,\nand thus fail to explicitly model the global interactions among them in the embedding space.'
+<EOS>
+b'To address these aforementioned issues, in this paper, we present a novel reinforcement learning\nbased generator-evaluator architecture that aims to'
+<EOS>
+b'i make full use of rich hidden structure'
+<EOS>
+b'in-'
+<EOS>
+b'formation beyond the simple word sequence ii generate syntactically and semantically valid text\nwhile maintaining the consistency of traintest measurement iii model explicitly the global interac-\ntions of semantic relationships between passage and answer at both word-level and contextual-level.'
+<EOS>
+b'In particular, to achieve the \xef\xac\x81rst goal, we \xef\xac\x81rst explore two different means to either construct a\nsyntax-based static graph or a semantics-aware dynamic graph from the text sequence, as well as its\nrich hidden structure information.'
+<EOS>
+b'Then, we design a graph-to-sequence Graph2Seq model based\ngenerator that encodes the graph representation of a text passage and decodes a question sequence\nusing a Recurrent Neural Network RNN.'
+<EOS>
+b'Our Graph2Seq model is based on a novel bidirectional\ngated graph neural network, which extends the original gated graph neural network Li et al., 2015\nby considering both incoming and outgoing edges, and fusing them during the graph embedding\nlearning.'
+<EOS>
+b'To achieve the second goal, we design a hybrid evaluator which is trained by optimizing\na mixed objective function that combines both cross-entropy and RL loss.'
+<EOS>
+b'We use not only discrete\nevaluation metrics like BLEU, but also semantic metrics like word movers distance Kusner et al.,\n2015 to encourage both syntactically and semantically valid text generation.'
+<EOS>
+b'To achieve the third\ngoal, we propose a novel Deep Alignment Network DAN for effectively incorporating answer\ninformation into the passage at multiple granularity levels.'
+<EOS>
+b'Our main contributions are as follows'
+<EOS>
+b'We propose a novel RL-based Graph2Seq model for natural question generation.'
+<EOS>
+b'To the\n\nbest of our knowledge, we are the \xef\xac\x81rst to introduce the Graph2Seq architecture for QG.'
+<EOS>
+b'We explore both static and dynamic ways of constructing graph from text and are the \xef\xac\x81rst'
+<EOS>
+b'to systematically investigate their performance impacts on a GNN encoder.'
+<EOS>
+b'The proposed model is end-to-end trainable, achieves new state-of-the-art scores, and out-\nperforms existing methods by a signi\xef\xac\x81cant margin on the standard SQuAD benchmark for\nQG.'
+<EOS>
+b'Our human evaluation study also corroborates that the questions generated by our\nmodel are more natural semantically and syntactically compared to other baselines.'
+<EOS>
+b'2 AN RL-BASED GENERATOR-EVALUATOR ARCHITECTURE'
+<EOS>
+b'In this section, we de\xef\xac\x81ne the question generation task, and then present our RL-based Graph2Seq\nmodel for question generation.'
+<EOS>
+b'We \xef\xac\x81rst motivate the design, and then present the details of each\ncomponent as shown in Fig.'
+<EOS>
+b'1.'
+<EOS>
+b'2.1 PROBLEM FORMULATION'
+<EOS>
+b'The goal of question generation is to generate natural language questions based on a given form of\ndata, such as knowledge base triples or tables Bao et al., 2018, sentences Du et al.,'
+<EOS>
+b'2017 Song'
+<EOS>
+b'et al., 2018a, or images Li et al., 2018, where the generated questions need to be answerable from\nthe input data.'
+<EOS>
+b'In this paper, we focus on QG from a given text passage, along with a target answer.'
+<EOS>
+b'We assume that a text passage is a collection of word tokens X p'
+<EOS>
+b'txp'
+<EOS>
+b'answer is also a collection of word tokens X'
+<EOS>
+b'a  txa'
+<EOS>
+b'N u, and a target\nLu.'
+<EOS>
+b'The task of natural question\n\n2, ..., xp\n\n2, ...,'
+<EOS>
+b'xa\n\n1,'
+<EOS>
+b'xp\n\n1,'
+<EOS>
+b'xa'
+<EOS>
+b'2'
+<EOS>
+b'Under review as a conference paper at ICLR 2020\n\nFigure 1 Overall architecture of the proposed model.'
+<EOS>
+b'Best viewed in color.'
+<EOS>
+b'generation is to generate the best natural language question consisting of a sequence of word tokens\n\xcb\x86Y'
+<EOS>
+b'ty1, y2, ..., yT'
+<EOS>
+b'u which maximizes the conditional likelihood \xcb\x86Y'
+<EOS>
+b'arg maxY P pY X p, X aq.'
+<EOS>
+b'Here N , L, and T are the lenghts of the passage, answer and question, respectively.'
+<EOS>
+b'We focus on the\nproblem setting where we have a set of passage and answers and target questions pairs, to learn'
+<EOS>
+b'the mapping existing QG approaches Du et al.,'
+<EOS>
+b'2017 Song et al., 2018a'
+<EOS>
+b'Zhao et al., 2018 Kim\net al., 2018 make a similar assumption.'
+<EOS>
+b'2.2 DEEP ALIGNMENT NETWORK'
+<EOS>
+b'Answer information is crucial for generating relevant and high quality questions from a passage.'
+<EOS>
+b'Un-'
+<EOS>
+b'like previous methods that neglect potential semantic relations between passage and answer words,\nwe explicitly model the global interactions among them in the embedding space.'
+<EOS>
+b'To this end, we\npropose a novel Deep Alignment Network DAN component for effectively incorporating answer\ninformation into the passage with multiple granularity levels.'
+<EOS>
+b'Speci\xef\xac\x81cally, we perform attention-'
+<EOS>
+b'based soft-alignment at the word level, as well as at the contextualized hidden state level, so that\nmultiple levels of alignments can help learn hierarchical representations.'
+<EOS>
+b'Figure 2'
+<EOS>
+b'The attention-based soft-alignment mechanism.'
+<EOS>
+b'Let Xp P RF \xcb\x86N and rXp P R rFp\xcb\x86N denote two embeddings associated with passage text.'
+<EOS>
+b'Similarly,\nlet Xa P RF \xcb\x86L and rXa P R rFa\xcb\x86L denoted two embeddings associated with answer text.'
+<EOS>
+b'Concep-'
+<EOS>
+b'tually, as shown in Fig. 2, the soft-alignment mechanism consists of three steps i compute the\nattention score \xce\xb2i,j for each pair of passage word xp'
+<EOS>
+b'j  ii multiply the atten-\ntion matrix \xce\xb2 with the answer embeddings rXa to obtain the aligned answer embeddings'
+<EOS>
+b'Hp for the\npassage iii concatenate the resulting aligned answer embeddings Hp with the passage embeddings'
+<EOS>
+b'rXp to get the \xef\xac\x81nal passage embeddings'
+<EOS>
+b'rHp P Rp'
+<EOS>
+b'Formally, we de\xef\xac\x81ne our soft-alignment function as following\n\ni and answer word'
+<EOS>
+b'xa'
+<EOS>
+b'rFaq\xcb\x86N .'
+<EOS>
+b'rFp\n\nrHp'
+<EOS>
+b'AlignpXp, Xa, rXp, rXaq  CATp'
+<EOS>
+b'1'
+<EOS>
+b'where the matrix rHp is the \xef\xac\x81nal passage embedding, the function CAT is a simple concatenation\noperation, and \xce\xb2 is a N \xcb\x86 L attention score matrix, computed by'
+<EOS>
+b'rXp'
+<EOS>
+b'Hpq  CATp\n\nrXp rXa\xce\xb2T q'
+<EOS>
+b'ReLUpWXpqT'
+<EOS>
+b'ReLUpWXaq'
+<EOS>
+b'\xce\xb2 9 exp\n\n2'
+<EOS>
+b'3'
+<EOS>
+b'Under review as a conference paper at ICLR 2020'
+<EOS>
+b'where W P Rd\xcb\x86F is a trainable weight matrix, with d being'
+<EOS>
+b'the hidden state size and ReLU is the\nrecti\xef\xac\x81ed linear unit Nair  Hinton, 2010.'
+<EOS>
+b'After introducing the general soft-alignment mechanism,\nwe next introduce how we do soft-alignment at both word-level and contextualized hidden state\nlevel.'
+<EOS>
+b'2.2.1 WORD-LEVEL ALIGNMENT'
+<EOS>
+b'In the word-level alignment stage, we \xef\xac\x81rst perform a soft-alignment between the passage and the\nanswer based only on their pretrained GloVe embeddings and compute the \xef\xac\x81nal passage embed-\ndings by rHp  AlignpGp, Ga, rGp Bp Lps, Gaq, where Gp, Bp, and Lp are the corresponding'
+<EOS>
+b'GloVe embedding Pennington et al., 2014, BERT embedding Devlin et al., 2018, and linguistic'
+<EOS>
+b'feature i.e., case, NER and POS embedding of the passage text, respectively.'
+<EOS>
+b'Then a bidirectional\nLSTM Hochreiter  Schmidhuber, 1997 is applied to the \xef\xac\x81nal passage embeddings rHp  t\nto obtain contextualized passage embeddings sHp P R sF \xcb\x86N .'
+<EOS>
+b'On the other hand, for the answer text'
+<EOS>
+b'Xa, we simply concatenate its GloVe embedding Ga and'
+<EOS>
+b'its BERT embedding Ba to obtain its word embedding matrix'
+<EOS>
+b'Ha P Rd1\xcb\x86L.'
+<EOS>
+b'Another BiLSTM is\nthen applied to the concatenated answer embedding sequence to obtain the contextualized answer'
+<EOS>
+b'embeddings'
+<EOS>
+b'sHa P R sF \xcb\x86L.'
+<EOS>
+b'rhp'
+<EOS>
+b'i uN'
+<EOS>
+b'i1'
+<EOS>
+b'2.2.2'
+<EOS>
+b'HIDDEN-LEVEL ALIGNMENT'
+<EOS>
+b'In the hidden-level alignment stage, we perform another soft-alignment based on the contextual-\nized passage and answer embeddings.'
+<EOS>
+b'Similarly, we compute the aligned answer embedding, and\nconcatenate it with the contextualized passage embedding to obtain the \xef\xac\x81nal passage embedding ma-'
+<EOS>
+b'trix AlignprGp Bp sHps, rGa Ba sHas, sHp, sHaq.'
+<EOS>
+b'Finally, we apply another BiLSTM to the above\nconcatenated embedding to get a sF \xcb\x86 N passage embedding matrix X.'
+<EOS>
+b'2.3 BIDIECTIONAL GRAPH-TO-SEQUENCE GENERATOR'
+<EOS>
+b'While RNNs are good at capturing local dependencies among consecutive words in text, GNNs\nhave been shown to better utilize the rich hidden text structure information such as syntactic parsing'
+<EOS>
+b'Xu et al., 2018b or semantic parsing'
+<EOS>
+b'Song et al., 2018b, and can model the global interactions'
+<EOS>
+b'relations among sequence words to further improve the representations.'
+<EOS>
+b'Therefore, unlike most of\nthe existing methods that rely on RNNs to encode the input passage, we \xef\xac\x81rst construct a passage\ngraph G from text where each passage word is treated as a graph node, and then employ a novel\nGraph2Seq model to encode the passage graph and answer, and to decode the natural language\nquestion.'
+<EOS>
+b'2.3.1'
+<EOS>
+b'PASSAGE GRAPH CONSTRUCTION'
+<EOS>
+b'Existing GNNs assume a graph structured input and directly consume it for computing the corre-'
+<EOS>
+b'sponding node embeddings.'
+<EOS>
+b'However, we need to construct a graph from the text.'
+<EOS>
+b'Although there\nare early attempts on constructing a graph from a sentence Xu et al., 2018b, there is no clear an-'
+<EOS>
+b'swer as to the best way of representing text as a graph.'
+<EOS>
+b'We explore both static and dynamic graph\nconstruction approaches, and systematically investigate the performance differences between these\ntwo methods in the experimental section.'
+<EOS>
+b'Syntax-based static graph construction'
+<EOS>
+b'We construct a directed and unweighted passage graph\nbased on dependency parsing.'
+<EOS>
+b'For each sentence in a passage, we \xef\xac\x81rst get its dependency parse\ntree.'
+<EOS>
+b'We then connect neighboring dependency parse trees by connecting those nodes that are at a\nsentence boundary and next to each other in text.'
+<EOS>
+b'Semantics-aware dynamic graph construction'
+<EOS>
+b'We dynamically build a directed and weighted graph\nto model semantic relationships among passage words.'
+<EOS>
+b'We make the process of building such a\ngraph depend on not only the passage, but also on the answer.'
+<EOS>
+b'The graph construction procedure\nconsists of three steps'
+<EOS>
+b'i we compute a dense adjacency matrix A for the passage graph by applying\nself-attention to the word-level passage embeddings rHp, ii a kNN-style graph sparsi\xef\xac\x81cation'
+<EOS>
+b'strat-'
+<EOS>
+b'egy'
+<EOS>
+b'Chen et al., 2019b is adopted to obtain a sparse adjacency matrix A, where we only keep the\n\n4'
+<EOS>
+b'Under review as a conference paper at ICLR 2020\n\nK nearest neighbors including itself as well as the associated attention scores i.e., the remaining\nattentions scores are masked off for each node and iii inspired by BiLSTM over LSTM, we also\ncompute two normalized adjacency matrices A and A'
+<EOS>
+b'according to their incoming and outgo-'
+<EOS>
+b'ing directions, by applying softmax operation on the resulting sparse adjacency matrix A and its\ntranspose, respectively.'
+<EOS>
+b'A  ReLUpU rHpqT ReLUpU rHpq,'
+<EOS>
+b'A'
+<EOS>
+b'kNNpAq, A, A  softmaxpt A,'
+<EOS>
+b'AT'
+<EOS>
+b'uq\n\n3'
+<EOS>
+b'rFaq trainable weight matrix.'
+<EOS>
+b'Note that the supervision signal is able to\nwhere U is a d \xcb\x86 p\nback-propagate through the kNN-style graph sparsi\xef\xac\x81cation operation since the K nearest attention'
+<EOS>
+b'scores are kept.'
+<EOS>
+b'rFp \n\n2.3.2'
+<EOS>
+b'BIDIRECTIONAL'
+<EOS>
+b'GATED GRAPH NEURAL NETWORKS'
+<EOS>
+b'To effectively learn the graph embeddings from the constructed text graph, we propose a novel Bidi-'
+<EOS>
+b'rectional Gated Graph Neural Network BiGGNN which extends Gated Graph Sequence Neural'
+<EOS>
+b'Networks Li et al., 2015 by learning node embedding from both incoming and outgoing edges\nin an interleaved fashion when processing the directed passage graph.'
+<EOS>
+b'Similar idea has also been\nexploited in Xu et al., 2018a, which extended another popular variant of GNNs - GraphSAGE\nHamilton et al., 2017.'
+<EOS>
+b'However, one of key difference between our BiGGNN and their bidi-'
+<EOS>
+b'rectional GraphSAGE is that we fuse the intermediate node embeddings from both incoming and'
+<EOS>
+b'outgoing edges in every iteration during the training, whereas their model simply trains the node\nembeddings of each direction independently and concatenates them in the \xef\xac\x81nal step.'
+<EOS>
+b'In BiGGNN, node embeddings are initialized to the passage embeddings X returned by DAN.'
+<EOS>
+b'The\nsame set of network parameters are shared at every hop of computation.'
+<EOS>
+b'At each computation hop,\nfor every node in the graph, we apply an aggregation function which takes as input a set of incoming\nor outgoing neighboring node vectors and outputs a backward or forward aggregation vector.'
+<EOS>
+b'For\nthe syntax-based static graph, we use a mean aggregator for simplicity although other operators such\nas max or attention Veli\xcb\x87ckovic et al., 2017 could also be employed,\n\nhk'
+<EOS>
+b'N'
+<EOS>
+b'hk'
+<EOS>
+b'N'
+<EOS>
+b'pvq\n\npvq'
+<EOS>
+b'MEANpthk1'
+<EOS>
+b'MEANpthk1'
+<EOS>
+b'v'
+<EOS>
+b'u'
+<EOS>
+b'u Y thk1'
+<EOS>
+b'u'
+<EOS>
+b'Y thk1\n\n, u P N\n, u P N'
+<EOS>
+b'u'
+<EOS>
+b'v'
+<EOS>
+b'pvquq'
+<EOS>
+b'pvquq'
+<EOS>
+b'For the semantics-aware dynamic graph we compute a weighted average for aggregation where the\nweights come from the normalized adjacency matrices A and A, de\xef\xac\x81ned as,\n\nhk'
+<EOS>
+b'N'
+<EOS>
+b'pvq\n\n\n\nv,uhk1'
+<EOS>
+b'a\n\nu\n\n, hk\nN'
+<EOS>
+b'pvq'
+<EOS>
+b'v,uhk1'
+<EOS>
+b'a\n\nu'
+<EOS>
+b'\xc3\xbf'
+<EOS>
+b'uPN'
+<EOS>
+b'pvq'
+<EOS>
+b'\xc3\xbf'
+<EOS>
+b'uPN'
+<EOS>
+b'pvq'
+<EOS>
+b'While Xu et al., 2018a learn separate node embeddings for both directions independently, we\nchoose to fuse the information aggregated in the two directions at each hop, which we \xef\xac\x81nd works\nbetter in general.'
+<EOS>
+b'hk'
+<EOS>
+b'N'
+<EOS>
+b'Fusephk'
+<EOS>
+b'N\n\n, hk\nN'
+<EOS>
+b'q'
+<EOS>
+b'pvq'
+<EOS>
+b'pvq'
+<EOS>
+b'We design the fusion function as a gated sum of two information sources,\n\nFusepa, bq  z d'
+<EOS>
+b'a  p1  zq d b,'
+<EOS>
+b'z  \xcf\x83pWzra b a d b'
+<EOS>
+b'a  bs'
+<EOS>
+b'bzq'
+<EOS>
+b'where d is the component-wise multiplication, \xcf\x83 is a sigmoid function, and z is a gating vector.'
+<EOS>
+b'Finally, a Gated Recurrent Unit GRU Cho et al., 2014 is used to update the node embeddings by\nincorporating the aggregation information.'
+<EOS>
+b'4'
+<EOS>
+b'5'
+<EOS>
+b'6'
+<EOS>
+b'7'
+<EOS>
+b'8'
+<EOS>
+b'After n hops of GNN computation, where n is a hyperparameter, we obtain the \xef\xac\x81nal state embedding'
+<EOS>
+b'hn'
+<EOS>
+b'v for node'
+<EOS>
+b'v. To compute the graph-level embedding, we \xef\xac\x81rst apply a linear projection to the node\nembeddings, and then apply max-pooling over all node embeddings to get a d-dim vector hG.\n\nhk'
+<EOS>
+b'v'
+<EOS>
+b'GRUphk1'
+<EOS>
+b'v\n\n, hk'
+<EOS>
+b'Nq\n\n5'
+<EOS>
+b'Under review as a conference paper at ICLR 2020'
+<EOS>
+b'2.3.3 RNN DECODER'
+<EOS>
+b'On the decoder side, we adopt the same model architecture as other state-of-the-art Seq2Seq'
+<EOS>
+b'mdoels where an attention-based Bahdanau et al., 2014 Luong et al., 2015 LSTM decoder with\ncopy Vinyals et al., 2015'
+<EOS>
+b'Gu et al., 2016 and coverage'
+<EOS>
+b'mechanisms Tu et al., 2016 is empolyed.'
+<EOS>
+b'The decoder takes the graph-level embedding hG followed by two separate fully-connected layers\nas initial hidden states i.e., c0 and s0 and the node embeddings'
+<EOS>
+b'thn'
+<EOS>
+b'v , v P Gu as the attention\nmemory, and generates the output sequence one word at a time.'
+<EOS>
+b'The particular decoder used in this\nwork closely follows See et al., 2017.'
+<EOS>
+b'We refer the readers to Appendix A for more details.'
+<EOS>
+b'2.4 HYBRID EVALUATOR'
+<EOS>
+b'It has been observed that optimizing such cross-entropy based training objectives for sequence learn-'
+<EOS>
+b'ing does not always produce the best results on discrete evaluation metrics Ranzato et al., 2015'
+<EOS>
+b'Wu et al., 2016'
+<EOS>
+b'Paulus et al., 2017.'
+<EOS>
+b'Major limitations of this strategy include exposure bias and\nevaluation discrepancy between training and testing.'
+<EOS>
+b'To tackle these issues, some recent QG ap-\nproaches'
+<EOS>
+b'Song et al., 2017 Kumar et al., 2018b directly optimize evaluation metrics using REIN-\nFORCE.'
+<EOS>
+b'We further use a mixed objective function with both syntactic and semantic constraints for\nguiding text generation.'
+<EOS>
+b'In particular, we present a hybrid evaluator with a mixed objective function\nthat combines both cross-entropy loss and RL loss in order to ensure the generation of syntactically\nand semantically valid text.'
+<EOS>
+b'For the RL part, we employ the self-critical sequence training'
+<EOS>
+b'SCST algorithm'
+<EOS>
+b'Rennie et al.,\n2017 to directly optimize the evaluation metrics.'
+<EOS>
+b'SCST is an ef\xef\xac\x81cient REINFORCE algorithm'
+<EOS>
+b'that\nutilizes the output of its own test-time inference algorithm to normalize the rewards it experiences.'
+<EOS>
+b'In SCST, at each training iteration, the model generates two output sequences the sampled output\nY s, produced by multinomial sampling, that is, each word ys\nt is sampled according to the likelihood\nP pytX,'
+<EOS>
+b'y\xc4\x83tq predicted by the generator, and the baseline output \xcb\x86Y , obtained by greedy search, that\nis, by maximizing the output probability distribution at each decoding step.'
+<EOS>
+b'We de\xef\xac\x81ne rpY q as the\nreward of an output sequence Y , computed by comparing it to corresponding ground-truth sequence'
+<EOS>
+b'Y  with some reward metrics.'
+<EOS>
+b'The loss function is de\xef\xac\x81ned as\nlog'
+<EOS>
+b'P pys'
+<EOS>
+b'Lrl  prp'
+<EOS>
+b'\xcb\x86Y'
+<EOS>
+b'q'
+<EOS>
+b'rpY sqq\n\n9'
+<EOS>
+b'\xc3\xbf'
+<EOS>
+b't X,'
+<EOS>
+b'ys'
+<EOS>
+b'\xc4\x83tq'
+<EOS>
+b't'
+<EOS>
+b'As we can see, if the sampled output has a higher reward than the baseline one, we maximize its\nlikelihood, and vice versa.'
+<EOS>
+b'One of the key factors for RL is to pick the proper reward function.'
+<EOS>
+b'To take syntactic and semantic\nconstraints into account, we consider the following metrics as our reward functions'
+<EOS>
+b'Evaluation metric as reward function'
+<EOS>
+b'We use one of our evaluation metrics, BLEU-4, as our reward\nfunction feval, which lets us directly optimize the model towards the evaluation metrics.'
+<EOS>
+b'Semantic metric as reward function'
+<EOS>
+b'One drawback of some evaluation metrics like BLEU is that\nthey do not measure meaning, but only reward systems for n-grams that have exact matches in\nthe reference system.'
+<EOS>
+b'To make our reward function more effective and robust, we additionally use\nword movers distance WMD as a semantic reward function fsem.'
+<EOS>
+b'WMD is the state-of-the-art\napproach to measure the dissimilarity between two sentences based on'
+<EOS>
+b'word embeddings Kusner\net al., 2015.'
+<EOS>
+b'Following Gong et al.'
+<EOS>
+b'2019, we take the negative of the WMD distance between\na generated sequence and the ground-truth sequence and divide it by the sequence length as its\nsemantic score.'
+<EOS>
+b'We de\xef\xac\x81ne the \xef\xac\x81nal reward function as rpY q  fevalpY, Y q  \xce\xb1fsempY, Y q where \xce\xb1 is a scalar.'
+<EOS>
+b'2.5 TRAINING AND TESTING'
+<EOS>
+b'We train our model in two stages.'
+<EOS>
+b'In the \xef\xac\x81rst state, we train the model using regular cross-entropy\nloss, de\xef\xac\x81ned as,\n\n\xc3\xbf'
+<EOS>
+b'Llm'
+<EOS>
+b'log P py'
+<EOS>
+b't X, y'
+<EOS>
+b'\xc4\x83tq'
+<EOS>
+b'\xce\xbb covlosst'
+<EOS>
+b'10'
+<EOS>
+b'where y\ncoverage loss de\xef\xac\x81ned as\n\nt is the word at the t-th position of the ground-truth output sequence and covlosst'
+<EOS>
+b'is the'
+<EOS>
+b'i being the i-th element of the attention vector over\n\niq, with at'
+<EOS>
+b'i minpat'
+<EOS>
+b'i, ct\n\n\xc5\x99'
+<EOS>
+b't'
+<EOS>
+b'6'
+<EOS>
+b'Under review as a conference paper at ICLR 2020'
+<EOS>
+b'the input sequence at time step t. Scheduled teacher forcing Bengio et al., 2015 is adopted to\nalleviate the exposure bias problem.'
+<EOS>
+b'In the second stage, we \xef\xac\x81ne-tune the model by optimizing a\nmixed objective function combining both cross-entropy loss and RL loss, de\xef\xac\x81ned as,\n\nwhere \xce\xb3 is a scaling factor controling the trade-off between cross-entropy loss and RL loss.'
+<EOS>
+b'During\nthe testing phase, we use beam search to generate \xef\xac\x81nal predictions.'
+<EOS>
+b'L'
+<EOS>
+b'\xce\xb3Lrl  p1'
+<EOS>
+b'\xce\xb3qLlm\n\n11\n\n3'
+<EOS>
+b'EXPERIMENTS'
+<EOS>
+b'We evaluate our proposed model against state-of-the-art methods on the SQuAD dataset Rajpurkar\net al., 2016.'
+<EOS>
+b'Our full models have two variants G2SstaBERTRL and G2SdynBERTRL'
+<EOS>
+b'which\nadopts static graph construction or dynamic graph construction, respectively.'
+<EOS>
+b'For model settings and\nsensitivity analysis, please refer to Appendix B and C. 1'
+<EOS>
+b'3.1 BASELINE METHODS'
+<EOS>
+b'We compare against the following baselines in our experiments'
+<EOS>
+b'i SeqCopyNet Zhou et al., 2018,'
+<EOS>
+b'ii NQG Zhou et al.,'
+<EOS>
+b'2017, iii MPQGR Song et al., 2017, iv AFPQA Sun et al., 2018,'
+<EOS>
+b'v s2sa-at-mp-gsa Zhao et al., 2018, vi ASs2s Kim et al., 2018, and vii CGC-QG Liu et al.,'
+<EOS>
+b'2019.'
+<EOS>
+b'Detailed descriptions of the baselines are provided in Appendix D. Experiments on baselines\nfollowed by  are conducted using released source codes.'
+<EOS>
+b'Results of other baselines are taken from\nthe corresponding papers, with unreported metrics marked as .'
+<EOS>
+b'3.2 DATA AND METRICS\n\nSQuAD contains more than 100K questions posed by crowd workers on 536 Wikipedia arti-\ncles.'
+<EOS>
+b'Since the test set of the original SQuAD is not publicly available, the accessible parts\n90 are used as the entire dataset in our experiments.'
+<EOS>
+b'For fair comparison with previ-'
+<EOS>
+b'ous methods'
+<EOS>
+b', we evaluated our model on both data split-1 Song et al., 2018a2 that contains\n75,50017,93411,805'
+<EOS>
+b'traindevelopmenttest examples and data split-2 Zhou'
+<EOS>
+b'et al., 2017 3'
+<EOS>
+b'that\ncontains 86,6358,9658,964 examples.'
+<EOS>
+b'Following previous works, we use BLEU-4 Papineni et al., 2002, METEOR Banerjee  Lavie,\n2005, ROUGE-L Lin, 2004 and Q-'
+<EOS>
+b'BLEU1'
+<EOS>
+b'Nema  Khapra, 2018 as our evaluation metrics.'
+<EOS>
+b'Initially, BLEU-4 and METEOR were designed for evaluating machine translation systems and\nROUGE-L was designed for evaluating text summarization systems.'
+<EOS>
+b'Recently, Q-BLEU1 was de-'
+<EOS>
+b'signed for better evaluating question generation systems, which was shown to correlate signi\xef\xac\x81cantly\nbetter with human judgments compared to existing metrics.'
+<EOS>
+b'Besides automatic evaluation metrics, we also conduct a human evaluation study on split-2.'
+<EOS>
+b'We ask\nhuman evaluators to rate generated questions from a set of anonymized competing systems based\non whether they are syntactically correct, semantically correct and relevant to the passage.'
+<EOS>
+b'The\nrating scale is from 1 to 5, on each of the three categories.'
+<EOS>
+b'Evaluation scores from all evaluators\nwere collected and averaged as \xef\xac\x81nal scores.'
+<EOS>
+b'Further details on human evaluation can be found\nin'
+<EOS>
+b'Appendix E.\n\n3.3 EXPERIMENTAL RESULTS AND HUMAN EVALUATION\n\nTable 1 shows the automatic evaluation results comparing our proposed models against other state-\nof-the-art baseline methods.'
+<EOS>
+b'First of all, we can see that both of our full models G2SstaBERTRL\nand G2SdynBERTRL achieve the new state-of-the-art scores on both data splits and consistently\noutperform previous methods by a signi\xef\xac\x81cant margin.'
+<EOS>
+b'This highlights that our RL-based Graph2Seq\nmodel, together with the deep alignment network, successfully addresses the three issues we high-'
+<EOS>
+b'lighted in Sec. 1.'
+<EOS>
+b'Between these two variants, G2SstaBERTRL outperforms'
+<EOS>
+b'G2SdynBERTRL'
+<EOS>
+b'1The implementation of our model will be made publicly available after the review period.'
+<EOS>
+b'2httpswww.cs.rochester.edulsong10downloadsnqg_data.tgz'
+<EOS>
+b'3httpsres.qyzhou.meredistribute.zip'
+<EOS>
+b'7'
+<EOS>
+b'Under review as a conference paper at ICLR 2020\n\nTable 1 Automatic evaluation results on the SQuAD test set.'
+<EOS>
+b'BLEU-4 METEOR ROUGE-L Q-BLEU1'
+<EOS>
+b'BLEU-4 METEOR ROUGE-L Q'
+<EOS>
+b'-BLEU1'
+<EOS>
+b'Methods'
+<EOS>
+b'Split-1'
+<EOS>
+b'14.39'
+<EOS>
+b'SeqCopyNet'
+<EOS>
+b'NQG'
+<EOS>
+b'MPQGR\nAFPQA'
+<EOS>
+b's2sa-at-mp-gsa'
+<EOS>
+b'ASs2s'
+<EOS>
+b'CGC-QG'
+<EOS>
+b'G2SdynBERTRL 17.55'
+<EOS>
+b'17.94'
+<EOS>
+b'G2SstaBERTRL'
+<EOS>
+b'15.32'
+<EOS>
+b'16.20'
+<EOS>
+b'19.29'
+<EOS>
+b'19.92'
+<EOS>
+b'21.42'
+<EOS>
+b'21.76'
+<EOS>
+b'43.91'
+<EOS>
+b'43.96'
+<EOS>
+b'45.59'
+<EOS>
+b'46.02'
+<EOS>
+b'55.40'
+<EOS>
+b'55.60'
+<EOS>
+b'Split-2'
+<EOS>
+b'44.00'
+<EOS>
+b'19.67'
+<EOS>
+b'44.24'
+<EOS>
+b'21.24\n21.53'
+<EOS>
+b'21.70\n\n44.53'
+<EOS>
+b'45.91\n45.98'
+<EOS>
+b'13.02'
+<EOS>
+b'13.29\n14.71'
+<EOS>
+b'15.64\n15.82'
+<EOS>
+b'16.17'
+<EOS>
+b'17.55'
+<EOS>
+b'18.06\n18.30'
+<EOS>
+b'55.00'
+<EOS>
+b'55.20'
+<EOS>
+b'18.99'
+<EOS>
+b'42.46'
+<EOS>
+b'52.00'
+<EOS>
+b'18.93'
+<EOS>
+b'42.60'
+<EOS>
+b'50.30'
+<EOS>
+b'Table 2 Human evaluation results  standard deviation on the SQuAD split-2 test set.'
+<EOS>
+b'The rating\nscale is from 1 to 5 higher scores indicate better results.'
+<EOS>
+b'Methods'
+<EOS>
+b'MPQGR'
+<EOS>
+b'G2SstaBERTRL'
+<EOS>
+b'Ground-truth'
+<EOS>
+b'Syntactically correct\n4.34 0.15\n4.41 0.09'
+<EOS>
+b'4.74 0.14'
+<EOS>
+b'Semantically correct Relevant\n4.01 0.23'
+<EOS>
+b'4.31 0.12\n4.74 0.19\n\n3.21 0.31\n3.79 0.45\n4.25 0.38'
+<EOS>
+b'on all the metrics.'
+<EOS>
+b'Also, unlike the baseline methods, our model does not rely on any hand-crafted\nrules or ad-hoc strategies, and is fully end-to-end trainable.'
+<EOS>
+b'As shown in Table 2, we conducted a human evaluation study to assess the quality of the questions\ngenerated by our model, the baseline method MPQGR, and the ground-truth data in terms of syn-\ntax, semantics and relevance metrics.'
+<EOS>
+b'We can see that our best performing model achieves good\nresults even compared to the ground-truth, and outperforms the strong baseline method MPQGR.'
+<EOS>
+b'Our error analysis shows that main syntactic error occurs in repeatedunknown words in generated\nquestions.'
+<EOS>
+b'Further, the slightly lower quality on semantics also impacts the relevance.'
+<EOS>
+b'3.4 ABLATION STUDY\n\nTable 3 Ablation study on the SQuAD split-2 test set.'
+<EOS>
+b'Methods'
+<EOS>
+b'G2SdynBERTRL'
+<EOS>
+b'G2SstaBERTRL'
+<EOS>
+b'G2SstaBERT-\xef\xac\x81xedRL'
+<EOS>
+b'G2SdynBERT'
+<EOS>
+b'G2SstaBERT'
+<EOS>
+b'G2SstaBERT-\xef\xac\x81xed'
+<EOS>
+b'G2SdynRL'
+<EOS>
+b'G2SstaRL'
+<EOS>
+b'BLEU-4'
+<EOS>
+b'18.06'
+<EOS>
+b'18.30\n18.20'
+<EOS>
+b'17.56\n18.02\n17.86'
+<EOS>
+b'17.18'
+<EOS>
+b'17.49'
+<EOS>
+b'Methods'
+<EOS>
+b'G2Sdyn'
+<EOS>
+b'G2Ssta'
+<EOS>
+b'G2Sdyn wo DAN'
+<EOS>
+b'G2Ssta'
+<EOS>
+b'wo DAN'
+<EOS>
+b'G2Ssta wo BiGGNN, w Seq2Seq'
+<EOS>
+b'G2Ssta wo BiGGNN, w GCN\nG2Ssta w GGNN-forward'
+<EOS>
+b'G2Ssta w GGNN-backward'
+<EOS>
+b'BLEU-4'
+<EOS>
+b'16.81\n16.96'
+<EOS>
+b'12.58'
+<EOS>
+b'12.62'
+<EOS>
+b'16.14\n14.47'
+<EOS>
+b'16.53'
+<EOS>
+b'16.75'
+<EOS>
+b'As shown in Table 3, we perform an ablation study to systematically assess the impact of differ-\nent model components e.g., BERT, RL, DAN, and BiGGNN for two proposed full model variants'
+<EOS>
+b'static vs dynamic on the SQuAD split-2 test set.'
+<EOS>
+b'It con\xef\xac\x81rms our \xef\xac\x81nding that syntax-based static'
+<EOS>
+b'graph construction G2SstaBERTRL performs better than semantics-aware dynamic graph'
+<EOS>
+b'con-\nstruction'
+<EOS>
+b'G2SdynBERTRL'
+<EOS>
+b'in almost every setting.'
+<EOS>
+b'However, it may be too early to conclude'
+<EOS>
+b'which one is the method of choice for QG.'
+<EOS>
+b'On the one hand, an advantage of static graph construc-\ntion is that useful domain knowledge can be hard-coded into the graph, which can greatly bene\xef\xac\x81t the\ndownstream task.'
+<EOS>
+b'However, it might suffer if there is a lack of prior knowledge for a speci\xef\xac\x81c domain\nknowledge.'
+<EOS>
+b'On the other hand, dynamic graph construction does not need any prior knowledge\nabout the hidden structure of text, and only relies on the attention matrix to capture these structured\ninformation, which provides an easy way to achieve a decent performance.'
+<EOS>
+b'One interesting direction\nis to explore effective ways of combining both static and dynamic graphs.'
+<EOS>
+b'8'
+<EOS>
+b'Under review as a conference paper at ICLR 2020'
+<EOS>
+b'By turning off the Deep Alignment Network DAN, the BLEU-4 score of G2Ssta similarly for\nG2Sdyn dramatically drops from 16.96 to 12.62, which indicates the importance of answer\ninformation for QG and shows the effectiveness of DAN.'
+<EOS>
+b'This can also be veri\xef\xac\x81ed by comparing the\nperformance between the DAN-enhanced Seq2Seq model 16.14 BLEU-4 score and other carefully\ndesigned answer-aware Seq2Seq baselines such as NQG 13.29 BLEU-4 score, MPQGR 14.71\nBLEU-4 score and AFPQA 15.82 BLEU-4 score.'
+<EOS>
+b'Further experiments demonstrate that both\nword-level G2Ssta w DAN-word only and hidden-level G2Ssta w'
+<EOS>
+b'DAN-hidden'
+<EOS>
+b'only answer'
+<EOS>
+b'alignments in DAN are helpful.'
+<EOS>
+b'We can see the advantages of Graph2Seq learning over Seq2Seq learning on this task by comparing\nthe performance between G2Ssta and Seq2Seq.'
+<EOS>
+b'Compared to Seq2Seq based QG methods that com-\npletely ignore hidden structure information in the passage, our Graph2Seq based method is aware of\nmore hidden structure information such as semantic similarity between any pair of words that are not\ndirectly connected or syntactic relationships between two words captured in a dependency parsing\ntree.'
+<EOS>
+b'In our experiments, we also observe that doing both forward and backward message passing\nin the GNN encoder is bene\xef\xac\x81cial.'
+<EOS>
+b'Surprisingly, using GCN Kipf  Welling, 2016 as the graph en-\ncoder and converting the input graph to an undirected graph does not provide good performance.'
+<EOS>
+b'In addition, \xef\xac\x81ne-tuning the model using REINFORCE can further improve the model performance\nin all settings i.e., w and wo BERT, which shows the bene\xef\xac\x81ts of directly optimizing the evalu-\nation metrics.'
+<EOS>
+b'Besides, we \xef\xac\x81nd that the pretrained BERT embedding has'
+<EOS>
+b'a considerable impact on\nthe performance and \xef\xac\x81ne-tuning BERT embedding even further improves the performance, which\ndemonstrates the power of large-scale pretrained language models.'
+<EOS>
+b'3.5 CASE STUDY\n\nTable 4'
+<EOS>
+b'Generated questions on SQuAD split-2 test set.'
+<EOS>
+b'Target answers are underlined.'
+<EOS>
+b'Passage for the successful execution of a project , effective planning is essential .'
+<EOS>
+b'Gold'
+<EOS>
+b'what is essential for the successful execution of a project ?'
+<EOS>
+b'G2Ssta'
+<EOS>
+b'wo BiGGNN Seq2Seq'
+<EOS>
+b'what type of planning is essential for the project ?'
+<EOS>
+b'G2Ssta wo DAN.'
+<EOS>
+b'what type of planning is essential for the successful execution of a project ?'
+<EOS>
+b'G2Ssta'
+<EOS>
+b'what is essential for the successful execution of a project ?'
+<EOS>
+b'G2SstaBERT'
+<EOS>
+b'what is essential for the successful execution of a project ?'
+<EOS>
+b'G2SstaBERTRL'
+<EOS>
+b'what is essential for the successful execution of a project ?'
+<EOS>
+b'G2SdynBERTRL'
+<EOS>
+b'what is essential for the successful execution of a project ?'
+<EOS>
+b'Passage'
+<EOS>
+b'the church operates three hundred sixty schools and institutions overseas .'
+<EOS>
+b'Gold how many schools and institutions does the church operate overseas ?'
+<EOS>
+b'G2Ssta'
+<EOS>
+b'wo'
+<EOS>
+b'BiGGNN Seq2Seq how many schools does the church have ?'
+<EOS>
+b'G2Ssta wo DAN.'
+<EOS>
+b'how many schools does the church have ?'
+<EOS>
+b'G2Ssta how many schools and institutions does the church have ?'
+<EOS>
+b'G2SstaBERT'
+<EOS>
+b'how many schools and institutions does the church have ?'
+<EOS>
+b'G2SstaBERTRL how many schools and institutions does the church operate ?'
+<EOS>
+b'G2SdynBERTRL'
+<EOS>
+b'how many schools does the church operate ?'
+<EOS>
+b'In Table 4, we further show a few examples that illustrate the quality of generated text given a pas-\nsage under different ablated systems.'
+<EOS>
+b'As we can see, incorporating answer information helps the\nmodel identify the answer type of the question to be generated, and thus makes the generated ques-\ntions more relevant and speci\xef\xac\x81c.'
+<EOS>
+b'Also, we \xef\xac\x81nd our Graph2Seq model can generate more complete\nand valid questions compared to the Seq2Seq baseline.'
+<EOS>
+b'We think it is because a Graph2Seq model\nis able to exploit the rich text structure information better than a Seq2Seq model.'
+<EOS>
+b'Lastly, it shows\nthat \xef\xac\x81ne-tuning the model using REINFORCE can improve the quality of the generated questions.'
+<EOS>
+b'4 RELATED WORK'
+<EOS>
+b'4.1 NATURAL QUESTION GENERATION'
+<EOS>
+b'Early works Mostow  Chen, 2009 Heilman  Smith,'
+<EOS>
+b'2010 Heilman, 2011 for QG focused on\nrule-based approaches that rely on heuristic rules or hand-crafted templates, with low generaliz-\nability and scalability.'
+<EOS>
+b'Recent attempts have focused on NN-based approaches that do not require\n\n9'
+<EOS>
+b'Under review as a conference paper at ICLR 2020\n\nmanually-designed rules and are end-to-end trainable.'
+<EOS>
+b'Existing NN-based approaches Du et al.,'
+<EOS>
+b'2017'
+<EOS>
+b'Yao'
+<EOS>
+b'et al.'
+<EOS>
+b'Zhou et al., 2018'
+<EOS>
+b'rely on the Seq2Seq model with attention, copy or coverage\nmechanisms.'
+<EOS>
+b'In addition, various ways Zhou et al.,'
+<EOS>
+b'2017 Song et al.,'
+<EOS>
+b'2017 Zhao et al.,'
+<EOS>
+b'2018 Sun\net al., 2018 Kim et al., 2018'
+<EOS>
+b'Liu et al., 2019 have been proposed to utilize the target answer so as\nto guide the generation of the question.'
+<EOS>
+b'To address the limitations of cross-entropy based sequence\nlearning, some approaches Song et al., 2017 Kumar et al., 2018b'
+<EOS>
+b'aim at directly optimizing eval-\nuation metrics using REINFORCE.'
+<EOS>
+b'However, the existing approaches for QG suffer from several limitations'
+<EOS>
+b'they'
+<EOS>
+b'i ignore the rich\nstructure information hidden in text, ii solely rely on cross-entropy loss that leads to issues like\nexposure bias and inconsistency between traintest measurement, and iii fail to fully exploit the\nanswer information.'
+<EOS>
+b'To address these limitations, we propose a reinforcement learning RL based\ngraph-to-sequence Graph2Seq model for'
+<EOS>
+b'QG as well as deep alignment networks to effectively\ncope with the QG task.'
+<EOS>
+b'To the best of our knowledge, we are the \xef\xac\x81rst to introduce the Graph2Seq\narchitecture to solve the question generation task.'
+<EOS>
+b'4.2 GRAPH NEURAL NETWORKS'
+<EOS>
+b'Over the past few years, graph neural networks GNNs Kipf  Welling, 2016'
+<EOS>
+b'Gilmer et al., 2017'
+<EOS>
+b'Hamilton et al., 2017'
+<EOS>
+b'Li et al., 2015 have attracted increasing attention.'
+<EOS>
+b'Due to more recent ad-'
+<EOS>
+b'vances in graph representation learning, a number of works have extended the widely used Seq2Seq\narchitectures Sutskever et al., 2014 Cho et al.,'
+<EOS>
+b'2014 to Graph2Seq architectures for machine trans-'
+<EOS>
+b'lation, semantic parsing, and AMRSQL-to-text tasks Bastings et al., 2017 Beck et al.,'
+<EOS>
+b'2018'
+<EOS>
+b'Xu'
+<EOS>
+b'et al.,'
+<EOS>
+b'2018abc Song et al., 2018b.'
+<EOS>
+b'While the high-quality graph structure is crucial for the per-\nformance of GNN-based approaches, most existing works use syntax-based static graph structures\nwhen applied to textual data.'
+<EOS>
+b'Very recently, researchers have started exploring methods to automat-\nically construct a graph of visual objects Norcliffe-Brown et al., 2018 or words Liu et al., 2018'
+<EOS>
+b'Chen et al., 2019b when applying GNNs to non-graph structured data.'
+<EOS>
+b'To the best of our knowledge, we are the \xef\xac\x81rst to investigate systematically the performance difference\nbetween syntactic-aware static graph construction and semantics-aware dynamic graph construction\nin the context of question generation.'
+<EOS>
+b'5 CONCLUSION'
+<EOS>
+b'We proposed a novel RL based Graph2Seq model for QG, where the answer information is utilized\nby an effective Deep Alignment Network and a novel bidirectional GNN is proposed to process the\ndirected passage graph.'
+<EOS>
+b'Our two-stage training strategy bene\xef\xac\x81ts from both cross-entropy based and'
+<EOS>
+b'REINFORCE based sequence training.'
+<EOS>
+b'We also explore both static and dynamic graph construction\nfrom text, and systematically investigate and analyze the performance difference between the two.'
+<EOS>
+b'On the benchmark SQuAD dataset, our proposed model outperforms previous state-of-the-art meth-\nods by a signi\xef\xac\x81cant margin and achieve new best results.'
+<EOS>
+b'One of the interesting future directions is\nto investigate more effective ways of automatically learning graph structures from any data source,\nincluding texts.'
+<EOS>
+b'It would be also be interesting to study the unpaired problem setting for QG.'
+<EOS>
+b'REFERENCES'
+<EOS>
+b'Dzmitry Bahdanau, Kyunghyun Cho, and Yoshua Bengio.'
+<EOS>
+b'Neural machine translation by jointly\n\nlearning to align and translate.'
+<EOS>
+b'arXiv preprint arXiv1409.0473, 2014.'
+<EOS>
+b'Satanjeev Banerjee and Alon Lavie.'
+<EOS>
+b'Meteor An automatic metric for mt evaluation with improved\ncorrelation with human judgments.'
+<EOS>
+b'In Proceedings of the acl workshop on intrinsic and extrinsic\nevaluation measures for machine translation andor summarization, pp.'
+<EOS>
+b'6572, 2005.'
+<EOS>
+b'Junwei Bao, Duyu Tang, Nan Duan, Zhao Yan, Yuanhua Lv, Ming Zhou, and Tiejun Zhao.'
+<EOS>
+b'Table-'
+<EOS>
+b'In Thirty-Second AAAI Conference on\n\nto-text Describing table region with natural language.'
+<EOS>
+b'Arti\xef\xac\x81cial Intelligence, 2018.'
+<EOS>
+b'10'
+<EOS>
+b'Under review as a conference paper at ICLR 2020'
+<EOS>
+b'Joost Bastings, Ivan Titov, Wilker Aziz, Diego Marcheggiani, and Khalil Simaan.'
+<EOS>
+b'Graph convolu-'
+<EOS>
+b'tional encoders for syntax-aware neural machine translation.'
+<EOS>
+b'arXiv preprint arXiv1704.04675,\n2017.'
+<EOS>
+b'Daniel Beck, Gholamreza Haffari, and Trevor Cohn.'
+<EOS>
+b'Graph-to-sequence learning using gated graph\n\nneural networks.'
+<EOS>
+b'arXiv preprint arXiv1806.09835, 2018.'
+<EOS>
+b'Samy Bengio, Oriol Vinyals,'
+<EOS>
+b'Navdeep Jaitly, and Noam Shazeer.'
+<EOS>
+b'Scheduled sampling for sequence\nprediction with recurrent neural networks.'
+<EOS>
+b'In Advances in Neural Information Processing'
+<EOS>
+b'Sys-'
+<EOS>
+b'tems, pp. 11711179, 2015.'
+<EOS>
+b'Danqi Chen, Adam Fisch, Jason Weston, and Antoine Bordes.'
+<EOS>
+b'Reading wikipedia to answer open-'
+<EOS>
+b'domain questions.'
+<EOS>
+b'arXiv preprint arXiv1704.00051, 2017.'
+<EOS>
+b'Yu Chen, Lingfei Wu, and Mohammed J Zaki.'
+<EOS>
+b'Bidirectional attentive memory networks for question\n\nanswering over knowledge bases.'
+<EOS>
+b'arXiv preprint arXiv1903.02188, 2019a.'
+<EOS>
+b'Yu Chen, Lingfei Wu, and Mohammed J Zaki.'
+<EOS>
+b'Graph\xef\xac\x82ow Exploiting conversation \xef\xac\x82ow with graph\nneural networks for conversational machine comprehension.'
+<EOS>
+b'arXiv preprint arXiv1908.00059,\n2019b.'
+<EOS>
+b'Kyunghyun Cho, Bart van Merrienboer, Caglar Gulcehre, Dzmitry Bahdanau, Fethi Bougares, Hol-'
+<EOS>
+b'ger Schwenk, and Yoshua Bengio.'
+<EOS>
+b'Learning phrase representations using rnn encoderdecoder\nfor statistical machine translation.'
+<EOS>
+b'In EMNLP, pp. 17241734, 2014.'
+<EOS>
+b'Guy Danon and Mark Last.'
+<EOS>
+b'A syntactic approach to domain-speci\xef\xac\x81c automatic question generation.'
+<EOS>
+b'arXiv preprint arXiv1712.09827, 2017.'
+<EOS>
+b'Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova.'
+<EOS>
+b'Bert Pre-training of deep\n\nbidirectional transformers for language understanding.'
+<EOS>
+b'arXiv preprint arXiv1810.04805, 2018.'
+<EOS>
+b'Xinya Du, Junru Shao, and Claire Cardie.'
+<EOS>
+b'Learning to ask Neural question generation for reading\n\ncomprehension.'
+<EOS>
+b'arXiv preprint arXiv1705.00106, 2017.'
+<EOS>
+b'Hady Elsahar, Christophe Gravier, and Frederique Laforest.'
+<EOS>
+b'Zero-shot question generation from\nknowledge graphs for unseen predicates and entity types.'
+<EOS>
+b'arXiv preprint arXiv1802.06842, 2018.'
+<EOS>
+b'Zhihao Fan, Zhongyu Wei, Siyuan Wang, Yang Liu, and Xuanjing Huang.'
+<EOS>
+b'A reinforcement learning'
+<EOS>
+b'framework for natural question generation using bi-discriminators.'
+<EOS>
+b'In Proceedings of the 27th\nInternational Conference on Computational Linguistics, pp.'
+<EOS>
+b'17631774, 2018.'
+<EOS>
+b'Justin Gilmer, Samuel S Schoenholz, Patrick F Riley, Oriol Vinyals, and George E Dahl.'
+<EOS>
+b'Neural\nmessage passing for quantum chemistry.'
+<EOS>
+b'In Proceedings of the 34th International Conference on\nMachine Learning-Volume 70, pp. 12631272.'
+<EOS>
+b'JMLR.'
+<EOS>
+b'org, 2017.'
+<EOS>
+b'Hongyu Gong, Suma Bhat, Lingfei Wu, Jinjun Xiong, and Wen-mei Hwu.'
+<EOS>
+b'Reinforcement learning'
+<EOS>
+b'based text style transfer without parallel training corpus.'
+<EOS>
+b'arXiv preprint arXiv1903.10671, 2019.'
+<EOS>
+b'Jiatao Gu, Zhengdong Lu, Hang Li, and Victor OK Li.'
+<EOS>
+b'Incorporating copying mechanism in\n\nsequence-to-sequence learning.'
+<EOS>
+b'arXiv preprint arXiv1603.06393, 2016.'
+<EOS>
+b'Will Hamilton, Zhitao Ying, and Jure Leskovec.'
+<EOS>
+b'Inductive representation learning on large graphs.'
+<EOS>
+b'In Advances in Neural Information Processing Systems, pp.'
+<EOS>
+b'10241034, 2017.'
+<EOS>
+b'Michael Heilman.'
+<EOS>
+b'Automatic factual question generation from text.'
+<EOS>
+b'2011.'
+<EOS>
+b'Michael Heilman and Noah A Smith.'
+<EOS>
+b'Good question!'
+<EOS>
+b'statistical ranking for question generation.'
+<EOS>
+b'In Human Language Technologies'
+<EOS>
+b'The 2010 Annual Conference of the North American Chapter\nof the Association for Computational Linguistics, pp. 609617.'
+<EOS>
+b'Association for Computational'
+<EOS>
+b'Linguistics, 2010.'
+<EOS>
+b'Sepp Hochreiter and Jurgen Schmidhuber.'
+<EOS>
+b'Long short-term memory.'
+<EOS>
+b'Neural computation, 98\n\n17351780, 1997.'
+<EOS>
+b'11'
+<EOS>
+b'Under review as a conference paper at ICLR 2020'
+<EOS>
+b'Yanghoon Kim, Hwanhee Lee, Joongbo Shin, and Kyomin Jung.'
+<EOS>
+b'Improving neural question gener-'
+<EOS>
+b'ation using answer separation.'
+<EOS>
+b'arXiv preprint arXiv1809.02393, 2018.'
+<EOS>
+b'Diederik P Kingma and Jimmy Ba.'
+<EOS>
+b'Adam A method for stochastic optimization.'
+<EOS>
+b'arXiv preprint'
+<EOS>
+b'arXiv1412.6980, 2014.'
+<EOS>
+b'Durk P Kingma, Tim Salimans, and Max Welling.'
+<EOS>
+b'Variational dropout and the local reparameteri-\n\nzation trick.'
+<EOS>
+b'In Advances in Neural Information Processing Systems, pp. 25752583, 2015.'
+<EOS>
+b'Thomas N Kipf and Max Welling.'
+<EOS>
+b'Semi-supervised classi\xef\xac\x81cation with graph convolutional net-\n\nworks.'
+<EOS>
+b'arXiv preprint arXiv1609.02907, 2016.'
+<EOS>
+b'Vishwajeet Kumar, Kireeti Boorla, Yogesh Meena, Ganesh Ramakrishnan, and Yuan-Fang Li.'
+<EOS>
+b'Au-'
+<EOS>
+b'tomating reading comprehension by generating question and answer pairs.'
+<EOS>
+b'In Paci\xef\xac\x81c-Asia Con-\nference on Knowledge Discovery and Data Mining, pp.'
+<EOS>
+b'335348.'
+<EOS>
+b'Springer, 2018a.'
+<EOS>
+b'Vishwajeet Kumar, Ganesh Ramakrishnan, and Yuan-Fang Li.'
+<EOS>
+b'A framework for automatic question\ngeneration from text using deep reinforcement learning.'
+<EOS>
+b'arXiv preprint arXiv1808.04961, 2018b.'
+<EOS>
+b'Matt Kusner, Yu Sun, Nicholas Kolkin, and Kilian Weinberger.'
+<EOS>
+b'From word embeddings to document\n\ndistances.'
+<EOS>
+b'In International Conference on Machine Learning, pp.'
+<EOS>
+b'957966, 2015.'
+<EOS>
+b'Yikang Li, Nan Duan, Bolei Zhou, Xiao Chu, Wanli Ouyang, Xiaogang Wang, and Ming Zhou.'
+<EOS>
+b'Visual question generation as dual task of visual question answering.'
+<EOS>
+b'In Proceedings of the IEEE'
+<EOS>
+b'Conference on Computer Vision and Pattern Recognition, pp.'
+<EOS>
+b'61166124, 2018.'
+<EOS>
+b'Yujia Li, Daniel Tarlow, Marc Brockschmidt, and Richard Zemel.'
+<EOS>
+b'Gated graph sequence neural\n\nnetworks.'
+<EOS>
+b'arXiv preprint arXiv1511.05493, 2015.'
+<EOS>
+b'Chin-Yew Lin.'
+<EOS>
+b'Rouge A package for automatic evaluation of summaries.'
+<EOS>
+b'Text Summarization'
+<EOS>
+b'Branches Out, 2004.'
+<EOS>
+b'Bang Liu, Mingjun Zhao, Di Niu, Kunfeng Lai, Yancheng He, Haojie Wei, and Yu Xu.'
+<EOS>
+b'Learning to\n\ngenerate questions by learning what not to generate.'
+<EOS>
+b'arXiv preprint arXiv1902.10418, 2019.'
+<EOS>
+b'Pengfei Liu, Shuaichen Chang, Xuanjing Huang, Jian Tang, and Jackie Chi Kit Cheung.'
+<EOS>
+b'Contextu-\nalized non-local neural networks for sequence learning.'
+<EOS>
+b'arXiv preprint arXiv1811.08600, 2018.'
+<EOS>
+b'Minh-Thang Luong, Hieu Pham, and Christopher D Manning.'
+<EOS>
+b'Effective approaches to attention-'
+<EOS>
+b'based neural machine translation.'
+<EOS>
+b'arXiv preprint arXiv1508.04025, 2015.'
+<EOS>
+b'Nasrin Mostafazadeh, Ishan Misra, Jacob Devlin, Margaret Mitchell, Xiaodong He, and Lucy Van-\nderwende.'
+<EOS>
+b'Generating natural questions about an image.'
+<EOS>
+b'arXiv preprint arXiv1603.06059, 2016.'
+<EOS>
+b'Jack Mostow and Wei Chen.'
+<EOS>
+b'Generating instruction automatically for the reading strategy of self-'
+<EOS>
+b'questioning.'
+<EOS>
+b'2009.'
+<EOS>
+b'Vinod Nair and Geoffrey E Hinton.'
+<EOS>
+b'Recti\xef\xac\x81ed linear units improve restricted boltzmann machines.'
+<EOS>
+b'In\nProceedings of the 27th international conference on machine learning ICML-10, pp. 807814,\n2010.'
+<EOS>
+b'Preksha Nema and Mitesh M Khapra.'
+<EOS>
+b'Towards a better metric for evaluating question generation\n\nsystems.'
+<EOS>
+b'arXiv preprint arXiv1808.10192, 2018.'
+<EOS>
+b'Will Norcliffe-Brown, Stathis Vafeias, and Sarah Parisot.'
+<EOS>
+b'Learning conditioned graph structures for\ninterpretable visual question answering.'
+<EOS>
+b'In Advances in Neural Information Processing Systems,\npp. 83448353, 2018.'
+<EOS>
+b'Kishore Papineni, Salim Roukos, Todd Ward, and Wei-Jing Zhu.'
+<EOS>
+b'Bleu a method for automatic\nevaluation of machine translation.'
+<EOS>
+b'In Proceedings of the 40th annual meeting on association for\ncomputational linguistics, pp. 311318.'
+<EOS>
+b'Association for Computational Linguistics, 2002.'
+<EOS>
+b'Romain Paulus, Caiming Xiong, and Richard Socher.'
+<EOS>
+b'A deep reinforced model for abstractive\n\nsummarization.'
+<EOS>
+b'arXiv preprint arXiv1705.04304, 2017.'
+<EOS>
+b'12'
+<EOS>
+b'Under review as a conference paper at ICLR 2020'
+<EOS>
+b'Jeffrey Pennington, Richard Socher, and Christopher Manning.'
+<EOS>
+b'Glove Global vectors for word\nrepresentation.'
+<EOS>
+b'In Proceedings of the 2014 conference on empirical methods in natural language'
+<EOS>
+b'processing EMNLP, pp. 15321543, 2014.'
+<EOS>
+b'Pranav Rajpurkar, Jian Zhang, Konstantin Lopyrev, and Percy Liang.'
+<EOS>
+b'Squad 100,000 questions\n\nfor machine comprehension of text.'
+<EOS>
+b'arXiv preprint arXiv1606.05250, 2016.'
+<EOS>
+b'MarcAurelio Ranzato, Sumit Chopra, Michael Auli, and Wojciech Zaremba.'
+<EOS>
+b'Sequence level train-'
+<EOS>
+b'ing with recurrent neural networks.'
+<EOS>
+b'arXiv preprint arXiv1511.06732, 2015.'
+<EOS>
+b'Steven J Rennie, Etienne Marcheret, Youssef Mroueh, Jerret Ross, and Vaibhava Goel.'
+<EOS>
+b'Self-critical\nsequence training for image captioning.'
+<EOS>
+b'In Proceedings of the IEEE Conference on Computer\nVision and Pattern Recognition, pp.'
+<EOS>
+b'70087024, 2017.'
+<EOS>
+b'Abigail See, Peter J Liu, and Christopher D Manning.'
+<EOS>
+b'Get to the point Summarization with pointer-'
+<EOS>
+b'generator networks.'
+<EOS>
+b'arXiv preprint arXiv1704.04368, 2017.'
+<EOS>
+b'Iulian Vlad Serban, Alberto Garc\xc4\xb1a-Duran, Caglar Gulcehre, Sungjin Ahn, Sarath Chandar, Aaron\nCourville, and Yoshua Bengio.'
+<EOS>
+b'Generating factoid questions with recurrent neural networks'
+<EOS>
+b'The\n30m factoid question-answer corpus.'
+<EOS>
+b'arXiv preprint arXiv1603.06807, 2016.'
+<EOS>
+b'Linfeng Song, Zhiguo Wang, and Wael Hamza.'
+<EOS>
+b'A uni\xef\xac\x81ed query-based generative model for question\n\ngeneration and question answering.'
+<EOS>
+b'arXiv preprint arXiv1709.01058, 2017.'
+<EOS>
+b'Linfeng Song, Zhiguo Wang, Wael Hamza, Yue Zhang, and Daniel Gildea.'
+<EOS>
+b'Leveraging context in-'
+<EOS>
+b'formation for natural question generation.'
+<EOS>
+b'In Proceedings of the 2018 Conference of the North\nAmerican Chapter of the Association for Computational Linguistics'
+<EOS>
+b'Human Language Technolo-'
+<EOS>
+b'gies, Volume 2 Short Papers, pp.'
+<EOS>
+b'569574, 2018a.'
+<EOS>
+b'Linfeng Song, Yue Zhang, Zhiguo Wang, and Daniel Gildea.'
+<EOS>
+b'A graph-to-sequence model for amr-\n\nto-text generation.'
+<EOS>
+b'arXiv preprint arXiv1805.02473, 2018b.'
+<EOS>
+b'Xingwu Sun, Jing Liu, Yajuan Lyu, Wei He, Yanjun Ma, and Shi Wang.'
+<EOS>
+b'Answer-focused and\nposition-aware neural question generation.'
+<EOS>
+b'In Proceedings of the 2018 Conference on Empirical'
+<EOS>
+b'Methods in Natural Language Processing, pp.'
+<EOS>
+b'39303939, 2018.'
+<EOS>
+b'Ilya Sutskever, Oriol Vinyals, and Quoc V Le.'
+<EOS>
+b'Sequence to sequence learning with neural networks.'
+<EOS>
+b'In Advances in neural information processing systems, pp. 31043112, 2014.'
+<EOS>
+b'Duyu Tang, Nan Duan, Tao Qin, Zhao Yan, and Ming Zhou.'
+<EOS>
+b'Question answering and question\n\ngeneration as dual tasks.'
+<EOS>
+b'arXiv preprint arXiv1706.02027, 2017.'
+<EOS>
+b'Zhaopeng Tu, Zhengdong Lu, Yang Liu, Xiaohua Liu, and Hang Li.'
+<EOS>
+b'Modeling coverage for neural\n\nmachine translation.'
+<EOS>
+b'arXiv preprint arXiv1601.04811, 2016.'
+<EOS>
+b'Petar Veli\xcb\x87ckovic, Guillem Cucurull, Arantxa Casanova, Adriana Romero, Pietro Lio, and Yoshua\n\nBengio.'
+<EOS>
+b'Graph attention networks.'
+<EOS>
+b'arXiv preprint arXiv1710.10903, 2017.'
+<EOS>
+b'Oriol Vinyals, Meire Fortunato, and Navdeep Jaitly.'
+<EOS>
+b'Pointer networks.'
+<EOS>
+b'In Advances in Neural\n\nInformation Processing Systems, pp.'
+<EOS>
+b'26922700, 2015.'
+<EOS>
+b'Ronald J Williams.'
+<EOS>
+b'Simple statistical gradient-following algorithms for connectionist reinforcement\n\nlearning.'
+<EOS>
+b'Machine learning, 83-4229256, 1992.'
+<EOS>
+b'Yonghui Wu, Mike Schuster, Zhifeng Chen, Quoc V Le, Mohammad Norouzi, Wolfgang Macherey,'
+<EOS>
+b'Maxim Krikun, Yuan Cao, Qin Gao, Klaus Macherey, et al.'
+<EOS>
+b'Googles neural machine trans-'
+<EOS>
+b'arXiv preprint\nlation system Bridging the gap between human and machine translation.'
+<EOS>
+b'arXiv1609.08144, 2016.'
+<EOS>
+b'Kun Xu, Lingfei Wu, Zhiguo Wang, and Vadim Sheinin.'
+<EOS>
+b'Graph2seq Graph to sequence learning\n\nwith attention-based neural networks.'
+<EOS>
+b'arXiv preprint arXiv1804.00823, 2018a.'
+<EOS>
+b'Kun Xu, Lingfei Wu, Zhiguo Wang, Mo Yu, Liwei Chen, and Vadim Sheinin.'
+<EOS>
+b'Exploiting\nrich syntactic information for semantic parsing with graph-to-sequence model.'
+<EOS>
+b'arXiv preprint'
+<EOS>
+b'arXiv1808.07624, 2018b.'
+<EOS>
+b'13'
+<EOS>
+b'Under review as a conference paper at ICLR 2020'
+<EOS>
+b'Kun Xu, Lingfei Wu, Zhiguo Wang, Mo Yu, Liwei Chen, and Vadim Sheinin.'
+<EOS>
+b'Sql-to-text generation\n\nwith graph-to-sequence model.'
+<EOS>
+b'arXiv preprint arXiv1809.05255, 2018c.'
+<EOS>
+b'Kaichun Yao, Libo Zhang, Tiejian Luo, Lili Tao, and Yanjun Wu.'
+<EOS>
+b'Teaching machines to ask ques-\n\ntions.'
+<EOS>
+b'Xingdi Yuan, Tong Wang, Caglar Gulcehre, Alessandro Sordoni, Philip Bachman, Sandeep Sub-'
+<EOS>
+b'ramanian, Saizheng Zhang, and Adam Trischler.'
+<EOS>
+b'Machine comprehension by text-to-text neural\nquestion generation.'
+<EOS>
+b'arXiv preprint arXiv1705.02012, 2017.'
+<EOS>
+b'Yao Zhao, Xiaochuan Ni, Yuanyuan Ding, and Qifa Ke.'
+<EOS>
+b'Paragraph-level neural question generation\nwith maxout pointer and gated self-attention networks.'
+<EOS>
+b'In Proceedings of the 2018 Conference\non Empirical Methods in Natural Language Processing, pp. 39013910, 2018.'
+<EOS>
+b'Qingyu Zhou, Nan Yang, Furu Wei, Chuanqi Tan, Hangbo Bao, and Ming Zhou.'
+<EOS>
+b'Neural question'
+<EOS>
+b'generation from text A preliminary study.'
+<EOS>
+b'In National CCF Conference on Natural Language\nProcessing and Chinese Computing, pp. 662671.'
+<EOS>
+b'Springer, 2017.'
+<EOS>
+b'Qingyu Zhou, Nan Yang, Furu Wei, and Ming Zhou.'
+<EOS>
+b'Sequential copying networks.'
+<EOS>
+b'In Thirty-Second\n\nAAAI Conference on Arti\xef\xac\x81cial Intelligence, 2018.'
+<EOS>
+b'A DETAILS ON THE RNN DECODER'
+<EOS>
+b'At each decoding step t, an attention mechanism learns to attend to the most relevant words in the\ninput sequence, and computes a context vector h'
+<EOS>
+b't based on the current decoding state st, the current\ncoverage vector ct and the attention memory.'
+<EOS>
+b'In addition, the generation probability pgen P r0, 1s is\ncalculated from the context vector h\nt , the decoder state st and the decoder input yt1.'
+<EOS>
+b'Next, pgen is\nused as a soft switch to choose between generating a word from the vocabulary, or copying a word\nfrom the input sequence.'
+<EOS>
+b'We dynamically maintain an extended vocabulary which is the union of the\nusual vocabulary and all words appearing in a batch of source examples i.e., passages and answers.'
+<EOS>
+b'Finally, in order to encourage the decoder to utilize the diverse components of the input sequence, a\ncoverage mechanism is applied.'
+<EOS>
+b'At each step, we maintain a coverage vector ct, which is the sum\nof attention distributions over all previous decoder time steps.'
+<EOS>
+b'A coverage loss is also computed to\npenalize repeatedly attending to the same locations of the input sequence.'
+<EOS>
+b'B MODEL SETTINGS'
+<EOS>
+b'We keep and \xef\xac\x81x the 300-dim GloVe vectors for the most frequent 70,000 words in the training set.'
+<EOS>
+b'We compute the 1024-dim BERT embeddings on the \xef\xac\x82y for each word in text using a trainable\nweighted sum of all BERT layer outputs.'
+<EOS>
+b'The embedding sizes of case, POS and NER tags are set\nto 3, 12 and 8, respectively.'
+<EOS>
+b'We set the hidden state size of BiLSTM to 150 so that the concatenated\nstate size for both directions is 300.'
+<EOS>
+b'The size of all other hidden layers is set to 300.'
+<EOS>
+b'We apply\na variational dropout Kingma et al., 2015 rate of 0.4'
+<EOS>
+b'after word embedding layers and 0.3 after\nRNN layers.'
+<EOS>
+b'We set the neighborhood size to 10 for dynamic graph construction.'
+<EOS>
+b'The number of\nGNN hops is set to 3.'
+<EOS>
+b'During training, in each epoch, we set the initial teacher forcing probability\nto 0.75 and exponentially increase it to 0.75  0.9999i where i is the training step.'
+<EOS>
+b'We set \xce\xb1 in the\nreward function to 0.1, \xce\xb3 in the mixed loss function to 0.99, and the coverage loss ratio \xce\xbb to 0.4.'
+<EOS>
+b'We use Adam Kingma  Ba, 2014 as the optimizer, and the learning rate is set to 0.001 in the\npretraining stage and 0.00001'
+<EOS>
+b'in the \xef\xac\x81ne-tuning stage.'
+<EOS>
+b'We reduce the learning rate by a factor of\n0.5 if the validation BLEU-4 score stops improving for three epochs.'
+<EOS>
+b'We stop the training when no\nimprovement is seen for 10 epochs.'
+<EOS>
+b'We clip the gradient at length 10.'
+<EOS>
+b'The batch size is set to 60 and\n50 on data split-1 and split-2, respectively.'
+<EOS>
+b'The beam search width is set to 5.'
+<EOS>
+b'All hyperparameters\nare tuned on the development set.'
+<EOS>
+b'C SENSITIVITY ANALYSIS OF HYPERPARAMETERS'
+<EOS>
+b'To study the effect of the number of GNN hops, we conduct experiments on the G2Ssta model on\nthe SQuAD split-2 data.'
+<EOS>
+b'Fig.'
+<EOS>
+b'3 shows that our model is not very sensitive to the number of GNN\nhops and can achieve reasonably good results with various number of hops.'
+<EOS>
+b'14'
+<EOS>
+b'Under review as a conference paper at ICLR 2020\n\nFigure 3 Effect of the number of GNN hops.'
+<EOS>
+b'D DETAILS ON BASELINE METHODS'
+<EOS>
+b'SeqCopyNet Zhou et al., 2018 proposed an extension to the copy mechanism which learns to copy\nnot only single words but also sequences from the input sentence.'
+<EOS>
+b'NQG Zhou'
+<EOS>
+b'et al., 2017 proposed an attention-based Seq2Seq model equipped with a copy\nmechanism and a feature-rich encoder to encode answer position, POS and NER tag information.'
+<EOS>
+b'MPQGR Song et al., 2017 proposed an RL-based Seq2Seq model with a multi-perspective\nmatching encoder to incorporate answer information.'
+<EOS>
+b'Copy and coverage mechanisms are applied.'
+<EOS>
+b'AFPQA Sun et al., 2018 consists of an answer-focused component which generates an interroga-\ntive word matching the answer type, and a position-aware component which is aware of the position\nof the context words when generating a question by modeling the relative distance between the\ncontext words and the answer.'
+<EOS>
+b's2sa-at-mp-gsa Zhao et al., 2018 proposed a model which contains a gated attention encoder and\na maxout pointer decoder to tackle the challenges of processing long input sequences.'
+<EOS>
+b'For fair\ncomparison, we report the results of the sentence-level version of their model to match with our\nsettings.'
+<EOS>
+b'ASs2s Kim et al., 2018 proposed an answer-separated Seq2Seq model which treats the passage'
+<EOS>
+b'and the answer separately.'
+<EOS>
+b'CGC-QG Liu et al., 2019 proposed a multi-task learning framework to guide the model to learn\nthe accurate boundaries between copying and generation.'
+<EOS>
+b'E DETAILS ON HUMAN EVALUATION'
+<EOS>
+b'We conducted a small-scale i.e., 50 random examples per system human evaluation on the split-2\ndata.'
+<EOS>
+b'We asked 5 human evaluators to give feedback on the quality of questions generated by a set\nof anonymized competing systems.'
+<EOS>
+b'In each example, given a triple containing a source passage, a\ntarget answer and an anonymised system output, they were asked to rate the quality of the output\nby answering the following three questions i is this generated question syntactically correct?'
+<EOS>
+b'ii'
+<EOS>
+b'is this generated question semantically correct?'
+<EOS>
+b'and iii is this generated question relevant to the\npassage?'
+<EOS>
+b'For each evaluation question, the rating scale is from 1 to 5 where a higher score means\nbetter quality'
+<EOS>
+b'i.e., 1 Poor, 2 Marginal, 3 Acceptable, 4 Good, 5 Excellent.'
+<EOS>
+b'Responses from all\nevaluators were collected and averaged.'
+<EOS>
+b'F MORE RESULTS ON ABLATION STUDY'
+<EOS>
+b'We perform the comprehensive ablation study to systematically assess the impact of different model\ncomponents e.g., BERT, RL, DAN, BiGGNN, FEAT, DAN-word, and DAN-hidden for two'
+<EOS>
+b'pro-'
+<EOS>
+b'15'
+<EOS>
+b'Under review as a conference paper at ICLR 2020\n\nTable 5 Ablation study on the SQuAD split-2 test set.'
+<EOS>
+b'Methods'
+<EOS>
+b'G2SdynBERTRL'
+<EOS>
+b'G2SstaBERTRL'
+<EOS>
+b'G2SstaBERT-\xef\xac\x81xedRL'
+<EOS>
+b'G2SdynBERT'
+<EOS>
+b'G2SstaBERT'
+<EOS>
+b'G2SstaBERT-\xef\xac\x81xed'
+<EOS>
+b'G2SdynRL'
+<EOS>
+b'G2SstaRL'
+<EOS>
+b'G2Sdyn'
+<EOS>
+b'G2Ssta'
+<EOS>
+b'BLEU-4'
+<EOS>
+b'18.06'
+<EOS>
+b'18.30\n18.20'
+<EOS>
+b'17.56\n18.02\n17.86'
+<EOS>
+b'17.18\n17.49'
+<EOS>
+b'16.81'
+<EOS>
+b'16.96'
+<EOS>
+b'Methods'
+<EOS>
+b'G2Sdyn wo feat'
+<EOS>
+b'G2Ssta wo feat'
+<EOS>
+b'G2Sdyn wo DAN'
+<EOS>
+b'G2Ssta'
+<EOS>
+b'wo DAN'
+<EOS>
+b'G2Ssta w DAN-word'
+<EOS>
+b'only\nG2Ssta w'
+<EOS>
+b'DAN-hidden only\nG2Ssta w GGNN-forward'
+<EOS>
+b'G2Ssta w GGNN-backward'
+<EOS>
+b'G2Ssta wo BiGGNN, w Seq2Seq'
+<EOS>
+b'G2Ssta wo BiGGNN, w GCN\n\nBLEU-4'
+<EOS>
+b'16.51'
+<EOS>
+b'16.65'
+<EOS>
+b'12.58'
+<EOS>
+b'12.62'
+<EOS>
+b'15.92'
+<EOS>
+b'16.07'
+<EOS>
+b'16.53'
+<EOS>
+b'16.75'
+<EOS>
+b'16.14'
+<EOS>
+b'14.47'
+<EOS>
+b'posed full model variants static vs dynamic on the SQuAD split-2 test set.'
+<EOS>
+b'Our experimental\nresults con\xef\xac\x81rmed that every component in our proposed model makes the contribution to the overall\nperformance.'
+<EOS>
+b'16'
+<EOS>
