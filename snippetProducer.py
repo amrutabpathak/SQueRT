@@ -32,7 +32,7 @@ def only_words(file_content):
         # print(a_word_without_punc)
         if len(word_with_punc) <= 0:
           processed_file = processed_file + " " +  possible_word
-        elif len(word_with_punc[0]) > 2:
+        elif len(word_with_punc[0]) > 3:
           processed_file = processed_file + " " +  possible_word
   return processed_file
     
