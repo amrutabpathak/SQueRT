@@ -1,1260 +1,608 @@
-b'Published as a conference paper at ICLR 2020 GRAPH INFERENCE LEARNING FOR SEMI SUPERVISED CLASSIFICATION Chunyan Xu Zhen Cui'
+Published as a conference paper at ICLR 2020  GRAPH INFERENCE LEARNING FOR SEMI-SUPERVISED CLASSIFICATION  Chunyan Xu, Zhen Cui∗, Xiaobin Hong, Tong Zhang, and Jian Yang School of Computer Science and Engineering, Nanjing University of Science and Technology, Nanjing, China {cyx,zhen.cui,xbhong,tong.zhang,csjyang}@njust.edu.cn  Wei Liu Tencent AI Lab, China wl2223@columbia.edu  ABSTRACT  In this work, we address semi-supervised classification of graph data, where the categories of those unlabeled nodes are inferred from labeled nodes as well as graph structures.
 <EOS>
-b'Xiaobin Hong Tong Zhang and Jian Yang School of Computer Science and Engineering Nanjing University of Science and Technology'
+Recent works often solve this problem via advanced graph convolution in a conventionally supervised manner, but the performance could degrade significantly when labeled data is scarce.
 <EOS>
-b'Nanjing China cyx zhen.'
+To this end, we propose a Graph Inference Learning (GIL) framework to boost the performance of semi- supervised node classification by learning the inference of node labels on graph topology.
 <EOS>
-b'cui xbhong tong.'
+To bridge the connection between two nodes, we formally define a structure relation by encapsulating node attributes, between-node paths, and local topological structures together, which can make the inference conveniently deduced from one node to another node.
 <EOS>
-b'zhang csjyang njust.'
+For learning the inference process, we further introduce meta-optimization on structure relations from training nodes to validation nodes, such that the learnt graph inference capability can be better self-adapted to testing nodes.
 <EOS>
-b'edu.'
+Comprehensive evaluations on four benchmark datasets (including Cora, Citeseer, Pubmed, and NELL) demonstrate the superiority of our proposed GIL when compared against state-of-the-art methods on the semi-supervised node classification task.
 <EOS>
-b'cn'
+ 1  INTRODUCTION  Graph, which comprises a set of vertices/nodes together with connected edges, is a formal structural representation of non-regular data.
 <EOS>
-b'Wei Liu Tencent AI Lab China wl2223 columbia.'
+Due to the strong representation ability, it accommodates many potential applications, e.g., social network (Orsini et al, 2017), world wide data (Page et al, 1999), knowledge graph (Xu et al, 2017), and protein-interaction network (Borgwardt et al, 2007).
 <EOS>
-b'edu ABSTRACT'
+Among these, semi-supervised node classification on graphs is one of the most interesting also popular topics.
 <EOS>
-b'In this work we address'
+Given a graph in which some nodes are labeled, the aim of semi-supervised classification is to infer the categories of those remaining unlabeled nodes by using various priors of the graph.
 <EOS>
-b'semi supervised classi\xef\xac\x81cation of graph data where the categories of those unlabeled nodes are inferred from labeled nodes as well as graph structures.'
+ While there have been numerous previous works (Brandes et al, 2008; Zhou et al, 2004; Zhu et al, 2003; Yang et al, 2016; Zhao et al, 2019) devoted to semi-supervised node classification based on explicit graph Laplacian regularizations, it is hard to efficiently boost the performance of label prediction due to the strict assumption that connected nodes are likely to share the same label information.
 <EOS>
-b'Recent works often solve this problem via advanced graph convolution in a conventionally supervised manner but the performance could degrade signi\xef\xac\x81cantly when labeled data is scarce.'
+With the progress of deep learning on grid-shaped images/videos (He et al, 2016), a few of graph convolutional neural networks (CNN) based methods, including spectral (Kipf & Welling, 2017) and spatial methods (Niepert et al, 2016; Pan et al, 2018; Yu et al, 2018), have been proposed to learn local convolution filters on graphs in order to extract more discriminative node representations.
 <EOS>
-b'To this end we propose a Graph Inference Learning GIL framework to boost the performance of semi supervised node classi\xef\xac\x81cation by learning the inference of node labels on graph topology.'
+Although graph CNN based methods have achieved considerable capabilities of graph embedding by optimizing filters, they are limited into a conventionally semi-supervised framework and lack of an efficient inference mechanism on graphs.
 <EOS>
-b'To bridge the connection between two nodes we formally de\xef\xac\x81ne a structure relation by encapsulating node attributes between node paths and local topological structures together which can make the inference conveniently deduced from one node to another node.'
+Especially, in the case of few-shot learning, where a small number of training nodes are labeled, this kind of methods would drastically compromise the performance.
 <EOS>
-b'For learning the inference process we further introduce meta optimization on structure relations from training nodes to validation nodes such that the learnt graph inference capability can be better self adapted to testing nodes.'
+For example, the Pubmed graph dataset (Sen et al, 2008) consists  ∗Corresponding author: Zhen Cui.
 <EOS>
-b'Comprehensive evaluations on four benchmark datasets including Cora Citeseer Pubmed and NELL demonstrate the superiority of our proposed GIL when compared against state of the art methods on the semi supervised node classi\xef\xac\x81cation task.'
+ 1  Published as a conference paper at ICLR 2020  Figure 1: The illustration of our proposed GIL framework.
 <EOS>
-b'1 INTRODUCTION Graph which comprises a set of vertices nodes together with connected edges is a formal structural representation of non regular data.'
+For the problem of graph node labeling, the category information of these unlabeled nodes depends on the similarity computation between a query node (e.g., vj) and these labeled reference nodes (e.g., vi).
 <EOS>
-b'Due to the strong representation ability it accommodates many potential applications social network Orsini et'
+We consider the similarity from three points: node attributes, the consistency of local topological structures (i.e., the circle with dashed line), and the between-node path reachability (i.e., the red wave line from vi to vj).
 <EOS>
-b'2017 world wide data'
+Specifically, the local structures as well as node attributes are encoded as high-level features with graph convolution, while the between-node path reachability is abstracted as reachable probabilities of random walks.
 <EOS>
-b'Page et 1999 knowledge graph'
+To better make the inference generalize to test nodes, we introduce a meta-learning strategy to optimize the structure relations learning from training nodes to validation nodes.
 <EOS>
-b'Xu et'
+ of 19,717 nodes and 44,338 edges, but only 0.3% nodes are labeled for the semi-supervised node classification task.
 <EOS>
-b'2017 and'
+These aforementioned works usually boil down to a general classification task, where the model is learnt on a training set and selected by checking a validation set.
 <EOS>
-b'protein interaction network Borgwardt et 2007'
+However, they do not put great efforts on how to learn to infer from one node to another node on a topological graph, especially in the few-shot regime.
 <EOS>
-b'Among these semi supervised'
+ In this paper, we propose a graph inference learning (GIL) framework to teach the model itself to adaptively infer from reference labeled nodes to those query unlabeled nodes, and finally boost the performance of semi-supervised node classification in the case of a few number of labeled samples.
 <EOS>
-b'node classi\xef\xac\x81cation on graphs is one of the most interesting also popular topics.'
+Given an input graph, GIL attempts to infer the unlabeled nodes from those observed nodes by building between-node relations.
 <EOS>
-b'Given a graph in which some nodes are labeled the aim of semi supervised classi\xef\xac\x81cation is to infer the categories of those remaining unlabeled nodes by using various priors of the graph.'
+The between-node relations are structured as the integration of node attributes, connection paths, and graph topological structures.
 <EOS>
-b'While there have been numerous previous works Brandes et'
+It means that the similarity between two nodes is decided from three aspects: the consistency of node attributes, the consistency of local topological structures, and the between-node path reachability, as shown in Fig 1.
 <EOS>
-b'2008 Zhou'
+The local structures anchored around each node as well as the attributes of nodes therein are jointly encoded with graph convolution (Defferrard et al, 2016) for the sake of high-level feature extraction.
 <EOS>
-b'et 2004'
+For the between-node path reachability, we adopt the random walk algorithm to obtain the characteristics from a labeled reference node vi to a query unlabeled node vj in a given graph.
 <EOS>
-b'Zhu et 2003'
+Based on the computed node representation and between-node reachability, the structure relations can be obtained by computing the similar scores/relationships from reference nodes to unlabeled nodes in a graph.
 <EOS>
-b'Yang et 2016'
+Inspired by the recent meta-learning strategy (Finn et al, 2017), we learn to infer the structure relations from a training set to a validation set, which can benefit the generalization capability of the learned model.
 <EOS>
-b'Zhao et 2019 devoted to semi supervised node classi\xef\xac\x81cation based on explicit graph Laplacian regularizations'
+In other words, our proposed GIL attempts to learn some transferable knowledge underlying in the structure relations from training samples to validation samples, such that the learned structure relations can be better self-adapted to the new testing stage.
 <EOS>
-b'it is hard to ef\xef\xac\x81ciently boost the performance of label prediction due to the strict assumption that connected nodes are likely to share the same label information.'
+ We summarize the main contributions of this work as three folds:  • We propose a novel graph inference learning framework by building structure relations to infer unknown node labels from those labeled nodes in an end-to-end way.
 <EOS>
-b'With the progress of deep learning on grid shaped images videos'
+The structure relations are well defined by jointly considering node attributes, between-node paths, and graph topological structures.
 <EOS>
-b'He et 2016'
+ • To make the inference model better generalize to test nodes, we introduce a meta-learning procedure to optimize structure relations, which could be the first time for graph node classification to the best of our knowledge.
 <EOS>
-b'a few of graph convolutional neural networks CNN based methods including spectral Kipf Welling 2017 and spatial methods'
+ • Comprehensive evaluations on three citation network datasets (including Cora, Citeseer, and Pubmed) and one knowledge graph data (i.e., NELL) demonstrate the superiority of our proposed GIL in contrast with other state-of-the-art methods on the semi-supervised classification task.
 <EOS>
-b'Niepert et 2016 Pan et 2018'
+ 2     (b) The process of Graph inference learning.
 <EOS>
-b'Yu et 2018 have been proposed to learn local convolution \xef\xac\x81lters on graphs in order to extract more discriminative node representations.'
+ We extract the local representation from the local subgraph (the circle with dashed line     The red wave line denote the node reachability from     to     dt th hbilit f  d t th d   Published as a conference paper at ICLR 2020  2 RELATED WORK  Graph CNNs: With the rapid development of deep learning methods, various graph convolution neural networks (Kashima et al, 2003; Morris et al, 2017; Shervashidze et al, 2009; Yanardag & Vishwanathan, 2015; Jiang et al, 2019; Zhang et al, 2020) have been exploited to analyze the irregular graph-structured data.
 <EOS>
-b'Although graph CNN based methods have achieved considerable capabilities of graph embedding by optimizing \xef\xac\x81lters they are limited into a conventionally semi supervised framework and lack of an ef\xef\xac\x81cient inference mechanism on graphs.'
+For better extending general convolutional neural networks to graph domains, two broad strategies have been proposed, including spectral and spatial convolution methods.
 <EOS>
-b'Especially in the case of few shot learning where a small number of training nodes are labeled this kind of methods would drastically compromise the performance.'
+Specifically, spectral filtering methods (Henaff et al, 2015; Kipf & Welling, 2017) develop convolution-like operators in the spectral domain, and then perform a series of spectral filters by decomposing the graph Laplacian.
 <EOS>
-b'For example the Pubmed graph dataset'
+Unfortunately, the spectral-based approaches often lead to a high computational complex due to the operation of eigenvalue decomposition, especially for a large number of graph nodes.
 <EOS>
-b'Sen et 2008 consists Corresponding author Zhen Cui.'
+To alleviate this computation burden, local spectral filtering methods (Defferrard et al, 2016) are then proposed by parameterizing the frequency responses as a Chebyshev polynomial approximation.
 <EOS>
-b'1 Published as a conference paper at ICLR 2020 Figure 1'
+Another type of graph CNNs, namely spatial methods (Li et al, 2016; Niepert et al, 2016), can perform the filtering operation by defining the spatial structures of adjacent vertices.
 <EOS>
-b'The illustration of our proposed GIL framework.'
+Various approaches can be employed to aggregate or sort neighboring vertices, such as diffusion CNNs (Atwood & Towsley, 2016), GraphSAGE (Hamilton et al, 2017), PSCN (Niepert et al, 2016), and NgramCNN (Luo et al, 2017).
 <EOS>
-b'For the problem of graph node labeling the category information of these unlabeled nodes depends on the similarity computation between a query node vj and these labeled reference nodes'
+From the perspective of data distribution, recently, the Gaussian induced convolution model (Jiang et al, 2019) is proposed to disentangle the aggregation process through encoding adjacent regions with Gaussian mixture model.
 <EOS>
-b'vi'
+ Semi-supervised node classification: Among various graph-related applications, semi-supervised node classification has gained increasing attention recently, and various approaches have been proposed to deal with this problem, including explicit graph Laplacian regularization and graph- embedding approaches.
 <EOS>
-b'We consider the similarity from three points node attributes the consistency of local topological structures the circle with dashed line and the between node path reachability the red wave line from vi to'
+Several classic algorithms with graph Laplacian regularization contain the label propagation method using Gaussian random fields (Zhu et al, 2003), the regularization framework by relying on the local/global consistency (Zhou et al, 2004), and the random walk- based sampling algorithm for acquiring the context information (Yang et al, 2016).
 <EOS>
-b'vj Speci\xef\xac\x81cally the local structures as well as'
+To further address scalable semi-supervised learning issues (Liu et al, 2012), the Anchor Graph regularization approach (Liu et al, 2010) is proposed to scale linearly with the number of graph nodes and then applied to massive-scale graph datasets.
 <EOS>
-b'node attributes are encoded as high level features with graph convolution while the between node path reachability is abstracted as reachable probabilities of random walks.'
+Several graph convolution network methods (Abu-El-Haija et al, 2018; Du et al, 2017; Thekumparampil et al, 2018; Velickovic et al, 2018; Zhuang & Ma, 2018) are then developed to obtain discriminative representations of input graphs.
 <EOS>
-b'To better make the inference generalize to test nodes'
+For example, Kipf et al (Kipf & Welling, 2017) proposed a scalable graph CNN model, which can scale linearly in the number of graph edges and learn graph representations by encoding both local graph structures and node attributes.
 <EOS>
-b'we introduce a meta learning strategy to optimize the structure relations learning from training nodes to validation nodes.'
+Graph attention networks (GAT) (Velickovic et al, 2018) are proposed to compute hidden representations of each node for attending to its neighbors with a self-attention strategy.
 <EOS>
-b'of 19 717 nodes and 44 338 edges but only 3 nodes are labeled for the semi supervised node classi\xef\xac\x81cation task.'
+By jointly considering the local- and global-consistency information, dual graph convolutional networks (Zhuang & Ma, 2018) are presented to deal with semi-supervised node classification.
 <EOS>
-b'These aforementioned works usually boil down to a general classi\xef\xac\x81cation task where the model is learnt on a training set and selected by checking a validation set.'
+The critical difference between our proposed GIL and those previous semi-supervised node classification methods is to adopt a graph inference strategy by defining structure relations on graphs and then leverage a meta optimization mechanism to learn an inference model, which could be the first time to the best of our knowledge, while the existing graph CNNs take semi-supervised node classification as a general classification task.
 <EOS>
-b'However they do not put great efforts on how to learn to infer from one node to another node on a topological graph especially in the few shot regime.'
+ 3 THE PROPOSED MODEL 3.1 PROBLEM DEFINITION  Formally, we denote an undirected/directed graph as G = {V, E, X , Y}, where V = {vi}n i=1 is the finite set of n (or |V|) vertices, E ∈ Rn×n defines the adjacency relationships (i.e., edges) between vertices representing the topology of G, X ∈ Rn×d records the explicit/implicit attributes/signals of vertices, and Y ∈ Rn is the vertex labels of C classes.
 <EOS>
-b'In this paper we propose a graph inference learning GIL framework to teach the model itself to adaptively infer from reference labeled nodes to those query unlabeled nodes and \xef\xac\x81nally boost the performance of semi supervised node classi\xef\xac\x81cation in the case of a few number of labeled samples.'
+The edge Eij = E(vi, vj) = 0 if and only if vertices vi, vj are not connected, otherwise Eij (cid:54)= 0.
 <EOS>
-b'Given an input graph GIL attempts to infer the unlabeled nodes from those observed nodes by building between node relations.'
+The attribute matrix X is attached to the vertex set V, whose i-th row Xvi (or Xi·) represents the attribute of the i-th vertex vi.
 <EOS>
-b'The between node relations are structured as the integration of node attributes connection paths and graph topological structures.'
+It means that vi ∈ V carries a vector of d-dimensional signals.
 <EOS>
-b'It means that the similarity between two nodes is decided from three aspects the consistency of node attributes the consistency of local topological structures and the between node path reachability as shown in Fig.'
+Associated with each node vi ∈ V, there is a discrete label yi ∈ {1, 2, · · · , C}.
 <EOS>
-b'The local structures anchored around each node as well as the attributes of nodes therein are jointly encoded with graph convolution Defferrard et 2016 for the sake of high level feature extraction.'
+ We consider the task of semi-supervised node classification over graph data, where only a small number of vertices are labeled for the model learning, i.e., |VLabel| (cid:28) |V|.
 <EOS>
-b'For the between node path reachability we adopt the random walk algorithm to obtain the characteristics from a labeled reference node vi to a query unlabeled node vj in a given graph.'
+Generally, we have three node sets: a training set Vtr, a validation set Vval, and a testing set Vte.
 <EOS>
-b'Based on the computed node representation and between node reachability the structure relations can be obtained by computing the similar scores relationships from reference nodes to unlabeled nodes in a graph.'
+In the standard protocol  3  Published as a conference paper at ICLR 2020  of prior literatures (Yang et al, 2016), the three node sets share the same label space.
 <EOS>
-b'Inspired by the recent meta learning strategy'
+We follow but do not restrict this protocol for our proposed method.
 <EOS>
-b'Finn et 2017'
+Given the training and validation node sets, the aim is to predict the node labels of testing nodes by using node attributes as well as edge connections.
 <EOS>
-b'we learn to infer the structure relations from a training set to a validation set which can bene\xef\xac\x81t the generalization capability of the learned model.'
+A sophisticated machine learning technique used in most existing methods (Kipf & Welling, 2017; Zhou et al, 2004) is to choose the optimal classifier (trained on a training set) after checking the performance on the validation set.
 <EOS>
-b'In other words our proposed GIL attempts to learn some transferable knowledge underlying in the structure relations from training samples to validation samples such that the learned structure relations can be better self adapted to the new testing stage.'
+However, these methods essentially ignore how to extract transferable knowledge from these known labeled nodes to unlabeled nodes, as the graph structure itself implies node connectivity/reachability.
 <EOS>
-b'We summarize the main contributions of this work as three folds We propose a novel graph inference learning framework by building structure relations to infer unknown node labels from those labeled nodes in an end to end way.'
+Moreover, due to the scarcity of labeled samples, the performance of such a classifier is usually not satisfying.
 <EOS>
-b'The structure relations are well de\xef\xac\x81ned by jointly considering node attributes between node paths and graph topological structures.'
+To address these issues, we introduce a meta-learning mechanism (Finn et al, 2017; Ravi & Larochelle, 2017; Sung et al, 2017) to learn to infer node labels on graphs.
 <EOS>
-b'To make the inference model better generalize to test nodes'
+Specifically, the graph structure, between-node path reachability, and node attributes are jointly modeled into the learning process.
 <EOS>
-b'we introduce a meta learning procedure to optimize structure relations which could be the \xef\xac\x81rst time for graph node classi\xef\xac\x81cation to the best of our knowledge.'
+Our aim is to learn to infer from labeled nodes to unlabeled nodes, so that the learner can perform better on a validation set and thus classify a testing set more accurately.
 <EOS>
-b'Comprehensive evaluations on three citation network datasets including Cora Citeseer and Pubmed and one knowledge graph data NELL demonstrate the superiority of our proposed GIL in contrast with other state of the art methods on the semi supervised classi\xef\xac\x81cation task.'
+ 3.2 STRUCTURE RELATION For convenient inference, we specifically build a structure relation between two nodes on the topology graph.
 <EOS>
-b'2 b'
+The labeled vertices (in a training set) are viewed as the reference nodes, and their information can be propagated into those unlabeled vertices for improving the label prediction accuracy.
 <EOS>
-b'The process of Graph inference learning.'
+Formally, given a reference node vi ∈ VLabel, we define the score of a query node vj similar to vi as  (1) where Gvi and Gvj may be understood as the centralized subgraphs around vi and vj, respectively. fe, fr, fP are three abstract functions that we explain as follows:  si→j = fr(fe(Gvi ), fe(Gvj ), fP (vi, vj, E)),  • Node representation fe(Gvi) −→ Rdv , encodes the local representation of the centralized subgraph Gvi around node vi, and may thus be understood as a local filter function on graphs.
 <EOS>
-b'We extract the local representation from the local subgraph the circle with dashed line'
+This function should not only take the signals of nodes therein as input, but also consider the local topological structure of the subgraph for more accurate similarity computation.
 <EOS>
-b'The red wave line denote the node reachability from to dt th'
+To this end, we perform the spectral graph convolution on subgraphs to learn discriminative node features, analogous to the pixel-level feature extraction from convolution maps of gridded images.
 <EOS>
-b'hbilit f d t'
+The details of feature extraction fe are described in Section 4.
 <EOS>
-b'th'
+ • Path reachability fP (vi, vj, E) −→ Rdp , represents the characteristics of path reachability from vi to vj.
 <EOS>
-b'd Published as a conference paper at ICLR 2020 2 RELATED WORK Graph CNNs With the rapid development of deep learning methods various graph convolution neural networks'
+As there usually exist multiple traversal paths between two nodes, we choose the function as reachable probabilities of different lengths of walks from vi to vj.
 <EOS>
-b'Kashima et 2003 Morris et 2017'
+More details will be introduced in Section 4.
 <EOS>
-b'Shervashidze et 2009 Yanardag Vishwanathan 2015'
+ • Structure relation fr(Rdv , Rdv , Rdp ) −→ R, is a relational function computing the score of vj similar to vi.
 <EOS>
-b'Jiang et 2019'
+This function is not exchangeable for different orders of two nodes, due to the asymmetric reachable relationship fPIf necessary, we may easily revise it as a symmetry function, e.g., summarizing two traversal directions.
 <EOS>
-b'Zhang et 2020 have been exploited to analyze the irregular graph structured data.'
+The score function depends on triple inputs: the local representations extracted from the subgraphs w.r.t. fe(Gvi) and fe(Gvj ), respectively, and the path reachability from vi to vj.
 <EOS>
-b'For better extending general convolutional neural networks to graph domains two broad strategies have been proposed including spectral and spatial convolution methods.'
+ In semi-supervised node classification, we take the training node set Vtr as the reference samples, and the validation set Vval as the query samples during the training stage.
 <EOS>
-b'Speci\xef\xac\x81cally spectral \xef\xac\x81ltering methods'
+Given a query node vj ∈ Vval, we can derive the class similarity score of vj w.r.t. the c-th (c = 1, · · · , C) category by weighting the reference samples Cc = {vk|yvk = c}.
 <EOS>
-b'Henaff et'
+Formally, we can further revise Eqn (1) and define the class-to-node relationship function as  sCc→j = φr(FCc→vj  wi→j · fe(Gvi), fe(Gvj )),  (cid:88)  vi∈Cc  s.t. wi→j = φw(fP (vi, vj, E)),  (3) where the function φw maps a reachable vector fP (vi, vj, E) into a weight value, and the function φr computes the similar score between vj and the c-th class nodes.
 <EOS>
-b'2015 Kipf Welling 2017 develop convolution like operators in the spectral domain and then perform a series of spectral \xef\xac\x81lters by decomposing the graph Laplacian.'
+The normalization factor FCc→vj of the c-th category w.r.t. vj is defined as  (2)  (4)  For the relation function φr and the weight function φw, we may choose some subnetworks to instantiate them in practice.
 <EOS>
-b'Unfortunately the spectral based approaches often lead to a high computational complex due to the operation of eigenvalue decomposition especially for a large number of graph nodes.'
+The detailed implementation of our model can be found in Section 4.
 <EOS>
-b'To alleviate this computation burden local spectral \xef\xac\x81ltering methods Defferrard et 2016 are then proposed by parameterizing the frequency responses as a Chebyshev polynomial approximation.'
+ FCc→vj =  (cid:80)  1  vi∈Cc  wi→j  4  Published as a conference paper at ICLR 2020  3.3  INFERENCE LEARNING  According to the class-to-node relationship function in Eqn (2), given a query node vj, we can obtain a score vector sC→j = [sC1→j, · · · , sCC →j](cid:124) ∈ RC after computing the relations to all classesThe indexed category with the maximum score is assumed to be the estimated label.
 <EOS>
-b'Another type of graph CNNs namely spatial methods'
+Thus, we can define the loss function based on cross entropy as follows:  L = −  yj,c log ˆyCc→j,  (cid:88)  C (cid:88)  vj  c=1  (5)  (6)  (7)  where yj,c is a binary indicator (i.e., 0 or 1) of class label c for node vj, and the softmax operation is imposed on sCc→j, i.e., ˆyCc→j = exp(sCc→j)/ (cid:80)C k=1 exp(sCk→j).
 <EOS>
-b'Li et 2016'
+Other error functions may be chosen as the loss function, e.g., mean square error.
 <EOS>
-b'Niepert et 2016 can perform the \xef\xac\x81ltering operation by de\xef\xac\x81ning the spatial structures of adjacent vertices.'
+In the regime of general classification, the cross entropy loss is a standard one that performs well.
 <EOS>
-b'Various approaches can be employed to aggregate or sort neighboring vertices such as diffusion CNNs Atwood Towsley 2016'
+ Given a training set Vtr, we expect that the best performance can be obtained on the validation set Vval after optimizing the model on Vtr.
 <EOS>
-b'GraphSAGE Hamilton'
+Given a trained/pretrained model Θ = {fe, φw, φr}, we perform iteratively gradient updates on the training set Vtr to obtain the new model, formally,  Θ(cid:48) = Θ − α∇ΘLtr(Θ),  where α is the updating rate.
 <EOS>
-b'et 2017'
+Note that, in the computation of class scores, since the reference node and query node can be both from the training set Vtr, we set the computation weight wi→j = 0 if i = j in Eqn (3).
 <EOS>
-b'PSCN'
+After several iterates of gradient descent on Vtr, we expect a better performance on the validation set Vval, i.e., min Θ  Lval(Θ(cid:48)).
 <EOS>
-b'Niepert et 2016 and NgramCNN'
+Thus, we can perform the gradient update as follows  where β is the learning rate of meta optimization (Finn et al, 2017).
 <EOS>
-b'Luo et 2017'
+ Θ = Θ − β∇ΘLval(Θ(cid:48)),  During the training process, we may perform batch sampling from training nodes and validation nodes, instead of taking all one time.
 <EOS>
-b'From the perspective of data distribution recently the Gaussian induced convolution model Jiang et 2019 is proposed to disentangle the aggregation process through encoding adjacent regions with Gaussian mixture model.'
+In the testing stage, we may take all training nodes and perform the model update according to Eqn (6) like the training process.
 <EOS>
-b'Semi supervised node classi\xef\xac\x81cation Among various graph related applications'
+The updated model is used as the final model and is then fed into Eqn (2) to infer the class labels for those query nodes.
 <EOS>
-b'semi supervised'
+ 4 MODULES In this section, we instantiate all modules (i.e., functions) of the aforementioned structure relation.
 <EOS>
-b'node classi\xef\xac\x81cation has gained increasing attention recently and various approaches have been proposed to deal with this problem including explicit graph Laplacian regularization and graph embedding approaches.'
+The implementation details can be found in the following.
 <EOS>
-b'Several classic algorithms with graph Laplacian regularization contain the label propagation method using Gaussian random \xef\xac\x81elds'
+ Node Representation fe(Gvi): The local representation at vertex vi can be extracted by performing the graph convolution operation on subgraph GviSimilar to gridded images/videos, on which local convolution kernels are defined as multiple lattices with various receptive fields, the spectral graph convolution is used to encode the local representations of an input graph in our work.
 <EOS>
-b'Zhu et 2003'
+ Given a graph sample G = {V, E, X }, the normalized graph Laplacian matrix is L = In − D−1/2ED−1/2 = UΛUT , with a diagonal matrix of its eigenvalues Λ.
 <EOS>
-b'the regularization framework by relying on the local global consistency Zhou'
+The spectral graph convo- lution can be defined as the multiplication of signal X with a filter gθ(Λ) = diag(θ) parameterized by θ in the Fourier domain: conv(X ) = gθ(L) ∗ X = Ugθ(Λ)UT X , where parameter θ ∈ Rn is a vector of Fourier coefficients.
 <EOS>
-b'et 2004'
+To reduce the computational complexity and obtain the local information, we use an approximate local filter of the Chebyshev polynomial (Defferrard et al, 2016), gθ(Λ) = (cid:80)K−1 k=0 θkTk(ˆΛ), where parameter θ ∈ RK is a vector of Chebyshev coefficients and Tk(ˆΛ) ∈ Rn×n is the Chebyshev polynomial of order k evaluated at ˆΛ = 2Λ/λmax − In, a diagonal matrix of scaled eigenvalues.
 <EOS>
-b'and the random walk based sampling algorithm for acquiring the context information'
+The graph filtering operation can then be expressed as gθ(Λ) ∗ X = (cid:80)K−1 k=0 θkTk(ˆL)X , where Tk(ˆL) ∈ Rn×n is the Chebyshev polynomial of order k evaluated at the scaled Laplacian ˆL = 2L/λmax − In. Further, we can construct multi-scale receptive fields for each vertex based on the Laplacian matrix L, where each receptive field records hopping neighborhood relationships around the reference vertex vi, and forms a local centralized subgraph.
 <EOS>
-b'Yang et 2016'
+ Path Reachability fP (vi, vj, E): Here we compute the probabilities of paths from vertex i to vertex j by employing random walks on graphs, which refers to traversing the graph from vi to vj according to the probability matrix P. For the input graph G with n vertices, the random-walk transition matrix  5  Published as a conference paper at ICLR 2020  Datasets Nodes 2,708 Cora 3,327 Citeseer 19,717 Pubmed NELL 65,755  Edges 5,429 4,732 44,338 266,144  Classes 7 6 3 210  Features 1,433 3,703 500 5,414  Label Rates 0.052 0.036 0.003 0.001  Table 1: The properties (especially for label rate) of various graph datasets used for the semi-supervised classification task.
 <EOS>
-b'To further address scalable semi supervised learning issues'
+ can be defined as P = D−1E, where D ∈ Rn×n is the diagonal degree matrix with Dii = (cid:80) That is to say, each element Pij is the probability of going from vertex i to vertex j in one step.
 <EOS>
-b'Liu et 2012'
+ i Eij.
 <EOS>
-b'the Anchor Graph regularization approach Liu et 2010 is proposed to scale linearly with the number of graph nodes and then applied to massive scale graph datasets.'
+ The sequence of nodes from vertex i to vertex j is a random walk on the graph, which can be modeled as a classical Markov chain by considering the set of graph vertices.
 <EOS>
-b'Several graph convolution network methods Abu El Haija'
+To represent this formulation, we show that P t ij is the probability of getting from vertex vi to vertex vj in t steps.
 <EOS>
-b'et 2018'
+This fact is easily exhibited by considering a t-step path from vertex vi to vertex vj as first taking a single step to some vertex h, and then taking t − 1 steps to vj.
 <EOS>
-b'Du et 2017'
+The transition probability P t in t steps can be formulated as  P t  ij =  PihP t−1 h,j       Pij (cid:88)  h  if t = 1 if t > 1 ,  where each matrix entry P t steps.
 <EOS>
-b'Thekumparampil et 2018'
+Finally, the node reachability from vi to vj can be written as a dp-dimensional vector:  ij denotes the probability of starting at vertex i and ending at vertex j in t  ij,., P dp ij ], where dp refers to the step length of the longest path from vi to vj.
 <EOS>
-b'Velickovic et 2018'
+ fP (vi, vj, E) = [Pij, P 2  Class-to-Node Relationship sCc→j: To define the node relationship si→j from vi to vj, we simulta- neously consider the property of path reachability fP (vi, vj, E), local representations fe(Gvi), and fe(Gvj ) of nodes vi, vj.
 <EOS>
-b'Zhuang Ma 2018 are then developed to obtain discriminative representations of input graphs.'
+The function φw(fP (vi, vj, E)) in Eqn (3), which is to map the reachable vector fP (vi, vj, E) ∈ Rdp into a weight value, can be implemented with two 16-dimensional fully connected layers in our experiments.
 <EOS>
-b'For example Kipf et Kipf Welling 2017 proposed a scalable graph CNN model which can scale linearly in the number of graph edges and learn graph representations by encoding both local graph structures and node attributes.'
+The computed value wi→j can be further used to weight the local features at node vi, fe(Gvi) ∈ RdvFor obtaining the similar score between vj and the c-th class nodes Cc in Eqn (2), we perform a concatenation of two input features, where one refers to the weighted features of vertex vi, and another is the local features of vertex vj.
 <EOS>
-b'Graph attention networks GAT Velickovic'
+One fully connected layer (w.r.t. φr) with C-dimensions is finally adopted to obtain the relation regression score.
 <EOS>
-b'et 2018 are proposed to compute hidden representations of each node for attending to its neighbors with a self attention strategy.'
+ (8)  (9)  5 EXPERIMENTS  5.1 EXPERIMENTAL SETTINGS  We evaluate our proposed GIL method on three citation network datasets: Cora, Citeseer, Pubmed (Sen et al, 2008), and one knowledge graph NELL dataset (Carlson et al, 2010).
 <EOS>
-b'By jointly considering the local and global consistency information dual graph convolutional networks Zhuang Ma 2018 are presented to deal with semi supervised node classi\xef\xac\x81cation.'
+The statistical properties of graph data are summarized in Table 1.
 <EOS>
-b'The critical difference between our proposed GIL and those previous semi supervised'
+Following the previous protocol in (Kipf & Welling, 2017; Zhuang & Ma, 2018), we split the graph data into a training set, a validation set, and a testing set.
 <EOS>
-b'node classi\xef\xac\x81cation methods is to adopt a graph inference strategy by de\xef\xac\x81ning structure relations on graphs and then leverage a meta optimization mechanism to learn an inference model which could be the \xef\xac\x81rst time to the best of our knowledge while the existing graph CNNs take semi supervised node classi\xef\xac\x81cation as a general classi\xef\xac\x81cation task.'
+Taking into account the graph convolution and pooling modules, we may alternately stack them into a multi-layer Graph convolutional network.
 <EOS>
-b'3'
+The GIL model consists of two graph convolution layers, each of which is followed by a mean-pooling layer, a class-to-node relationship regression module, and a final softmax layer.
 <EOS>
-b'THE PROPOSED MODEL 1 PROBLEM DEFINITION'
+We have given the detailed configuration of the relationship regression module in the class-to-node relationship of Section 4.
 <EOS>
-b'Formally we denote an undirected directed graph as G V E X Y where V vi'
+The parameter dp in Eqn (9) is set to the mean length of between-node reachability paths in the input graph.
 <EOS>
-b'n'
+The channels of the 1-st and 2-nd convolutional layers are set to 128 and 256, respectively.
 <EOS>
-b'i 1 is the \xef\xac\x81nite set of n or V vertices'
+The scale of the respective filed is 2 in both convolutional layers.
 <EOS>
-b'E Rn n de\xef\xac\x81nes the adjacency relationships edges between vertices representing the topology of G X'
+The dropout rate is set to 0.5 in the convolution and fully connected layers to avoid over-fitting, and the ReLU unit is leveraged as a nonlinear activation function.
 <EOS>
-b'Rn d records'
+We pre-train our proposed GIL model for 200 iterations with the training set, where its initial learning rate, decay factor, and momentum are set to 0.05, 0.95, and 0.9, respectively.
 <EOS>
-b'the explicit implicit attributes signals of vertices and Y Rn is the vertex labels of C classes.'
+Here we train the GIL model using the stochastic gradient descent method with the batch size of 100.
 <EOS>
-b'The edge Eij E vi vj 0'
+We further improve the inference learning capability of the GIL model for 1200 iterations with the validation set, where the meta-learning rates α and β are both set to 0.001.
 <EOS>
-b'if and only if vertices'
+ 6  Published as a conference paper at ICLR 2020  5.2 COMPARISON WITH STATE-OF-THE-ARTS  We compare the GIL approach with several state-of-the-art methods (Monti et al, 2017; Kipf & Welling, 2017; Zhou et al, 2004; Zhuang & Ma, 2018) over four graph datasets, including Cora, Citeseer, Pubmed, and NELL.
 <EOS>
-b'vi vj are not connected'
+The classification accuracies for all methods are reported in Table 2.
 <EOS>
-b'otherwise Eij cid 54'
+Our proposed GIL can significantly outperform these graph Laplacian regularized methods on four graph datasets, including Deep walk (Zhou et al, 2004), modularity clustering (Brandes et al, 2008), Gaussian fields (Zhu et al, 2003), and graph embedding (Yang et al, 2016) methods.
 <EOS>
-b'The attribute matrix X is attached to the vertex set'
+For example, we can achieve much higher performance than the deepwalk method (Zhou et al, 2004), e.g., 43.2% vs 74.1% on the Citeseer dataset, 65.3% vs 83.1% on the Pubmed dataset, and 58.1% vs 78.9% on the NELL dataset.
 <EOS>
-b'V whose i th row Xvi or Xi represents the attribute of the i th vertex'
+We find that the graph embedding method (Yang et al, 2016), which has considered both label information and graph structure during sampling, can obtain lower accuracies than our proposed GIL by 9.4% on the Citeseer dataset and 10.5% on the Cora dataset, respectively.
 <EOS>
-b'It means that vi V carries a vector of d dimensional signals.'
+This indicates that our proposed GIL can better optimize structure relations and thus improve the network generalization.
 <EOS>
-b'Associated with each node'
+We further compare our proposed GIL with several existing deep graph embedding methods, including graph attention network (Velickovic et al, 2018), dual graph convolutional networks (Zhuang & Ma, 2018), topology adaptive graph convolutional networks (Du et al, 2017), Multi-scale graph convolution (Abu-El-Haija et al, 2018), etc.
 <EOS>
-b'vi'
+For example, our proposed GIL achieves a very large gain, e.g., 86.2% vs 83.3% (Du et al, 2017) on the Cora dataset, and 78.9% vs 66.0% (Kipf & Welling, 2017) on the NELL dataset.
 <EOS>
-b'V'
+We evaluate our proposed GIL method on a large graph dataset with a lower label rate, which can significantly outperform existing baselines on the Pubmed dataset: 3.1% over DGCN (Zhuang & Ma, 2018), 4.1% over classic GCN (Kipf & Welling, 2017) and TAGCN (Du et al, 2017), 3.2% over AGNN (Thekumparampil et al, 2018), and 3.6% over N-GCN (Abu-El-Haija et al, 2018).
 <EOS>
-b'there is'
+It demonstrates that our proposed GIL performs very well on various graph datasets by building the graph inference learning process, where the limited label information and graph structures can be well employed in the predicted framework.
 <EOS>
-b'a discrete label yi 1 2 C'
+ Table 2: Performance comparisons of semi-supervised classification methods.
 <EOS>
-b'We consider the task of semi supervised node classi\xef\xac\x81cation over graph data where only a small number of vertices are labeled for the model learning VLabel cid'
+ Methods Clustering (Brandes et al, 2008) DeepWalk (Zhou et al, 2004) Gaussian (Zhu et al, 2003) G-embedding (Yang et al, 2016) DCNN (Atwood & Towsley, 2016) GCN (Kipf & Welling, 2017) MoNet (Monti et al, 2017) N-GCN (Abu-El-Haija et al, 2018) GAT (Velickovic et al, 2018) AGNN (Thekumparampil et al, 2018) TAGCN (Du et al, 2017) DGCN (Zhuang & Ma, 2018) Our GIL  Cora 59.5 67.2 68.0 75.7 76.8 81.5 81.7 83.0 83.0 83.1 83.3 83.5 86.2  Citeseer 60.1 43.2 45.3 64.7 - 70.3 - 72.2 72.5 71.7 72.5 72.6 74.1  Pubmed NELL 70.7 65.3 63.0 77.2 73.0 79.0 78.8 79.5 79.0 79.9 79.0 80.0 83.1  21.8 58.1 26.5 61.9 - 66.0 - - - - - 74.2 78.9  5.3 ANALYSIS  Meta-optimization: As can be seen in Table 3, we report the classification accuracies of semi-supervised classification with several variants of our proposed GIL and the classical GCN method (Kipf & Welling, 2017) when evaluating them on the Cora dataset.
 <EOS>
-b'28 V'
+For analyzing the perfor- mance improvement of our proposed GIL with the graph inference learning process, we report the classification accuracies of GCN (Kipf & Welling, 2017) and our proposed GIL on the Cora dataset under two different situations, including “only learning with the training set Vtr" and “with jointly learning on a training set Vtr and a validation set Vval".
 <EOS>
-b'Generally we have three node sets a training set'
+“GCN /w jointly learning on Vtr & Vval" achieves a better result than “GCN /w learning on Vtr" by 3.6%, which demonstrates that the network performance can be improved by employing validation samples.
 <EOS>
-b'Vtr'
+When using structure relations, “GIL /w learning on Vtr" obtains an improvement of 1.9% (over “GCN /w learning on Vtr”), which can be attributed to the building connection between nodes.
 <EOS>
-b'a validation set Vval and a testing set Vte.'
+The meta-optimization strategy (“GIL /w meta-training from Vtr → Vval" vs “GIL /w learning on Vtr”) has a gain of 2.9%, which indicates that a good inference capability can be learnt through meta-optimization.
 <EOS>
-b'In the standard protocol 3 Published as a conference paper at ICLR 2020 of prior literatures'
+It is worth noting that, GIL adopts a meta-optimization strategy to learn the inference model, which is a process of migrating  7  Published as a conference paper at ICLR 2020  from a training set to a validation set.
 <EOS>
-b'Yang et 2016'
+In other words, the validation set is only used to teach the model itself how to transfer to unseen data.
 <EOS>
-b'the three node sets share the same label space.'
+In contrast, the conventional methods often employ a validation set to tune parameters of a certain model of interest.
 <EOS>
-b'We follow but do not restrict this protocol for our proposed method.'
+ Table 3: Performance comparisons with several GIL variants and the classical GCN method on the Cora dataset.
 <EOS>
-b'Given the training and validation node sets the aim is to predict the node labels of testing nodes by using node attributes as well as edge connections.'
+ GCN (Kipf & Welling, 2017)  Methods  GIL  GIL+mean pooling  GIL+2  conv layers  /w learning on Vtr /w jointly learning on Vtr & Vval /w learning on Vtr /w meta-train Vtr → Vval /w 1  conv layer /w 2  conv layers /w 3  conv layers /w max-pooling /w mean pooling  Acc. (%) 81.4 84.0 83.3 86.2 84.5 86.2 85.4 85.2 86.2  Network settings: We explore the effectiveness of our proposed GIL with the same mean pooling mechanism, but with different numbers of convolutional layers, i.e., “GIL + mean pooling" with one, two, and three convolutional layers, respectively.
 <EOS>
-b'A sophisticated machine learning technique used in most existing methods'
+As can be seen in Table 3, the proposed GIL with two convolutional layers can obtain a better performance on the Cora data than the other two network settings (i.e., GIL with one or three convolutional layers).
 <EOS>
-b'Kipf Welling 2017'
+For example, the performance of ‘GIL /w 1  conv layer + mean pooling" is slightly decreased by 1.7% over “GIL /w 2  conv layers + mean pooling" on the Cora dataset.
 <EOS>
-b'Zhou'
+Furthermore, we report the classification results of our proposed GIL by using mean and max-pooling mechanisms, respectively.
 <EOS>
-b'et 2004 is to choose the optimal classi\xef\xac\x81er trained on a training set after checking the performance on the validation set.'
+GIL with mean pooling (i.e., “GIL /w 2 conv layers + mean pooling") can get a better result than the GIL method with max-pooling (i.e., “GIL /w 2 conv layers + max-pooling"), e.g., 86.2% vs 85.2% on the Cora graph dataset.
 <EOS>
-b'However these methods essentially ignore how to extract transferable knowledge from these known labeled nodes to unlabeled nodes as the graph structure itself implies node connectivity reachability.'
+The reason may be that the graph network with two convolutional layers and the mean pooling mechanism can obtain the optimal graph embeddings, but when increasing the network layers, more parameters of a certain graph model need to be optimized, which may lead to the over-fitting issue.
 <EOS>
-b'Moreover due to the scarcity of labeled samples the performance of such a classi\xef\xac\x81er is usually not satisfying.'
+ Inﬂuence of different between-node steps: We compare the classification performance within different between-node steps for our proposed GIL and GCN (Kipf & Welling, 2017), as illustrated in Fig 2(a).
 <EOS>
-b'To address these issues we introduce a meta learning mechanism Finn et'
+The length of between-node steps can be computed with the shortest path between reference nodes and query nodes.
 <EOS>
-b'2017 Ravi Larochelle 2017'
+When the step between nodes is smaller, both GIL and GCN methods can predict the category information for a small part of unlabeled nodes in the testing set.
 <EOS>
-b'Sung et 2017 to learn to infer node labels on graphs.'
+The reason may be that the node category information may be disturbed by its nearest neighboring nodes with different labels and fewer nodes are within 1 or 2 steps in the testing set.
 <EOS>
-b'Speci\xef\xac\x81cally the graph structure between node path reachability and node attributes are jointly modeled into the learning process.'
+The GIL and GCN methods can infer the category information for a part of unlabeled nodes by adopting node attributes, when two nodes are not connected in the graph (i.e., step=∞).
 <EOS>
-b'Our aim is to learn to infer from labeled nodes to unlabeled nodes so that the learner can perform better on a validation set and thus classify a testing set more accurately.'
+By increasing the length of reachability path, the inference process of the GIL method would become difficult and more graph structure information may be employed in the predicted process.
 <EOS>
-b'2 STRUCTURE RELATION For convenient inference we speci\xef\xac\x81cally build a structure relation between two nodes on the topology graph.'
+GIL can outperform the classic GCN by analyzing the accuracies within different between-node steps, which indicates that our proposed GIL has a better reference capability than GCN by using the meta-optimization mechanism from training nodes to validation nodes.
 <EOS>
-b'The labeled vertices in a training set are viewed as the reference nodes and their information can be propagated into those unlabeled vertices for improving the label prediction accuracy.'
+ (a)  (b)  Figure 2: (a) Performance comparisons within different between-node steps on the Cora dataset.
 <EOS>
-b'Formally given a reference node'
+The accuracy equals to the number of correctly classified nodes divided by all testing samples, and is accumulated from step 1 to step k. (b) Performance comparisons with different label rates on the Pubmed dataset.
 <EOS>
-b'vi'
+ 8  1357911step0.00.20.40.60.8accuracyour GILGCNlabel rate0.30%0.60%0.90%1.20%1.50%1.80%GCN0.7920.7970.8050.8240.8290.834GIL(ours)0.8170.8240.8310.8360.8380.8421x2x3x4x5x6x77.0%79.0%81.0%83.0%85.0%1x2x3x4x5x6xGCNGIL(ours)Label rates Accuracy Published as a conference paper at ICLR 2020  Inﬂuence of different label rates: We also explore the performance comparisons of the GIL method with different label rates, and the detailed results on the Pubmed dataset can be shown in Fig 2(b).
 <EOS>
-b'VLabel'
+When label rates increase by multiplication, the performances of GIL and GCN are improved, but the relative gain becomes narrow.
 <EOS>
-b'we de\xef\xac\x81ne the score of a query node vj similar to vi as 1 where Gvi and Gvj may be understood as the centralized subgraphs around vi and vj respectively.'
+The reason is that, the reachable path lengths between unlabeled nodes and labeled nodes will be reduced with the increase of labeled nodes, which will weaken the effect of inference learning.
 <EOS>
-b'fe fr fP are three abstract functions that we explain as follows si j fr fe Gvi fe'
+In the extreme case, labels of unlabeled nodes could be determined by those neighbors with the 1 ∼ 2 step reachability.
 <EOS>
-b'Gvj fP'
+In summary, our proposed GIL method prefers small ratio labeled nodes on the semi-supervised node classification task.
 <EOS>
-b'vi'
+ Inference learning process: Classification errors of different epochs on the validation set of the Cora dataset can be illustrated in Fig 3.
 <EOS>
-b'vj E Node representation'
+Classification errors are rapidly decreasing as the number of iterations increases from the beginning to 400 iterations, while they are with a slow descent from 400 iterations to 1200 iterations.
 <EOS>
-b'fe Gvi Rdv encodes the local representation of the centralized subgraph Gvi around node vi and may thus be understood as a local \xef\xac\x81lter function on graphs.'
+It demonstrates that the learned knowledge from the training samples can be transferred for inferring node category information from these reference labeled nodes.
 <EOS>
-b'This function should not only take the signals of nodes therein as input but also consider the local topological structure of the subgraph for more accurate similarity computation.'
+The performance of semi-supervised classification can be further increased by improving the generalized capability of the Graph CNN model.
 <EOS>
-b'To this end we perform the spectral graph convolution on subgraphs to learn discriminative node features analogous to the pixel level feature extraction from convolution maps of gridded images.'
+ Table 4: Performance comparisons with different mod- ules on the Cora dataset, where fe, fP , and fr denote node representation, path reachability, and structure re- lation, respectively.
 <EOS>
-b'The details of feature extraction fe are described in Section Path reachability'
+ fP fr fe - - - (cid:88) - - (cid:88) (cid:88) - (cid:88) (cid:88) (cid:88)  Acc.(%) 56.0 81.5 85.0 86.2  Figure 3: Classification errors of different itera- tions on the validation set of the Cora dataset.
 <EOS>
-b'fP'
+ Module analysis: We evaluate the effectiveness of different modules within our proposed GIL framework, including node representation fe, path reachability fP , and structure relation fr.
 <EOS>
-b'vi'
+Note that the last one fr defines on the former two ones, so we consider the cases in Table 4 by adding modules.
 <EOS>
-b'vj E Rdp represents the characteristics of path reachability from vi to As there usually exist multiple traversal paths between two nodes we choose the function as reachable probabilities of different lengths of walks from vi to More details will be introduced in Section Structure relation fr Rdv Rdv Rdp R is a relational function computing the score of vj similar to This function is not exchangeable for different orders of two nodes due to the asymmetric reachable relationship fP'
+When not using all modules, only original attributes of nodes are used to predict labels.
 <EOS>
-b'If necessary we may easily revise it as a symmetry function summarizing two traversal directions.'
+The case of only using fe belongs to the GCN method, which can achieve 81.5% on the Cora dataset.
 <EOS>
-b'The score function depends on triple inputs the local representations extracted from the subgraphs fe Gvi and fe Gvj respectively and the path reachability from vi to'
+The large gain of using the relation module fr (i.e., from 81.5% to 85.0%) may be contributed to the ability of inference learning on attributes as well as local topology structures which are implicitly encoded in fe.
 <EOS>
-b'In semi supervised node classi\xef\xac\x81cation'
+The path information fP can further boost the performance by 1.2%, e.g., 86.2% vs 85.0%.
 <EOS>
-b'we take the training node set Vtr as the reference samples and the validation set Vval as the query samples during the training stage.'
+It demonstrates that three different modules of our method can improve the graph inference learning capability.
 <EOS>
-b'Given a query node'
+ Computational complexity: For the computational complexity of our proposed GIL, the cost is mainly spent on the computations of node representation, between-node reachability, and class-to- node relationship, which are about O((ntr + nte) ∗ e ∗ din ∗ dout), O((ntr + nte) ∗ e ∗ P ), and O(ntr ∗ nted2 out), respectively. ntr and nte refer to the numbers of training and testing nodes, din and dout denote the input and output dimensions of node representation, e is about the average degree of graph node, and P is the step length of node reachability.
 <EOS>
-b'vj Vval'
+Compared with those classic Graph CNNs (Kipf & Welling, 2017), our proposed GIL has a slightly higher cost due to an extra inference learning process, but can complete the testing stage with several seconds on these benchmark datasets.
 <EOS>
-b'we can derive the class similarity score of vj'
+ 6 CONCLUSION  In this work, we tackled the semi-supervised node classification task with a graph inference learning method, which can better predict the categories of these unlabeled nodes in an end-to-end framework.
 <EOS>
-b'the c th c 1 C category by weighting the reference samples'
+We can build a structure relation for obtaining the connection between any two graph nodes, where node attributes, between-node paths, and graph structure information can be encapsulated together.
 <EOS>
-b'Cc'
+For better capturing the transferable knowledge, our method further learns to transfer the mined knowledge from the training samples to the validation set, finally boosting the prediction accuracy of the labels of unlabeled nodes in the testing set.
 <EOS>
-b'vk yvk'
+The extensive experimental results demonstrate the effectiveness of our proposed GIL for solving the semi-supervised learning problem, even in the few-shot paradigm.
 <EOS>
-b'c'
+In the future, we would extend the graph inference method to handle more graph-related tasks, such as graph generation and social network analysis.
 <EOS>
-b'Formally we can further revise Eqn. 1 and de\xef\xac\x81ne the class to node relationship function as sCc j \xcf\x86r FCc vj wi j'
+ 9  the number of iterations error Published as a conference paper at ICLR 2020  ACKNOWLEDGMENT  This work was supported by the National Natural Science Foundation of China (Nos 61972204, 61906094, U1713208), the Natural Science Foundation of Jiangsu Province (Grant Nos.
 <EOS>
-b'fe Gvi fe Gvj cid 88'
+BK20191283 and BK20190019), and Tencent AI Lab Rhino-Bird Focused Research Program (No.
 <EOS>
-b'vi'
+JR201922).
 <EOS>
-b'Cc wi j'
+ REFERENCES  2001, 2016.
 <EOS>
-b'\xcf\x86w fP'
+ Sami Abu-El-Haija, Amol Kapoor, Bryan Perozzi, and Joonseok Lee.
 <EOS>
-b'vi'
+N-gcn: Multi-scale graph  convolution for semi-supervised node classification. arXiv preprint arXiv:1802.08888, 2018.
 <EOS>
-b'vj E 3 where the function \xcf\x86w maps a reachable vector'
+ James Atwood and Don Towsley.
 <EOS>
-b'fP vi'
+Diffusion-convolutional neural networks.
 <EOS>
-b'vj E into a weight value and the function \xcf\x86r computes the similar score between vj and the c th class nodes.'
+In NeurIPS, pp 1993–  Karsten M Borgwardt, Hans-Peter Kriegel, SVN Vishwanathan, and Nicol N Schraudolph.
 <EOS>
-b'The normalization factor FCc vj of the c th category vj is de\xef\xac\x81ned as 2 4 For the relation function \xcf\x86r and the weight function'
+Graph ker- nels for disease outcome prediction from protein-protein interaction networks.
 <EOS>
-b'\xcf\x86w'
+Pacific Symposium on Biocomputing Pacific Symposium on Biocomputing, pp 4–15, 2007.
 <EOS>
-b'we may choose some subnetworks to instantiate them in practice.'
+ Ulrik Brandes, Daniel Delling, Marco Gaertler, Robert Gorke, Martin Hoefer, Zoran Nikoloski, and Dorothea Wagner.
 <EOS>
-b'The detailed implementation of our model can be found in Section FCc'
+On modularity clustering.
 <EOS>
-b'vj cid 80'
+IEEE transactions on knowledge and data engineering, 20(2):172–188, 2008.
 <EOS>
-b'1 vi'
+ Andrew Carlson, Justin Betteridge, Bryan Kisiel, Burr Settles, Estevam R. Hruschka Jr., and Tom M.  Mitchell.
 <EOS>
-b'Cc wi j 4 Published as a conference paper at ICLR 2020 3 INFERENCE LEARNING'
+Toward an architecture for never-ending language learning.
 <EOS>
-b'According to the class to node relationship function in Eqn. 2'
+In AAAI, 2010.
 <EOS>
-b'given a query'
+ Michaël Defferrard, Xavier Bresson, and Pierre Vandergheynst.
 <EOS>
-b'node'
+Convolutional neural networks on  graphs with fast localized spectral filtering.
 <EOS>
-b'vj we can obtain a score vector sC'
+In NeurIPS, pp 3844–3852, 2016.
 <EOS>
-b'j sC1 j sCC'
+ Jian Du, Shanghang Zhang, Guanhang Wu, José MF Moura, and Soummya Kar.
 <EOS>
-b'j cid 124 RC after computing the relations to all classes'
+Topology adaptive  graph convolutional networks. arXiv preprint arXiv:1710.10370, 2017.
 <EOS>
-b'The indexed category with the maximum score is assumed to be the estimated label.'
+ Chelsea Finn, Pieter Abbeel, and Sergey Levine.
 <EOS>
-b'Thus we can de\xef\xac\x81ne the loss function based on cross entropy as follows L yj'
+Model-agnostic meta-learning for fast adaptation of  deep networks.
 <EOS>
-b'c log'
+In ICML, pp 1126–1135, 2017.
 <EOS>
-b'\xcb\x86yCc j cid 88'
+ Will Hamilton, Zhitao Ying, and Jure Leskovec.
 <EOS>
-b'C cid 88'
+Inductive representation learning on large graphs.
 <EOS>
-b'vj c 1'
+In  NeurIPS, pp 1025–1035, 2017.
 <EOS>
-b'5 6 7 where yj c is a binary indicator 0 or 1 of class label c for node vj and the softmax operation is imposed on sCc j'
+ Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun.
 <EOS>
-b'\xcb\x86yCc j exp sCc'
+Deep residual learning for image  recognition.
 <EOS>
-b'j cid'
+In CVPR, pp 770–778, 2016.
 <EOS>
-b'80 C k 1 exp sCk j Other error functions may be chosen as the loss function mean square error.'
+ Mikael Henaff, Joan Bruna, and Yann LeCun.
 <EOS>
-b'In the regime of general classi\xef\xac\x81cation the cross entropy loss is a standard one that performs well.'
+Deep convolutional networks on graph-structured data.
 <EOS>
-b'Given a training set'
+ arXiv preprint arXiv:1506.05163, 2015.
 <EOS>
-b'Vtr'
+ Jiatao Jiang, Zhen Cui, Chunyan Xu, and Jian Yang.
 <EOS>
-b'we expect that the best performance can be obtained on the validation set Vval after optimizing the model on Vtr.'
+Gaussian-induced convolution for graphs.
 <EOS>
-b'Given a trained pretrained model'
+In  AAAI, volume 33, pp 4007–4014, 2019.
 <EOS>
-b'\xce\x98 fe \xcf\x86w \xcf\x86r we perform iteratively gradient updates on the training set Vtr to obtain the new model'
+ Hisashi Kashima, Koji Tsuda, and Akihiro Inokuchi.
 <EOS>
-b'formally \xce\x98 cid 48'
+Marginalized kernels between labeled graphs.
 <EOS>
-b'\xce\x98 \xce\xb1 \xce\x98Ltr \xce\x98 where \xce\xb1 is the updating rate.'
+ In ICML, pp 321–328, 2003.
 <EOS>
-b'Note that in the computation of class scores since the reference node and query node can be both from the training set'
+ Thomas N. Kipf and Max Welling.
 <EOS>
-b'Vtr'
+Semi-supervised classification with graph convolutional networks.
 <EOS>
-b'we set the computation weight wi j 0'
+ In ICLR, 2017.
 <EOS>
-b'if i j in Eqn.'
+ networks.
 <EOS>
-b'3'
+ICLR, 2016.
 <EOS>
-b'After several iterates of gradient descent on Vtr'
+ learning.
 <EOS>
-b'we expect a better performance on the validation set Vval min'
+In ICML, 2010.
 <EOS>
-b'\xce\x98 Lval \xce\x98 cid 48'
+ Yujia Li, Daniel Tarlow, Marc Brockschmidt, and Richard Zemel.
 <EOS>
-b'Thus we can perform the gradient update as follows where \xce\xb2 is the learning rate of meta optimization Finn et 2017 \xce\x98 \xce\x98 \xce\xb2'
+Gated graph sequence neural  Wei Liu, Junfeng He, and Shih-Fu Chang.
 <EOS>
-b'\xce\x98Lval \xce\x98 cid 48 During the training process we may perform batch sampling from training nodes and validation nodes instead of taking all one time.'
+Large graph construction for scalable semi-supervised  Wei Liu, Jun Wang, and Shih-Fu Chang.
 <EOS>
-b'In the testing stage we may take all training nodes and perform the model update according to Eqn.'
+Robust and scalable graph-based semisupervised learning.
 <EOS>
-b'6 like the training process.'
+ Proceedings of the IEEE, 100(9):2624–2638, 2012.
 <EOS>
-b'The updated model is used as the \xef\xac\x81nal model and is then fed into Eqn. 2 to infer the class labels for those query nodes.'
+ Zhiling Luo, Ling Liu, Jianwei Yin, Ying Li, and Zhaohui Wu. Deep learning of graphs with ngram convolutional neural networks.
 <EOS>
-b'4 MODULES'
+IEEE Transactions on Knowledge and Data Engineering, 29(10): 2125–2139, 2017.
 <EOS>
-b'In this section we instantiate all modules functions of the aforementioned structure relation.'
+ 10  Published as a conference paper at ICLR 2020  Federico Monti, Davide Boscaini, Jonathan Masci, Emanuele Rodola, Jan Svoboda, and Michael M Bronstein.
 <EOS>
-b'The implementation details can be found in the following.'
+Geometric deep learning on graphs and manifolds using mixture model cnns.
 <EOS>
-b'Node Representation fe Gvi'
+In CVPR, pp 5115–5124, 2017.
 <EOS>
-b'The local representation at vertex vi can be extracted by performing the graph convolution operation on subgraph Gvi Similar to gridded images videos on which local convolution kernels are de\xef\xac\x81ned as multiple lattices with various receptive \xef\xac\x81elds'
+ Christopher Morris, Kristian Kersting, and Petra Mutzel.
 <EOS>
-b'the spectral graph convolution is used to encode the local representations of an input graph in our work.'
+Glocalized weisfeiler-lehman graph kernels:  Global-local feature maps of graphs.
 <EOS>
-b'Given a graph sample G V E X the normalized graph Laplacian matrix is L'
+In ICDM, pp 327–336.
 <EOS>
-b'In D 1 2ED 1 2 U\xce\x9bUT with a diagonal matrix of its eigenvalues'
+IEEE, 2017.
 <EOS>
-b'The spectral graph convo lution can be de\xef\xac\x81ned as the multiplication of signal X with a \xef\xac\x81lter g\xce\xb8 \xce\x9b diag \xce\xb8 parameterized by \xce\xb8 in the Fourier domain conv'
+ Mathias Niepert, Mohamed Ahmed, and Konstantin Kutzkov.
 <EOS>
-b'X g\xce\xb8 L X Ug\xce\xb8 \xce\x9b UT X'
+Learning convolutional neural networks  for graphs.
 <EOS>
-b'where parameter \xce\xb8 Rn is a vector of Fourier coef\xef\xac\x81cients.'
+In ICML, pp 2014–2023, 2016.
 <EOS>
-b'To reduce the computational complexity and obtain the local information we use an approximate local \xef\xac\x81lter of the Chebyshev polynomial Defferrard et 2016 g\xce\xb8 \xce\x9b cid 80 K 1 k'
+ Francesco Orsini, Daniele Baracchi, and Paolo Frasconi.
 <EOS>
-b'0'
+Shift aggregate extract networks. arXiv  preprint arXiv:1703.05537, 2017.
 <EOS>
-b'\xce\xb8kTk \xcb\x86\xce\x9b'
+ Lawrence Page, Sergey Brin, Rajeev Motwani, and Terry Winograd.
 <EOS>
-b'where parameter \xce\xb8 RK is a vector of Chebyshev coef\xef\xac\x81cients and'
+The pagerank citation ranking:  Bringing order to the web.
 <EOS>
-b'Tk \xcb\x86\xce\x9b'
+Technical Report 1999-66, 1999.
 <EOS>
-b'Rn n is the Chebyshev polynomial of order k evaluated at \xcb\x86\xce\x9b'
+ Shirui Pan, Ruiqi Hu, Guodong Long, Jing Jiang, Lina Yao, and Chengqi Zhang.
 <EOS>
-b'2\xce\x9b \xce\xbbmax'
+Adversarially  regularized graph autoencoder for graph embedding.
 <EOS>
-b'In a diagonal matrix of scaled eigenvalues.'
+In IJCAI, pp 2609–2615, 2018.
 <EOS>
-b'The graph \xef\xac\x81ltering operation can then be expressed as g\xce\xb8 \xce\x9b X cid 80 K 1 k 0'
+ Sachin Ravi and Hugo Larochelle.
 <EOS>
-b'\xce\xb8kTk \xcb\x86L X where Tk \xcb\x86L'
+Optimization as a model for few-shot learning.
 <EOS>
-b'Rn n is the Chebyshev polynomial of order k evaluated at the scaled Laplacian \xcb\x86L 2L \xce\xbbmax'
+In ICLR, 2017.
 <EOS>
-b'Further we can construct multi scale receptive \xef\xac\x81elds for each vertex based on the Laplacian matrix L where each receptive \xef\xac\x81eld records hopping neighborhood relationships around the reference vertex vi and forms a local centralized subgraph.'
+ Prithviraj Sen, Galileo Namata, Mustafa Bilgic, Lise Getoor, Brian Galligher, and Tina Eliassi-Rad.
 <EOS>
-b'Path Reachability fP'
+ Collective classification in network data.
 <EOS>
-b'vi'
+AI magazine, 29(3):93–93, 2008.
 <EOS>
-b'vj E'
+ Nino Shervashidze, SVN Vishwanathan, Tobias Petri, Kurt Mehlhorn, and Karsten Borgwardt.
 <EOS>
-b'Here we compute the probabilities of paths from vertex i to vertex j by employing random walks on graphs which refers to traversing the graph from vi to vj according to the probability matrix For the input graph G with n vertices'
+Efficient graphlet kernels for large graph comparison.
 <EOS>
-b'the random walk transition matrix 5 Published as a conference paper at ICLR 2020 Datasets Nodes 2 708'
+In Artificial Intelligence and Statistics, pp 488–495, 2009.
 <EOS>
-b'Cora 3 327 Citeseer 19 717'
+ Flood Sung, Li Zhang, Tao Xiang, Timothy Hospedales, and Yongxin Yang.
 <EOS>
-b'Pubmed NELL'
+Learning to learn:  Meta-critic networks for sample efficient learning. arXiv preprint arXiv:1706.09529, 2017.
 <EOS>
-b'65 755 Edges 5'
+ Kiran K Thekumparampil, Chong Wang, Sewoong Oh, and Li-Jia Li. Attention-based graph neural  network for semi-supervised learning. arXiv preprint arXiv:1803.03735, 2018.
 <EOS>
-b'429'
+ Petar Velickovic, Guillem Cucurull, Arantxa Casanova, Adriana Romero, Pietro Liò, and Yoshua  Bengio.
 <EOS>
-b'4 732 44 338 266 144 Classes'
+Graph attention networks.
 <EOS>
-b'7 6 3 210 Features 1 433'
+ICLR, 2018.
 <EOS>
-b'3 703 500 5 414 Label Rates 052'
+ Danfei Xu, Yuke Zhu, Christopher B Choy, and Li Fei-Fei.
 <EOS>
-b'036 003 001 Table 1'
+Scene graph generation by iterative  message passing.
 <EOS>
-b'The properties especially for label rate of various graph datasets used for the semi supervised classi\xef\xac\x81cation task.'
+In CVPR, pp 5410–5419, 2017.
 <EOS>
-b'can be de\xef\xac\x81ned as P D 1E where D Rn n is the diagonal degree matrix with Dii cid 80'
+ Pinar Yanardag and SVN Vishwanathan.
 <EOS>
-b'That is to say each element Pij is the probability of going from vertex i to vertex j in one step.'
+Deep graph kernels.
 <EOS>
-b'i Eij.'
+In SIGKDD, pp 1365–1374, 2015.
 <EOS>
-b'The sequence of nodes from vertex i to vertex j is a random walk on the graph which can be modeled as a classical Markov chain by considering the set of graph vertices.'
+ Zhilin Yang, William W Cohen, and Ruslan Salakhutdinov.
 <EOS>
-b'To represent this formulation we show that P t ij is the probability of getting from vertex vi to vertex vj in t steps.'
+Revisiting semi-supervised learning with  graph embeddings.
 <EOS>
-b'This fact is easily exhibited by considering a t step path from vertex vi to vertex vj as \xef\xac\x81rst taking a single step to some vertex h and then taking t 1 steps to The transition probability P t in t steps can be formulated as P t ij PihP t 1 h j Pij'
+ICML, 2016.
 <EOS>
-b'cid 88 h'
+ Bing Yu, Haoteng Yin, and Zhanxing Zhu.
 <EOS>
-b'if t 1 if t 1 where each matrix entry P t steps.'
+Spatio-temporal graph convolutional networks: A deep  learning framework for traffic forecasting.
 <EOS>
-b'Finally the node reachability from vi to vj can be written as a dp dimensional vector ij denotes the probability of starting at vertex i and ending at vertex j in t ij P dp'
+In IJCAI, pp 3634–3640, 2018.
 <EOS>
-b'ij where dp refers to the step length of the longest path from vi to fP vi vj E Pij P 2 Class to Node Relationship'
+ Tong Zhang, Zhen Cui, Chunyan Xu, Wenming Zheng, and Jian Yang.
 <EOS>
-b'sCc j To de\xef\xac\x81ne the node relationship si j from vi to vj'
+Variational pathway reasoning  for eeg emotion recognition.
 <EOS>
-b'we simulta'
+In AAAI, 2020.
 <EOS>
-b'neously consider the property of path reachability fP'
+ Wenting Zhao, Zhen Cui, Chunyan Xu, Chengzheng Li, Tong Zhang, and Jian Yang.
 <EOS>
-b'vi'
+Hashing graph  convolution for node classification.
 <EOS>
-b'vj E local representations fe Gvi and fe Gvj of nodes'
+In CIKM, 2019.
 <EOS>
-b'vi The function'
+ Dengyong Zhou, Olivier Bousquet, Thomas N Lal, Jason Weston, and Bernhard Schölkopf.
 <EOS>
-b'\xcf\x86w fP'
+Learning  with local and global consistency.
 <EOS>
-b'vi vj E in Eqn. 3 which is to map the reachable vector fP vi'
+In NeurIPS, pp 321–328, 2004.
 <EOS>
-b'vj E Rdp into a weight value can be implemented with two 16 dimensional fully connected layers in our experiments.'
+ Xiaojin Zhu, Zoubin Ghahramani, and John D Lafferty.
 <EOS>
-b'The computed value wi j can be further used to weight the local features at node vi'
+Semi-supervised learning using gaussian  fields and harmonic functions.
 <EOS>
-b'fe Gvi Rdv'
+In ICML, pp 912–919, 2003.
 <EOS>
-b'For obtaining the similar score between vj and the c th class nodes Cc in Eqn. 2 we perform a concatenation of two input features where one refers to the weighted features of vertex vi and another is the local features of vertex One fully connected layer \xcf\x86r with C dimensions is \xef\xac\x81nally adopted to obtain the relation regression score.'
+ Chenyi Zhuang and Qiang Ma. Dual graph convolutional networks for graph-based semi-supervised  classification.
 <EOS>
-b'8 9 5 EXPERIMENTS 1'
+In WWW, pp 499–508, 2018.
 <EOS>
-b'EXPERIMENTAL SETTINGS'
-<EOS>
-b'We evaluate our proposed GIL method on three citation network datasets Cora Citeseer'
-<EOS>
-b'Pubmed Sen et 2008 and one knowledge graph NELL dataset Carlson et 2010'
-<EOS>
-b'The statistical properties of graph data are summarized in Table Following the previous protocol in Kipf Welling 2017'
-<EOS>
-b'Zhuang Ma 2018'
-<EOS>
-b'we split the graph data into a training set a validation set and a testing set.'
-<EOS>
-b'Taking into account the graph convolution and pooling modules we may alternately stack them into a multi layer Graph convolutional network.'
-<EOS>
-b'The GIL model consists of two graph convolution layers each of which is followed by a mean pooling layer a class to node relationship regression module and a \xef\xac\x81nal softmax layer.'
-<EOS>
-b'We have given the detailed con\xef\xac\x81guration of the relationship regression module in the class to node relationship of Section'
-<EOS>
-b'The parameter dp in Eqn.'
-<EOS>
-b'9 is set to the mean length of between node reachability paths in the input graph.'
-<EOS>
-b'The channels of the 1 st and 2 nd convolutional layers are set to 128 and 256 respectively.'
-<EOS>
-b'The scale of the respective \xef\xac\x81led is 2 in both convolutional layers.'
-<EOS>
-b'The dropout rate is set to 5 in the convolution and fully connected layers to avoid over \xef\xac\x81tting and the ReLU unit is leveraged as a nonlinear activation function.'
-<EOS>
-b'We pre train our proposed GIL model for 200 iterations with the training set where its initial learning rate decay factor and momentum are set to 05 95 and 9 respectively.'
-<EOS>
-b'Here we train the GIL model using the stochastic gradient descent method with the batch size of 100.'
-<EOS>
-b'We further improve the inference learning capability of the GIL model for 1200 iterations with the validation set where the meta learning rates \xce\xb1 and \xce\xb2 are both set to 001.'
-<EOS>
-b'6 Published as a conference paper at ICLR'
-<EOS>
-b'2020 2 COMPARISON WITH STATE OF THE ARTS'
-<EOS>
-b'We compare the GIL approach with several state of the art methods'
-<EOS>
-b'Monti et 2017'
-<EOS>
-b'Kipf Welling 2017'
-<EOS>
-b'Zhou'
-<EOS>
-b'et 2004'
-<EOS>
-b'Zhuang Ma 2018 over four graph datasets including Cora Citeseer Pubmed and NELL.'
-<EOS>
-b'The classi\xef\xac\x81cation accuracies for all methods are reported in Table Our proposed GIL can signi\xef\xac\x81cantly outperform these graph'
-<EOS>
-b'Laplacian regularized methods on four graph datasets including Deep walk'
-<EOS>
-b'Zhou et'
-<EOS>
-b'2004 modularity clustering Brandes et 2008'
-<EOS>
-b'Gaussian \xef\xac\x81elds'
-<EOS>
-b'Zhu et'
-<EOS>
-b'2003 and graph embedding'
-<EOS>
-b'Yang et 2016 methods.'
-<EOS>
-b'For example we can achieve much higher performance than the deepwalk method Zhou et 2004 2 vs 1 on the Citeseer'
-<EOS>
-b'dataset 3 vs 1 on the Pubmed dataset and 1 vs 9 on the NELL dataset.'
-<EOS>
-b'We \xef\xac\x81nd that the graph embedding method'
-<EOS>
-b'Yang et'
-<EOS>
-b'2016 which has considered both label information and graph structure during sampling can obtain lower accuracies than our proposed GIL by 4 on the Citeseer dataset and 5 on the Cora dataset respectively.'
-<EOS>
-b'This indicates that our proposed GIL can better optimize structure relations and thus improve the network generalization.'
-<EOS>
-b'We further compare our proposed GIL with several existing deep graph embedding methods including graph attention network Velickovic et 2018 dual graph convolutional networks'
-<EOS>
-b'Zhuang Ma 2018 topology adaptive graph convolutional networks'
-<EOS>
-b'Du et 2017 Multi scale graph convolution Abu El Haija'
-<EOS>
-b'et 2018 etc.'
-<EOS>
-b'For example our proposed GIL achieves a very large gain 2 vs 3 Du et 2017 on the Cora dataset and 9'
-<EOS>
-b'vs 0'
-<EOS>
-b'Kipf Welling 2017 on the NELL dataset.'
-<EOS>
-b'We evaluate our proposed GIL method on a large graph dataset with a lower label rate which can signi\xef\xac\x81cantly outperform existing baselines on the Pubmed dataset 1 over DGCN Zhuang Ma 2018 1 over classic GCN Kipf Welling 2017 and TAGCN Du et 2017 2 over AGNN Thekumparampil'
-<EOS>
-b'et 2018 and 6 over N GCN Abu El Haija'
-<EOS>
-b'et 2018'
-<EOS>
-b'It demonstrates that our proposed GIL performs very well on various graph datasets by building the graph inference learning process where the limited label information and graph structures can be well employed in the predicted framework.'
-<EOS>
-b'Table 2 Performance comparisons of semi supervised classi\xef\xac\x81cation methods.'
-<EOS>
-b'Methods Clustering Brandes et 2008'
-<EOS>
-b'DeepWalk Zhou'
-<EOS>
-b'et 2004'
-<EOS>
-b'Gaussian Zhu'
-<EOS>
-b'et 2003'
-<EOS>
-b'G embedding Yang'
-<EOS>
-b'et 2016'
-<EOS>
-b'DCNN Atwood Towsley 2016'
-<EOS>
-b'GCN Kipf'
-<EOS>
-b'Welling 2017'
-<EOS>
-b'MoNet Monti'
-<EOS>
-b'et 2017 N GCN Abu El Haija et 2018 GAT Velickovic et 2018'
-<EOS>
-b'AGNN Thekumparampil'
-<EOS>
-b'et 2018 TAGCN'
-<EOS>
-b'Du et 2017 DGCN'
-<EOS>
-b'Zhuang Ma 2018'
-<EOS>
-b'Our GIL Cora 5 2 0'
-<EOS>
-b'7 8 5 7 0 0 1 3 5 2 Citeseer 1'
-<EOS>
-b'2 3 7 3 2 5 7 5 6 1 Pubmed NELL 7 3 0'
-<EOS>
-b'2 0 0'
-<EOS>
-b'8 5 0 9 0'
-<EOS>
-b'0 1'
-<EOS>
-b'8 1 5'
-<EOS>
-b'9 0 2 9 3 ANALYSIS Meta optimization As can be seen in Table 3'
-<EOS>
-b'we report the classi\xef\xac\x81cation accuracies of semi supervised classi\xef\xac\x81cation with several variants of our proposed GIL and the classical GCN method Kipf Welling 2017 when evaluating them on the Cora dataset.'
-<EOS>
-b'For analyzing the perfor mance improvement of our proposed GIL with the graph inference learning process we report the classi\xef\xac\x81cation accuracies of GCN Kipf Welling 2017 and our proposed GIL on the Cora dataset under two different situations including only learning with the training set Vtr and with jointly learning on a training set Vtr and a validation set Vval GCN w jointly learning on Vtr Vval achieves a better result than GCN w learning on Vtr by 6 which demonstrates that the network performance can be improved by employing validation samples.'
-<EOS>
-b'When using structure relations GIL w learning on Vtr obtains an improvement of 9 over GCN w learning on Vtr which can be attributed to the building connection between nodes.'
-<EOS>
-b'The meta optimization strategy GIL w meta training from Vtr Vval vs GIL w learning on Vtr has a gain of 9 which indicates that a good inference capability can be learnt through meta optimization.'
-<EOS>
-b'It is worth noting that GIL adopts a meta optimization strategy to learn the inference model which is a process of migrating 7 Published as a conference paper at ICLR 2020 from a training set to a validation set.'
-<EOS>
-b'In other words the validation set is only used to teach the model itself how to transfer to unseen data.'
-<EOS>
-b'In contrast the conventional methods often employ a validation set to tune parameters of a certain model of interest.'
-<EOS>
-b'Table 3 Performance comparisons with several GIL variants and the classical GCN method on the Cora dataset.'
-<EOS>
-b'GCN Kipf'
-<EOS>
-b'Welling 2017'
-<EOS>
-b'Methods'
-<EOS>
-b'GIL GIL mean pooling GIL 2 conv.'
-<EOS>
-b'layers w learning on Vtr w jointly learning on Vtr Vval w learning on Vtr w meta train'
-<EOS>
-b'Vtr Vval'
-<EOS>
-b'w 1 conv.'
-<EOS>
-b'layer w 2 conv.'
-<EOS>
-b'layers w 3 conv.'
-<EOS>
-b'layers w max pooling'
-<EOS>
-b'w mean'
-<EOS>
-b'pooling Acc.'
-<EOS>
-b'4'
-<EOS>
-b'0 3 2 5 2 4 2 2 Network settings'
-<EOS>
-b'We explore the effectiveness of our proposed GIL with the same mean pooling mechanism but with different numbers of convolutional layers'
-<EOS>
-b'GIL mean pooling with one two and three convolutional layers respectively.'
-<EOS>
-b'As can be seen in Table 3 the proposed GIL with two convolutional layers can obtain a better performance on the Cora data than the other two network settings GIL with one or three convolutional layers'
-<EOS>
-b'For example the performance of GIL w 1 conv.'
-<EOS>
-b'layer mean pooling is slightly decreased by 7 over GIL w 2 conv.'
-<EOS>
-b'layers mean pooling on the Cora dataset.'
-<EOS>
-b'Furthermore we report the classi\xef\xac\x81cation results of our proposed GIL by using mean and max pooling mechanisms respectively.'
-<EOS>
-b'GIL with mean pooling GIL w 2 conv layers mean pooling can get a better result than the GIL method with max pooling'
-<EOS>
-b'GIL w 2 conv layers max pooling 2 vs 2 on the Cora graph'
-<EOS>
-b'dataset.'
-<EOS>
-b'The reason may be that the graph network with two convolutional layers and the mean pooling mechanism can obtain the optimal graph embeddings but when increasing the network layers more parameters of a certain graph model need to be optimized which may lead to the over \xef\xac\x81tting issue.'
-<EOS>
-b'In\xef\xac\x82uence of different between node steps'
-<EOS>
-b'We compare the classi\xef\xac\x81cation performance within different between node steps for our proposed GIL and GCN Kipf'
-<EOS>
-b'Welling 2017 as illustrated in Fig.'
-<EOS>
-b'2'
-<EOS>
-b'a The length of between node steps can be computed with the shortest path between reference nodes and query nodes.'
-<EOS>
-b'When the step between nodes is smaller both GIL and GCN methods can predict the category information for a small part of unlabeled nodes in the testing set.'
-<EOS>
-b'The reason may be that the node category information may be disturbed by its nearest neighboring nodes with different labels and fewer nodes are within 1 or 2 steps in the testing set.'
-<EOS>
-b'The GIL and GCN methods can infer the category information for a part of unlabeled nodes by adopting node attributes when two nodes are not connected in the graph step By increasing the length of reachability path the inference process of the GIL method would become dif\xef\xac\x81cult and more graph structure information may be employed in the predicted process.'
-<EOS>
-b'GIL can outperform the classic GCN by analyzing the accuracies within different between node steps which indicates that our proposed GIL has a better reference capability than GCN by using the meta optimization mechanism from training nodes to validation nodes.'
-<EOS>
-b'a b Figure 2 a Performance comparisons within different between node steps on the Cora dataset.'
-<EOS>
-b'The accuracy equals to the number of correctly classi\xef\xac\x81ed nodes divided by all testing samples and is accumulated from step 1 to step b Performance comparisons with different label rates on the Pubmed dataset.'
-<EOS>
-b'8'
-<EOS>
-b'1357911step0.'
-<EOS>
-b'8accuracyour GILGCNlabel rate0.'
-<EOS>
-b'30'
-<EOS>
-b'60'
-<EOS>
-b'90 20 50 80 GCN0. 7920.'
-<EOS>
-b'7970.'
-<EOS>
-b'8050.'
-<EOS>
-b'8240.'
-<EOS>
-b'8290.'
-<EOS>
-b'834GIL ours 8170.'
-<EOS>
-b'8240.'
-<EOS>
-b'8310.'
-<EOS>
-b'8360.'
-<EOS>
-b'8380.'
-<EOS>
-b'8421x2x3x4x5x6x77. 0 0 0 0 0'
-<EOS>
-b'1x2x3x4x5x6xGCNGIL ours Label rates Accuracy Published as a conference paper at ICLR'
-<EOS>
-b'2020 In\xef\xac\x82uence of different label rates'
-<EOS>
-b'We also explore the performance comparisons of the GIL method with different label rates and the detailed results on the Pubmed dataset can be shown in Fig.'
-<EOS>
-b'2 b'
-<EOS>
-b'When label rates increase by multiplication the performances of GIL and GCN are improved but the relative gain becomes narrow.'
-<EOS>
-b'The reason is that the reachable path lengths between unlabeled nodes and labeled nodes will be reduced with the increase of labeled nodes which will weaken the effect of inference learning.'
-<EOS>
-b'In the extreme case labels of unlabeled nodes could be determined by those neighbors with the 1 2 step reachability.'
-<EOS>
-b'In summary our proposed GIL method prefers small ratio labeled nodes on the semi supervised node classi\xef\xac\x81cation task.'
-<EOS>
-b'Inference learning process Classi\xef\xac\x81cation errors of different epochs on the validation set of the Cora dataset can be illustrated in Fig.'
-<EOS>
-b'Classi\xef\xac\x81cation errors are rapidly decreasing as the number of iterations increases from the beginning to 400 iterations while they are with a slow descent from 400 iterations to 1200 iterations.'
-<EOS>
-b'It demonstrates that the learned knowledge from the training samples can be transferred for inferring node category information from these reference labeled nodes.'
-<EOS>
-b'The performance of semi supervised classi\xef\xac\x81cation can be further increased by improving the generalized capability of the Graph CNN model.'
-<EOS>
-b'Table 4 Performance comparisons with different mod ules on the Cora dataset where fe fP and fr denote node representation path reachability and structure re lation respectively.'
-<EOS>
-b'fP'
-<EOS>
-b'fr fe cid 88'
-<EOS>
-b'cid 88'
-<EOS>
-b'cid 88'
-<EOS>
-b'cid 88'
-<EOS>
-b'cid 88 cid 88 Acc. 0'
-<EOS>
-b'5 0 2 Figure 3 Classi\xef\xac\x81cation errors of different itera tions on the validation set of the Cora dataset.'
-<EOS>
-b'Module analysis'
-<EOS>
-b'We evaluate the effectiveness of different modules within our proposed GIL framework including node representation fe path reachability fP and structure relation Note that the last one fr de\xef\xac\x81nes on the former two ones'
-<EOS>
-b'so we consider the cases in Table 4 by adding modules.'
-<EOS>
-b'When not using all modules only original attributes of nodes are used to predict labels.'
-<EOS>
-b'The case of only using fe belongs to the GCN method which can achieve 5 on the Cora dataset.'
-<EOS>
-b'The large gain of using the relation module fr from 5 to 0 may be contributed to the ability of inference learning on attributes as well as local topology structures which are implicitly encoded in The path information fP can further boost the performance by 2 2 vs 0'
-<EOS>
-b'It demonstrates that three different modules of our method can improve the graph inference learning capability.'
-<EOS>
-b'Computational complexity For the computational complexity of our proposed GIL'
-<EOS>
-b'the cost is mainly spent on the computations of node representation between node reachability and class to node relationship which are about O ntr nte'
-<EOS>
-b'e din dout'
-<EOS>
-b'O ntr nte e P and O'
-<EOS>
-b'ntr nted2 out respectively.'
-<EOS>
-b'ntr and nte refer to the numbers of training and testing nodes din and dout denote'
-<EOS>
-b'the input and output dimensions of node representation e is about the average degree of graph node and P'
-<EOS>
-b'is the step length of node reachability.'
-<EOS>
-b'Compared with those classic Graph CNNs Kipf Welling 2017 our proposed GIL has a slightly higher cost due to an extra inference learning process but can complete the testing stage with several seconds on these benchmark datasets.'
-<EOS>
-b'6 CONCLUSION'
-<EOS>
-b'In this work we tackled the semi supervised node classi\xef\xac\x81cation task with a graph inference learning method which can better predict the categories of these unlabeled nodes in an end to end framework.'
-<EOS>
-b'We can build a structure relation for obtaining the connection between any two graph nodes where node attributes between node paths and graph structure information can be encapsulated together.'
-<EOS>
-b'For better capturing the transferable knowledge our method further learns to transfer the mined knowledge from the training samples to the validation set \xef\xac\x81nally boosting the prediction accuracy of the labels of unlabeled nodes in the testing set.'
-<EOS>
-b'The extensive experimental results demonstrate the effectiveness of our proposed GIL for solving the semi supervised learning problem even in the few shot paradigm.'
-<EOS>
-b'In the future we would extend the graph inference method to handle more graph related tasks such as graph generation and social network analysis.'
-<EOS>
-b'9'
-<EOS>
-b'the number of iterations error Published as a conference paper at ICLR'
-<EOS>
-b'2020 ACKNOWLEDGMENT'
-<EOS>
-b'This work was supported by the National Natural Science Foundation of China Nos.'
-<EOS>
-b'61972204'
-<EOS>
-b'61906094'
-<EOS>
-b'U1713208'
-<EOS>
-b'the Natural Science Foundation of Jiangsu Province Grant Nos.'
-<EOS>
-b'BK20191283 and BK20190019 and Tencent AI Lab Rhino'
-<EOS>
-b'Bird Focused Research Program JR201922 REFERENCES 2001 2016.'
-<EOS>
-b'Sami Abu El'
-<EOS>
-b'Haija Amol Kapoor Bryan Perozzi and Joonseok Lee.'
-<EOS>
-b'N gcn Multi scale graph convolution for semi supervised node classi\xef\xac\x81cation.'
-<EOS>
-b'arXiv preprint arXiv 1802.'
-<EOS>
-b'08888 2018.'
-<EOS>
-b'James Atwood and Don Towsley.'
-<EOS>
-b'Diffusion convolutional neural networks.'
-<EOS>
-b'In NeurIPS 1993 Karsten M Borgwardt Hans Peter Kriegel SVN Vishwanathan and Nicol N Schraudolph.'
-<EOS>
-b'Graph ker nels for disease outcome prediction from protein protein interaction networks.'
-<EOS>
-b'Paci\xef\xac\x81c Symposium on Biocomputing Paci\xef\xac\x81c Symposium on Biocomputing 4 15 2007.'
-<EOS>
-b'Ulrik Brandes Daniel Delling Marco Gaertler'
-<EOS>
-b'Robert Gorke Martin Hoefer Zoran Nikoloski and Dorothea Wagner.'
-<EOS>
-b'On modularity clustering.'
-<EOS>
-b'IEEE transactions on knowledge and data engineering 20'
-<EOS>
-b'2'
-<EOS>
-b'172 188 2008.'
-<EOS>
-b'Andrew Carlson Justin Betteridge'
-<EOS>
-b'Bryan Kisiel Burr Settles Estevam Hruschka and Tom Mitchell.'
-<EOS>
-b'Toward an architecture for never ending language learning.'
-<EOS>
-b'In AAAI 2010.'
-<EOS>
-b'Micha\xc3\xabl Defferrard Xavier Bresson and Pierre Vandergheynst.'
-<EOS>
-b'Convolutional neural networks on graphs with fast localized spectral \xef\xac\x81ltering.'
-<EOS>
-b'In NeurIPS 3844 3852 2016.'
-<EOS>
-b'Jian Du Shanghang Zhang Guanhang Wu Jos\xc3\xa9 MF Moura and Soummya Kar.'
-<EOS>
-b'Topology adaptive graph convolutional networks.'
-<EOS>
-b'arXiv preprint arXiv 1710.'
-<EOS>
-b'10370 2017.'
-<EOS>
-b'Chelsea Finn Pieter Abbeel and Sergey Levine.'
-<EOS>
-b'Model agnostic meta learning for fast adaptation of deep networks.'
-<EOS>
-b'In ICML 1126 1135 2017.'
-<EOS>
-b'Will'
-<EOS>
-b'Hamilton Zhitao Ying and Jure Leskovec.'
-<EOS>
-b'Inductive representation learning on large graphs.'
-<EOS>
-b'In NeurIPS 1025 1035 2017.'
-<EOS>
-b'Kaiming'
-<EOS>
-b'He Xiangyu Zhang'
-<EOS>
-b'Shaoqing Ren and Jian Sun.'
-<EOS>
-b'Deep residual learning for image recognition.'
-<EOS>
-b'In CVPR 770 778 2016.'
-<EOS>
-b'Mikael Henaff Joan Bruna and Yann LeCun.'
-<EOS>
-b'Deep convolutional networks on graph structured data.'
-<EOS>
-b'arXiv preprint arXiv 1506.'
-<EOS>
-b'05163 2015.'
-<EOS>
-b'Jiatao Jiang Zhen Cui Chunyan Xu and Jian Yang.'
-<EOS>
-b'Gaussian induced convolution for graphs.'
-<EOS>
-b'In AAAI volume 33 4007 4014 2019.'
-<EOS>
-b'Hisashi Kashima Koji Tsuda and Akihiro Inokuchi.'
-<EOS>
-b'Marginalized kernels between labeled graphs.'
-<EOS>
-b'In ICML 321 328 2003.'
-<EOS>
-b'Thomas Kipf and Max Welling.'
-<EOS>
-b'Semi supervised classi\xef\xac\x81cation with graph convolutional networks.'
-<EOS>
-b'In ICLR 2017.'
-<EOS>
-b'networks.'
-<EOS>
-b'ICLR 2016.'
-<EOS>
-b'learning.'
-<EOS>
-b'In ICML 2010.'
-<EOS>
-b'Yujia Li Daniel Tarlow Marc Brockschmidt and Richard Zemel.'
-<EOS>
-b'Gated graph sequence'
-<EOS>
-b'neural Wei Liu Junfeng He and Shih Fu Chang.'
-<EOS>
-b'Large graph construction for scalable semi supervised Wei Liu Jun Wang and Shih Fu Chang.'
-<EOS>
-b'Robust and scalable graph based semisupervised learning.'
-<EOS>
-b'Proceedings of the IEEE 100 9 2624 2638 2012.'
-<EOS>
-b'Zhiling Luo Ling Liu Jianwei Yin Ying Li and Zhaohui Deep learning of graphs with ngram convolutional neural networks.'
-<EOS>
-b'IEEE Transactions on Knowledge and Data Engineering 29 10 2125 2139 2017.'
-<EOS>
-b'10 Published as a conference paper at ICLR 2020'
-<EOS>
-b'Federico Monti Davide Boscaini Jonathan Masci Emanuele Rodola Jan Svoboda and Michael M Bronstein.'
-<EOS>
-b'Geometric deep learning on graphs and manifolds using mixture model cnns.'
-<EOS>
-b'In CVPR 5115 5124 2017.'
-<EOS>
-b'Christopher Morris Kristian Kersting and Petra Mutzel.'
-<EOS>
-b'Glocalized weisfeiler lehman graph kernels Global local feature maps of graphs.'
-<EOS>
-b'In ICDM 327 336.'
-<EOS>
-b'IEEE 2017.'
-<EOS>
-b'Mathias Niepert Mohamed Ahmed and Konstantin Kutzkov.'
-<EOS>
-b'Learning convolutional neural networks for graphs.'
-<EOS>
-b'In ICML 2014 2023 2016.'
-<EOS>
-b'Francesco Orsini Daniele Baracchi and Paolo Frasconi.'
-<EOS>
-b'Shift aggregate extract networks.'
-<EOS>
-b'arXiv preprint arXiv 1703.'
-<EOS>
-b'05537 2017.'
-<EOS>
-b'Lawrence Page Sergey'
-<EOS>
-b'Brin Rajeev Motwani and Terry Winograd.'
-<EOS>
-b'The pagerank citation ranking Bringing order to the web.'
-<EOS>
-b'Technical Report 1999 66 1999.'
-<EOS>
-b'Shirui Pan Ruiqi Hu'
-<EOS>
-b'Guodong Long Jing Jiang Lina Yao and Chengqi Zhang.'
-<EOS>
-b'Adversarially regularized graph autoencoder for graph embedding.'
-<EOS>
-b'In IJCAI 2609 2615 2018.'
-<EOS>
-b'Sachin Ravi and Hugo Larochelle.'
-<EOS>
-b'Optimization as a model for few shot learning.'
-<EOS>
-b'In ICLR 2017.'
-<EOS>
-b'Prithviraj Sen Galileo Namata Mustafa Bilgic Lise Getoor Brian Galligher and Tina Eliassi Rad.'
-<EOS>
-b'Collective classi\xef\xac\x81cation in network data.'
-<EOS>
-b'AI magazine 29 3'
-<EOS>
-b'93 93 2008.'
-<EOS>
-b'Nino Shervashidze'
-<EOS>
-b'SVN Vishwanathan Tobias Petri Kurt Mehlhorn and Karsten Borgwardt.'
-<EOS>
-b'Ef\xef\xac\x81cient graphlet kernels for large graph comparison.'
-<EOS>
-b'In Arti\xef\xac\x81cial Intelligence and Statistics 488 495 2009.'
-<EOS>
-b'Flood Sung Li Zhang Tao Xiang Timothy Hospedales and Yongxin Yang.'
-<EOS>
-b'Learning to learn Meta critic networks for sample ef\xef\xac\x81cient learning.'
-<EOS>
-b'arXiv preprint arXiv 1706.'
-<EOS>
-b'09529 2017.'
-<EOS>
-b'Kiran K Thekumparampil Chong Wang Sewoong'
-<EOS>
-b'Oh'
-<EOS>
-b'and Li Jia Attention based graph neural network for semi supervised learning.'
-<EOS>
-b'arXiv preprint arXiv 1803.'
-<EOS>
-b'03735 2018.'
-<EOS>
-b'Petar Velickovic Guillem Cucurull Arantxa Casanova Adriana'
-<EOS>
-b'Romero Pietro Li\xc3\xb2 and Yoshua Bengio.'
-<EOS>
-b'Graph attention networks.'
-<EOS>
-b'ICLR 2018.'
-<EOS>
-b'Danfei Xu Yuke Zhu Christopher B Choy and Li Fei Fei.'
-<EOS>
-b'Scene graph generation by iterative message passing.'
-<EOS>
-b'In CVPR 5410 5419 2017.'
-<EOS>
-b'Pinar Yanardag and SVN Vishwanathan.'
-<EOS>
-b'Deep graph kernels.'
-<EOS>
-b'In SIGKDD 1365 1374 2015.'
-<EOS>
-b'Zhilin Yang William W Cohen and Ruslan Salakhutdinov.'
-<EOS>
-b'Revisiting semi supervised learning with graph embeddings.'
-<EOS>
-b'ICML 2016.'
-<EOS>
-b'Bing Yu Haoteng Yin and Zhanxing Zhu.'
-<EOS>
-b'Spatio temporal graph convolutional networks'
-<EOS>
-b'A deep learning framework for traf\xef\xac\x81c forecasting.'
-<EOS>
-b'In IJCAI 3634 3640 2018.'
-<EOS>
-b'Tong Zhang Zhen Cui Chunyan Xu Wenming Zheng and Jian Yang.'
-<EOS>
-b'Variational pathway reasoning for eeg emotion recognition.'
-<EOS>
-b'In AAAI 2020.'
-<EOS>
-b'Wenting Zhao Zhen Cui Chunyan Xu Chengzheng Li Tong Zhang and Jian Yang.'
-<EOS>
-b'Hashing graph convolution for node classi\xef\xac\x81cation.'
-<EOS>
-b'In CIKM 2019.'
-<EOS>
-b'Dengyong Zhou Olivier Bousquet'
-<EOS>
-b'Thomas N Lal Jason Weston and Bernhard Sch\xc3\xb6lkopf.'
-<EOS>
-b'Learning with local and global consistency.'
-<EOS>
-b'In NeurIPS 321 328 2004.'
-<EOS>
-b'Xiaojin Zhu Zoubin Ghahramani and John D Lafferty.'
-<EOS>
-b'Semi supervised learning using gaussian \xef\xac\x81elds and harmonic functions.'
-<EOS>
-b'In ICML 912 919 2003.'
-<EOS>
-b'Chenyi Zhuang and Qiang Dual graph convolutional networks for graph based semi supervised classi\xef\xac\x81cation.'
-<EOS>
-b'In WWW 499 508 2018.'
-<EOS>
-b'11'
+ 11  
 <EOS>
