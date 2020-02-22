@@ -1,1752 +1,730 @@
-b'Published as a conference paper at ICLR 2020\n\nSTRUCTPOOL: STRUCTURED GRAPH'
+Published as a conference paper at ICLR 2020  STRUCTPOOL: STRUCTURED GRAPH POOLING VIA CONDITIONAL RANDOM FIELDS  Hao Yuan Department of Computer Science & Engineering Texas A&M University College Station, TX 77843, USA hao.yuan@tamu.edu  Shuiwang Ji Department of Computer Science & Engineering Texas A&M University College Station, TX 77843, USA sji@tamu.edu  ABSTRACT  Learning high-level representations for graphs is of great importance for graph analysis tasks.
 <EOS>
-b'POOLING VIA'
+In addition to graph convolution, graph pooling is an important but less explored research area.
 <EOS>
-b'CONDITIONAL'
+In particular, most of existing graph pooling techniques do not consider the graph structural information explicitly.
 <EOS>
-b'RANDOM FIELDS'
+We argue that such information is important and develop a novel graph pooling technique, know as the STRUCTPOOL, in this work.
 <EOS>
-b'Hao Yuan\nDepartment of Computer Science & Engineering'
+We consider the graph pooling as a node clustering problem, which requires the learning of a cluster assignment ma- trix.
 <EOS>
-b'Texas A&M University'
+We propose to formulate it as a structured prediction problem and employ conditional random fields to capture the relationships among the assignments of different nodes.
 <EOS>
-b'College Station, TX 77843, USA\nhao.yuan@tamu.edu'
+We also generalize our method to incorporate graph topologi- cal information in designing the Gibbs energy function.
 <EOS>
-b'Shuiwang Ji'
+Experimental results on multiple datasets demonstrate the effectiveness of our proposed STRUCTPOOL.
 <EOS>
-b'Department of Computer Science & Engineering'
+ 1  INTRODUCTION  Graph neural networks have achieved the state-of-the-art results for multiple graph tasks, such as node classification (Veliˇckovi´c et al, 2018; Gao & Ji, 2019b; Gao et al, 2018) and link predic- tion (Zhang & Chen, 2018; Cai & Ji, 2020).
 <EOS>
-b'Texas A&M University'
+These results demonstrate the effectiveness of graph neural networks to learn node representations.
 <EOS>
-b'College Station, TX 77843'
+However, graph classification tasks also require learn- ing good graph-level representations.
 <EOS>
-b', USA\nsji@tamu.edu\n\nABSTRACT'
+Since pooling operations are shown to be effective in many image and NLP tasks, it is natural to investigate pooling techniques for graph data (Yu & Koltun, 2016; Springenberg et al, 2014).
 <EOS>
-b'Learning high-level representations for graphs is of great importance for graph\nanalysis tasks.'
+Recent work extends the global sum/average pooling operations to graph models by simply summing or averaging all node features (Atwood & Towsley, 2016; Simonovsky & Komodakis, 2017).
 <EOS>
-b'In addition to graph convolution, graph pooling is an important\nbut less explored research area.'
+However, these trivial global pooling operations may lose im- portant features and ignore structural information.
 <EOS>
-b'In particular, most of existing graph pooling\ntechniques do not consider the graph structural information explicitly.'
+Furthermore, global pooling are not hierarchical so that we cannot apply them where multiple pooling operations are required, such as Graph U- Net (Gao & Ji, 2019a).
 <EOS>
-b'We argue\nthat such information is important and develop a novel graph pooling technique,'
+Several advanced graph pooling methods, such as SORTPOOL (Zhang et al, 2018), TOPKPOOL (Gao & Ji, 2019a), DIFFPOOL (Ying et al, 2018), and SAGPOOL (Lee et al, 2019) , are recently proposed and achieve promising performance on graph classification tasks.
 <EOS>
-b'know as the STRUCTPOOL, in this work.'
+However, none of them explicitly models the relationships among different nodes and thus may ig- nore important structural information.
 <EOS>
-b'We consider the graph pooling as a\nnode clustering problem, which requires the learning of a cluster assignment ma-\ntrix.'
+We argue that such information is important and should be explicitly captured in graph pooling.
 <EOS>
-b'We propose to formulate it as a structured prediction problem and employ\nconditional random \xef\xac\x81elds to capture the relationships among the assignments of\ndifferent nodes.'
+ In this work, we propose a novel graph pooling technique, known as the STRUCTPOOL, that formu- lates graph pooling as a structured prediction problem.
 <EOS>
-b'We also generalize our method to incorporate graph topologi-'
+Following DIFFPOOL (Ying et al, 2018), we consider graph pooling as a node clustering problem, and each cluster corresponds to a node in the new graph after pooling.
 <EOS>
-b'cal information in designing the Gibbs energy function.'
+Intuitively, two nodes with similar features should have a higher probability of being assigned to the same cluster.
 <EOS>
-b'Experimental results on\nmultiple datasets demonstrate the effectiveness of our proposed STRUCTPOOL.'
+Hence, the assignment of a given node should depend on both the input node features and the assignments of other nodes.
 <EOS>
-b'1'
+We formulate this as a structured prediction problem and employ conditional random fields (CRFs) (Lafferty et al, 2001) to capture such high-order structural relationships among the assignments of different nodes.
 <EOS>
-b'INTRODUCTION'
+In addition, we generalize our method by incorporating the graph topological information so that our method can control the clique set in our CRFs.
 <EOS>
-b'Graph neural networks have achieved the state-of-the-art results for multiple graph tasks, such as\nnode classi\xef\xac\x81cation (Veli\xcb\x87ckovi\xc2\xb4c et al., 2018; Gao & Ji, 2019b; Gao et al., 2018) and link predic-\ntion (Zhang & Chen, 2018; Cai & Ji, 2020).'
+We employ the mean field approximation to compute the assignments and describe how to incorporate it in graph networks.
 <EOS>
-b'These results demonstrate the effectiveness of graph\nneural networks to learn node representations.'
+Then the networks can be  1  Published as a conference paper at ICLR 2020  trained in an end-to-end fashion.
 <EOS>
-b'However, graph classi\xef\xac\x81cation tasks also require learn-'
+Experiments show that our proposed STRUCTPOOL outperforms existing methods significantly and consistently.
 <EOS>
-b'ing good graph-level representations.'
+We also show that STRUCTPOOL incurs acceptable computational cost given its superior performance.
 <EOS>
-b'Since pooling operations are shown to be effective in many\nimage and NLP tasks, it is natural to investigate pooling techniques for graph data (Yu & Koltun,\n2016; Springenberg et al., 2014).'
+ 2 BACKGROUND AND RELATED WORK  2.1 GRAPH CONVOLUTIONAL NETWORKS  A graph can be represented by its adjacency matrix and node features.
 <EOS>
-b'Recent work extends the global sum/average pooling operations\nto graph models by simply summing or averaging all node features (Atwood & Towsley, 2016;\nSimonovsky & Komodakis, 2017).'
+Formally, for a graph G consisting of n nodes, its topology information can be represented by an adjacency matrix A ∈ {0, 1}n×n, and the node features can be represented as X ∈ Rn×c assuming each node has a c-dimensional feature vector.
 <EOS>
-b'However, these trivial global pooling operations may lose im-'
+Deep graph neural networks (GNNs) learn feature representa- tions for different nodes using these matrices (Gilmer et al, 2017).
 <EOS>
-b'portant features and ignore structural information.'
+Several approaches are pro- posed to investigate deep GNNs, and they generally follow a neighborhood information aggregation scheme (Gilmer et al, 2017; Xu et al, 2019; Hamilton et al, 2017; Kipf & Welling, 2017; Veliˇckovi´c et al, 2018).
 <EOS>
-b'Furthermore, global pooling are not hierarchical\nso that we cannot apply them where multiple pooling operations are required, such as Graph U-'
+In each step, the representation of a node is updated by aggregating the representations of its neighbors.
 <EOS>
-b'Net (Gao & Ji, 2019a).'
+Graph Convolutional Networks (GCNs) are popular variants of GNNs and inspired by the first order graph Laplacian methods (Kipf & Welling, 2017).
 <EOS>
-b'Several advanced graph pooling methods, such as SORTPOOL (Zhang\net al., 2018), TOPKPOOL (Gao & Ji, 2019a), DIFFPOOL'
+The graph convolution operation is formally defined as:  Xi+1 = f (D− 1  2 ˆAD− 1  (1) where ˆA = A + I is used to add self-loops to the adjacency matrix, D denotes the diagonal node degree matrix to normalize ˆA, Xi ∈ Rn×ci are the node features after ith graph convolution layer, Pi ∈ Rci×ci+1 is a trainable matrix to perform feature transformation, and f (·) denotes a non-linear activation function.
 <EOS>
-b'(Ying et al., 2018), and SAGPOOL'
+Then Xi ∈ Rn×ci is transformed to Xi+1 ∈ Rn×ci+1 where the number of nodes remains the same.
 <EOS>
-b'(Lee'
+A similar form of GCNs proposed in (Zhang et al, 2018) can be expressed as:  2 XiPi),  (2) It differs from the GCNs in Equation (1) by performing different normalization and is a theoretically closer approximation to the Weisfeiler-Lehman algorithm (Weisfeiler & Lehman, 1968).
 <EOS>
-b'et al., 2019) , are recently proposed and achieve promising performance on graph classi\xef\xac\x81cation tasks.'
+Hence, in our models, we use the latter version of GCNs in Equation (2).
 <EOS>
-b'However, none of them explicitly models the relationships among different nodes and thus may ig-\nnore important structural information.'
+ Xi+1 = f (D−1 ˆAXiPi).
 <EOS>
-b'We argue that such information is important and should be\nexplicitly captured in graph pooling.'
+ 2.2 GRAPH POOLING  Several advanced pooling techniques are proposed recently for graph models, such as SORTPOOL, TOPKPOOL, DIFFPOOL, and SAGPOOL, and achieve great performance on multiple benchmark datasets.
 <EOS>
-b'In this work, we propose a novel graph pooling technique, known as the STRUCTPOOL, that formu-\nlates graph pooling as a structured prediction problem.'
+All of SORTPOOL (Zhang et al, 2018), TOPKPOOL (Gao & Ji, 2019a), and SAG- POOL (Lee et al, 2019) learn to select important nodes from the original graph and use these nodes to build a new graph.
 <EOS>
-b'Following DIFFPOOL'
+They share the similar idea to learn a sorting vector based on node representa- tions using GCNs, which indicates the importance of different nodes.
 <EOS>
-b'(Ying et al., 2018)'
+Then only the top k important nodes are selected to form a new graph while the other nodes are ignored.
 <EOS>
-b',\nwe consider graph pooling as a node clustering problem, and each cluster corresponds to a node\nin the new graph after pooling.'
+However, the ignored nodes may contain important features and this information is lost during pooling.
 <EOS>
-b'Intuitively, two nodes with similar features should have a higher\nprobability of being assigned to the same cluster.'
+DIFFPOOL (Ying et al, 2018) treats the graph pooling as a node clustering problem.
 <EOS>
-b'Hence, the assignment of a given node should\ndepend on both the input node features and the assignments of other nodes.'
+A cluster of nodes from the orig- inal graph are merged to form a new node in the new graph.
 <EOS>
-b'We formulate this as a\nstructured prediction problem and employ conditional random \xef\xac\x81elds (CRFs)'
+DIFFPOOL proposes to perform GCNs on node features to obtain node clustering assignment matrix.
 <EOS>
-b'(Lafferty et al., 2001)'
+Intuitively, the cluster assignment of a given node should depend on the cluster assignments of other nodes.
 <EOS>
-b'to capture such high-order structural relationships among the assignments of different nodes.'
+However, DIFFPOOL does not explicitly consider such high-order structural relationships, which we believe are important for graph pooling.
 <EOS>
-b'In\naddition, we generalize our method by incorporating the graph topological information so that our\nmethod can control the clique set in our CRFs.'
+In this work, we propose a novel structured graph pooling technique, known as the STRUCTPOOL, for effectively learning high-level graph representations.
 <EOS>
-b'We employ the mean \xef\xac\x81eld approximation to compute\nthe assignments and describe how to incorporate it in graph networks.'
+Different from exist- ing methods, our method explicitly captures high-order structural relationships between different nodes via conditional random fields.
 <EOS>
-b'Then the networks can be\n\n1'
+In addition, our method is generalized by incorporating graph topological information A to control which node pairs are included in our CRFs.
 <EOS>
-b'Published as a conference paper at ICLR 2020'
+ 2.3  INTEGRATING CRFS WITH GNNS  Recent work (Gao et al, 2019; Qu et al, 2019; Ma et al, 2019) investigates how to combine CRFs with GNNs.
 <EOS>
-b'trained in an end-to-end fashion.'
+The CGNF (Ma et al, 2019) is a GNN architecture for graph node classification which explicitly models a joint probability of the entire set of node labels via CRFs and performs inference  2  Published as a conference paper at ICLR 2020  via dynamic programming.
 <EOS>
-b'Experiments show that our proposed STRUCTPOOL outperforms\nexisting methods signi\xef\xac\x81cantly and consistently.'
+In addition, the GMNN (Qu et al, 2019) focuses on semi-supervised object classification tasks and models the joint distribution of object labels conditioned on object attributes using CRFs.
 <EOS>
-b'We also show that STRUCTPOOL incurs acceptable\ncomputational cost given its superior performance.'
+It proposes a pseudolikelihood variational EM framework for model learning and inference.
 <EOS>
-b'2 BACKGROUND AND RELATED WORK'
+Recent work (Gao et al, 2019) integrates CRFs with GNNs by proposing a CRF layer to encourage similar nodes to have similar hidden features so that similarity information can be preserved explicitly.
 <EOS>
-b'2.1 GRAPH CONVOLUTIONAL NETWORKS'
+All these methods are proposed for node classification tasks and the CRFs are incorporated in different ways.
 <EOS>
-b'A graph can be represented by its adjacency matrix and node features.'
+Different from existing work, our STRUCTPOOL is proposed for graph pooling operation and the energy is optimized via mean field approximation.
 <EOS>
-b'Formally, for a graph\nG consisting of n nodes, its topology information can be represented by an adjacency matrix'
+All operations in our STRUCTPOOL can be realized by GNN operations so that our STRUCTPOOL can be easily used in any GNNs and trained in an end-to-end fashion.
 <EOS>
-b'A \xe2\x88\x88 {0, 1}n\xc3\x97n, and the node features can be represented as X \xe2\x88\x88 Rn\xc3\x97c assuming each node'
+ 3 STRUCTURED GRAPH POOLING  3.1 GRAPH POOLING VIA NODE CLUSTERING  Even though pooling techniques are shown to facilitate the training of deep models and improve their performance significantly in many image and NLP tasks (Yu & Koltun, 2016; Springenberg et al, 2014), local pooling operations cannot be directly applied to graph tasks.
 <EOS>
-b'has a c-dimensional feature vector.'
+The reason is there is no spatial locality information among graph nodes.
 <EOS>
-b'Deep graph neural networks (GNNs) learn feature representa-'
+Global max/average pooling operations can be employed for graph tasks but they may lead to information loss, due to largely reducing the size of representations trivially.
 <EOS>
-b'tions for different nodes using these matrices (Gilmer et al., 2017).'
+A graph G with n nodes can be represented by a feature matrix X ∈ Rn×c and an adjacent matrix A ∈ {0, 1}n×n.
 <EOS>
-b'Several approaches are pro-\nposed to investigate deep GNNs, and they generally follow a neighborhood information aggregation\nscheme (Gilmer et al., 2017; Xu et al., 2019; Hamilton et al., 2017; Kipf & Welling, 2017; Veli\xcb\x87ckovi\xc2\xb4c\net al., 2018).'
+Graph pooling operations aim at reducing the number of graph nodes and learning new representations.
 <EOS>
-b'In each step, the representation of a node is updated by aggregating the representations\nof its neighbors.'
+Suppose that graph pooling generates a new graph ˜G with k nodes.
 <EOS>
-b'Graph Convolutional Networks (GCNs) are popular variants of GNNs and inspired\nby the \xef\xac\x81rst order graph Laplacian methods (Kipf & Welling, 2017).'
+The representation matrices of ˜G are denoted as ˜X ∈ Rk×˜c and ˜A ∈ {0, 1}k×k.
 <EOS>
-b'The graph convolution operation\nis formally de\xef\xac\x81ned as:\n\nXi+1 = f (D\xe2\x88\x92 1\n\n2 \xcb\x86AD\xe2\x88\x92 1'
+The goal of graph pooling is to learn relationships between X, A and ˜X, ˜A.
 <EOS>
-b'(1)\nwhere \xcb\x86A ='
+In this work, we consider graph pooling via node clustering.
 <EOS>
-b'A'
+In particular, the nodes of the original graph G are assigned to k different clusters.
 <EOS>
-b'+ I is used to add self-loops to the adjacency matrix, D denotes the diagonal node\ndegree matrix to normalize \xcb\x86A,'
+Then each cluster is transformed to a new node in the new graph ˜G.
 <EOS>
-b'Xi \xe2\x88\x88 Rn\xc3\x97ci are the node features after ith graph convolution layer,'
+The clustering assignments can be represented as an assignment matrix M ∈ Rn×k.
 <EOS>
-b'Pi \xe2\x88\x88 Rci\xc3\x97ci+1 is a trainable matrix to perform feature transformation, and f (\xc2\xb7) denotes a non-linear\nactivation function.'
+For hard assignments, mi,j ∈ {0, 1} denotes if node i in graph G belongs to cluster j. For soft assignments, mi,j ∈ [0, 1] denotes the probability that node i in graph G belongs to cluster j and (cid:80) j mi,j = 1.
 <EOS>
-b'Then Xi \xe2\x88\x88 Rn\xc3\x97ci is transformed to Xi+1 \xe2\x88\x88'
+Then the new graph ˜G can be computed as  ˜X = M T X, ˜A = g(M T AM ),  (3)  where g(·) is a function that g(˜ai,j) = 1 if ˜ai,j > 0 and g(˜ai,j) = 0 otherwise.
 <EOS>
-b'Rn\xc3\x97ci+1 where the number of\nnodes remains the same.'
+ 3.2 LEARNING CLUSTERING ASSIGNMENTS VIA CONDITIONAL RANDOM FIELDS  Intuitively, node features describe the properties of different nodes.
 <EOS>
-b'A similar form of GCNs proposed in (Zhang et al., 2018) can be expressed\nas:\n\n2 XiPi),'
+Then nodes with similar features should have a higher chance to be assigned to the same cluster.
 <EOS>
-b'(2)'
+That is, for any node in the original graph G, its cluster assignment should not only depend on node feature matrix X but also condition on the cluster assignments of the other nodes.
 <EOS>
-b'It differs from the GCNs in Equation (1) by performing different normalization and is a theoretically\ncloser approximation to the Weisfeiler-Lehman algorithm (Weisfeiler & Lehman, 1968).'
+We believe such high-order structural information is useful for graph pooling and should be explicitly captured while learning clustering assignments.
 <EOS>
-b'Hence, in\nour models, we use the latter version of GCNs in Equation (2).'
+To this end, we propose a novel structured graph pooling technique, known as STRUCTPOOL, which generates the assignment matrix by considering the feature matrix X and the relationships between the assignments of different nodes.
 <EOS>
-b'Xi+1'
+We propose to formulate this as a conditional random field (CRF) problem.
 <EOS>
-b'= f (D\xe2\x88\x921 \xcb\x86AXiPi).'
+The CRFs model a set of random variables with a Markov Random Field (MRF), conditioned on a global observation (Lafferty et al, 2001).
 <EOS>
-b'2.2 GRAPH POOLING'
+We formally define Y = {Y1, · · · , Yn} as a random field where Yi ∈ {1, · · · , k} is a random variable.
 <EOS>
-b'Several advanced pooling techniques are proposed recently for graph models, such as SORTPOOL,\nTOPKPOOL, DIFFPOOL, and SAGPOOL, and achieve great performance on multiple benchmark\ndatasets.'
+Each Yi indicates to which cluster the node i is assigned.
 <EOS>
-b'All of SORTPOOL (Zhang et al., 2018), TOPKPOOL (Gao & Ji, 2019a), and SAG-\nPOOL (Lee et al., 2019) learn to select important nodes from the original graph and use these nodes\nto build a new graph.'
+Here the feature representation X is treated as global observation.
 <EOS>
-b'They share the similar idea to learn a sorting vector based on node representa-\ntions using GCNs, which indicates the importance of different nodes.'
+We build a graphical model on Y , which is defined as G(cid:48).
 <EOS>
-b'Then only the top k important\nnodes are selected to form a new graph while the other nodes are ignored.'
+Then the pair (Y, X) can be defined as a CRF, characterized by the Gibbs distribution as  P (Y |X) =  exp  −  ψc(Yc|X)   ,  (4)  1  Z(X)  (cid:88)  c∈CG(cid:48)    where c denotes a clique, CG(cid:48) is a set of cliques in G(cid:48), Z(X) is the partition function, and ψc(·) is a potential function induced by c (Kr¨ahenb¨uhl & Koltun, 2011; Lafferty et al, 2001).
 <EOS>
-b'However, the ignored\nnodes may contain important features and this information is lost during pooling.'
+Then the Gibbs    3  Published as a conference paper at ICLR 2020  Figure 1: Illustrations of our proposed STRUCTPOOL.
 <EOS>
-b'DIFFPOOL (Ying\net al., 2018) treats the graph pooling as a node clustering problem.'
+Given a graph with 6 nodes, the color of each node represents its features.
 <EOS>
-b'A cluster of nodes from the orig-\ninal graph are merged to form a new node in the new graph.'
+We perform graph pooling to obtain a new graph with k = 4 nodes.
 <EOS>
-b'DIFFPOOL proposes to perform GCNs\non node features to obtain node clustering assignment matrix.'
+The unary energy matrix can be obtained by multiple GCN layers using X and A. The pairwise energy is measured by attention matrix using node feature X and topology information A. Then by performing iterative updating, the mean field approximation yields the most probable assignment matrix.
 <EOS>
-b'Intuitively, the cluster assignment\nof a given node should depend on the cluster assignments of other nodes.'
+Finally, we obtain the new graph with 4 nodes, represented by ˜X and ˜A.
 <EOS>
-b'However, DIFFPOOL\ndoes not explicitly consider such high-order structural relationships, which we believe are important\nfor graph pooling.'
+ (5)  (6)  energy function for an assignment y = {y1, · · · , yn} for all variables can be written as  E(y|X) =  ψc(yc|X).
 <EOS>
-b'In this work, we propose a novel structured graph pooling technique, known as\nthe STRUCTPOOL, for effectively learning high-level graph representations.'
+ (cid:88)  c∈CG(cid:48)  Finding the optimal assignment is equivalent to maximizing P (Y |X), which can also be interpreted as minimizing the Gibbs energy.
 <EOS>
-b'Different from exist-'
+ 3.3 GIBBS ENERGY WITH TOPOLOGY INFORMATION  Now we define the clique set CG(cid:48) in G(cid:48).
 <EOS>
-b'ing methods'
+Similar to the existing CRF model (Kr¨ahenb¨uhl & Koltun, 2011), we include all unary cliques in CG(cid:48) since we need to measure the energy for assigning each node.
 <EOS>
-b', our method explicitly captures high-order structural relationships between different\nnodes via conditional random \xef\xac\x81elds.'
+For pairwise cliques, we generalize our method to control the pairwise clique set by incorporating the graph topological information A. We consider (cid:96)-hop connectivity based on A to define the pairwise cliques, which builds pairwise relationships between different nodes.
 <EOS>
-b'In addition, our method is generalized by incorporating graph\ntopological information A to control which node pairs are included in our CRFs.'
+Let A(cid:96) ∈ {0, 1}n×n represent the (cid:96)-hop connectivity of graph G where a(cid:96) i,j = 1 indicates node i and node j are reachable in G within (cid:96) hops.
 <EOS>
-b'2.3'
+Then we include all pairwise cliques (i, j) in CG(cid:48) if a(cid:96) i,j = 1.
 <EOS>
-b'INTEGRATING CRFS WITH GNNS'
+Altogether, the Gibbs energy for a cluster assignment y can be written as  E(y) =  ψu(yi) +  ψp(yi, yj)a(cid:96)  i,j,  (cid:88)  i  (cid:88)  i(cid:54)=j  where ψu(yi) represents the unary energy for node i to be assigned to cluster yi.
 <EOS>
-b'Recent work (Gao et al., 2019; Qu et al., 2019;'
+In addition, ψp(yi, yj) is the pairwise energy, which indicates the energy of assigning node i, j to cluster yi, yj respectively.
 <EOS>
-b'Ma et al., 2019) investigates how to combine CRFs\nwith GNNs.'
+Note that we drop the condition information in Equation (6) for simplicity.
 <EOS>
-b'The CGNF (Ma et al., 2019) is a GNN architecture for graph node classi\xef\xac\x81cation which\nexplicitly models a joint probability of the entire set of node labels via CRFs and performs inference'
+If (cid:96) is large enough, our CRF is equivalent to the dense CRFs.
 <EOS>
-b'2'
+If (cid:96) is equal to 1, we have A(cid:96) = A so that only 1-hop information in the adjacent matrix is considered.
 <EOS>
-b'Published as a conference paper at ICLR 2020\n\nvia dynamic programming.'
+These two types of energy can be obtained directly by neural networks (Zheng et al, 2015).
 <EOS>
-b'In addition, the GMNN (Qu et al., 2019) focuses on semi-supervised\nobject classi\xef\xac\x81cation tasks and models the joint distribution of object labels conditioned on object'
+Given the global observations X and the topology information A, we employ multiple graph convolution layers to obtain the unary energy Ψu ∈ Rn×k.
 <EOS>
-b'attributes using CRFs.'
+Existing work on image tasks (Kr¨ahenb¨uhl & Koltun, 2011) proposes to employ Gaus- sian kernels to measure the pairwise energy.
 <EOS>
-b'It proposes a pseudolikelihood variational EM framework for model learning\nand inference.'
+However, due to computational inefficiency, we cannot directly apply it to our CRF model.
 <EOS>
-b'Recent work (Gao et al., 2019) integrates CRFs with GNNs by proposing a CRF\nlayer to encourage similar nodes to have similar hidden features so that similarity information can\nbe preserved explicitly.'
+The pairwise energy proposed in (Kr¨ahenb¨uhl & Koltun, 2011) can be written as  ψp(yi, yj) = µ(yi, yj)  w(m)k(m)(xi, xj),  (7)  where k(m)(·, ·) represents the mth Gaussian kernel, xi is the feature vector for node i in X, w(m) denotes learnable weights, and µ(yi, yj) is a compatibility function that models the compatibility  K (cid:88)  m=1  4  1234561234Original GraphNew Graph  GCNsAttention Iteratively UpdateUnary EnergyAssignment MatrixSoftmaxPairwise Energy    Published as a conference paper at ICLR 2020  Algorithm 1 STRUCTPOOL 1: Given a graph G with n nodes represented by X ∈ Rn×c and A ∈ {0, 1}n×n, the goal is to obtain ˜G with k nodes that ˜X ∈ Rk×˜c and ˜A ∈ {0, 1}k×k.
 <EOS>
-b'All these methods are proposed for node classi\xef\xac\x81cation tasks and the CRFs\nare incorporated in different ways.'
+The (cid:96)-hop connectivity matrix A(cid:96) can be easily obtained from A.  2: Perform GCNs to obtain unary energy matrix Ψu ∈ Rn×k.
 <EOS>
-b'Different from existing work, our STRUCTPOOL is proposed for\ngraph pooling operation and the energy is optimized via mean \xef\xac\x81eld approximation.'
+3: Initialize that Q(i, j) = 1 Zi 4: while not converged do  exp (Ψu(i, j)) for all 0 ≤ i ≤ n and 0 ≤ j ≤ k.  xT  i xj m(cid:54)=i xT  (cid:80)  6:  5:  i xm  m(cid:54)=i wi,mQ(m, j).
 <EOS>
-b'All operations\nin our STRUCTPOOL can be realized by GNN operations so that our STRUCTPOOL can be easily\nused in any GNNs and trained in an end-to-end fashion.'
+ Calculate attention map W that wi,j = Message passing that ˜Q(i, j) = (cid:80) Compatibility transform that ˆQ(i, j) = (cid:80) Local update that ¯Q(i, j) = Ψu(i, j) − ˆQ(i, j).
 <EOS>
-b'3'
+Perform normalization that Q(i, j) = 1 Zi  7: 8: 9: 10: end while 11: For soft assignments, the assignment matrix is M = softmax(Q).
 <EOS>
-b'STRUCTURED GRAPH POOLING'
+12: For hard assignments, the assignment matrix is M = argmax(Q) for each row.
 <EOS>
-b'3.1 GRAPH POOLING VIA NODE CLUSTERING'
+13: Obtain new graph ˜Q that ˜X = M T X, ˜A = g(M T AM ).
 <EOS>
-b'Even though pooling techniques are shown to facilitate the training of deep models and improve\ntheir performance signi\xef\xac\x81cantly in many image and NLP tasks (Yu & Koltun, 2016; Springenberg\net al., 2014), local pooling operations cannot be directly applied to graph tasks.'
+ exp (cid:0) ¯Q(i, j)(cid:1) for all i and j.  m µ(m, j) ˜Q(i, m).
 <EOS>
-b'The reason is there\nis no spatial locality information among graph nodes.'
+ a(cid:96) i,j for all i (cid:54)= j and 0 ≤ i, j ≤ n.  between different assignment pairs.
 <EOS>
-b'Global max/average pooling operations can be\nemployed for graph tasks but they may lead to information loss, due to largely reducing the size of\nrepresentations trivially.'
+However, it is computationally inefficient to accurately com- pute the outputs of Gaussian kernels, especially for graph data when the feature vectors are high- dimensional.
 <EOS>
-b'A graph G with n nodes can be represented by a feature matrix X \xe2\x88\x88 Rn\xc3\x97c\nand an adjacent matrix A \xe2\x88\x88 {0, 1}n\xc3\x97n.'
+Hence, in this work, we propose to employ the attention matrix as the measurement of pairwise energy.
 <EOS>
-b'Graph pooling operations aim at reducing the number of\ngraph nodes and learning new representations.'
+Intuitively, Gaussian kernels indicate how strongly different feature vectors are connected with each other.
 <EOS>
-b'Suppose that graph pooling generates a new graph\n\xcb\x9cG with k nodes.'
+Similarly, the attention matrix reﬂects similarities between different fea- ture vectors but with a significantly less computational cost.
 <EOS>
-b'The representation matrices of \xcb\x9cG are denoted as \xcb\x9cX \xe2\x88\x88'
+Specifically, each feature vector xi is attended to any other feature vector xj if the pair (i, j) is existing in clique set CG(cid:48).
 <EOS>
-b'Rk\xc3\x97\xcb\x9cc and \xcb\x9cA \xe2\x88\x88 {0, 1}k\xc3\x97k.'
+Hence, the pairwise energy can be obtained by  ψp(yi, yj) = µ(yi, yj)  xT i xj k(cid:54)=i xT  i xk  ,  (cid:80)  (8)  It can be efficiently computed by matrix multiplication and normalization.
 <EOS>
-b'The goal of graph pooling is to learn relationships between X, A and \xcb\x9cX, \xcb\x9cA.'
+Minimizing the Gibbs en- ergy in Equation (6) results in the most probable cluster assignments for a given graph G. However, such minimization is intractable, and hence a mean field approximation is proposed (Kr¨ahenb¨uhl & Koltun, 2011), which is an iterative updating algorithm.
 <EOS>
-b'In this work, we\nconsider graph pooling via node clustering.'
+We follow the mean-field approximation to obtain the most probable cluster assignments.
 <EOS>
-b'In particular, the nodes of the original graph G are\nassigned to k different clusters.'
+Altogether, the steps of our proposed STRUCT- POOL are shown in Algorithm 1.
 <EOS>
-b'Then each cluster is transformed to a new node in the new graph'
+All operations in our proposed STRUCTPOOL can be implemented as GNN operations, and hence the STRUCTPOOL can be employed in any deep graph model and trained in an end-to-end fashion.
 <EOS>
-b'\xcb\x9cG.'
+The unary energy matrix can be obtained by stacking several GCN layers, and the normalization operations (step 3&9 in Algorithm 1) are equivalent to softmax operations.
 <EOS>
-b'The clustering assignments can be represented as an assignment matrix M \xe2\x88\x88 Rn\xc3\x97k.'
+All other steps can be computed by matrix computations.
 <EOS>
-b'For hard\nassignments, mi,j \xe2\x88\x88 {0, 1} denotes if node i in graph G belongs to cluster j. For soft assignments,\nmi,j \xe2\x88\x88'
+It is noteworthy that the com- patibility function µ(yi, yj) can be implemented as a trainable matrix N ∈ Rk×k, and automatically learned during training.
 <EOS>
-b'[0, 1] denotes the probability that node i in graph G belongs to cluster j and (cid:80)'
+Hence, no prior domain knowledge is required for designing the compatibil- ity function.
 <EOS>
-b'j mi,j ='
+We illustrate our proposed STRUCTPOOL in Figure 1 where we perform STRUCTPOOL on a graph G with 6 nodes, and obtain a new graph ˜G with 4 nodes.
 <EOS>
-b'1.'
+ 3.4 COMPUTATIONAL COMPLEXITY ANALYSIS  We theoretically analyze the computational efficiency of our proposed STRUCTPOOL.
 <EOS>
-b'Then the new graph \xcb\x9cG can be computed as\n\n\xcb\x9cX ='
+Since computational efficiency is especially important for large-scale graph datasets, we assume that n > k, c, ˜c.
 <EOS>
-b'M T X, \xcb\x9cA = g(M T AM ),\n\n(3)\n\nwhere g(\xc2\xb7) is a function that g(\xcb\x9cai,j) = 1'
+The computational complexity of one GCN layer is O(n3 + n2c + nc˜c) ≈ O(n3).
 <EOS>
-b'if \xcb\x9cai,'
+Assuming we employ i layers of GCNs to obtain the unary energy, its computational cost is O(in3).
 <EOS>
-b'j > 0 and g(\xcb\x9cai,j) ='
+Assuming there are m iterations in our updating algorithm, the computational com- plexity is O(m(n2c + n2k + nk2)) ≈ O(mn3).
 <EOS>
-b'0'
+The final step for computing ˜A and ˜X takes O(nkc + n2k + nk2) ≈ O(n3) computational complexity.
 <EOS>
-b'otherwise.'
+Altogether, the complexity STRUCT- POOL is O((m + i)n3), which is close to the complexity of stacking m + i layers of GCNs.
 <EOS>
-b'3.2 LEARNING CLUSTERING'
+ 5  Published as a conference paper at ICLR 2020  Table 1: Classification results for six benchmark datasets.
 <EOS>
-b'ASSIGNMENTS VIA'
+Note that none of these deep methods can outperform the traditional method WL on COLLAB.
 <EOS>
-b'CONDITIONAL RANDOM FIELDS'
+We believe the reason is the graphs in COLLAB only have single-layer structures while deep models are too complex to capture them.
 <EOS>
-b'Intuitively, node features describe the properties of different nodes.'
+ Method  Dataset  ENZYMES D&D COLLAB  PROTEINS  IMDB-B IMDB-M  GRAPHLET SHORTEST-PATH WL  PATCHYSAN DCNN DGK ECC GRAPHSAGE SET2SET DGCNN DIFFPOOL  STRUCTPOOL  41.03 42.32 53.43  - - -  53.50 54.25 60.15 57.12 62.53  63.83  74.85 78.86 78.34  76.27 58.09  -  72.54 75.42 78.12 79.37 80.64  84.19  64.66 59.10 78.61  72.60 52.11 73.09 67.79 68.25 71.75 73.76 75.48  74.22  72.91 76.43 74.68  75.00 61.29 71.68 72.65 70.48 74.29 75.54 76.25  80.36  - - -  - - -  -  71.00 49.06 66.96  45.23 33.49 44.55  70.03  47.83  74.70  52.47  - - -  - - -  -  3.5 DEEP GRAPH NETWORKS FOR GRAPH CLASSIFICATION  In this section, we investigate graph classification tasks which require both good node-level and graph-level representations.
 <EOS>
-b'Then nodes with similar features\nshould have a higher chance to be assigned to the same cluster.'
+For most state-of-the-art deep graph classification models, they share a similar pipeline that first produces node representations using GNNs, then performs pooling op- erations to obtain high-level representations, and finally employs fully-connected layers to perform classification.
 <EOS>
-b'That is, for any node in the original\ngraph G, its cluster assignment should not only depend on node feature matrix X but also condition\non the cluster assignments of the other nodes.'
+Note that the high-level representations can be either a vector or a group of k vectors.
 <EOS>
-b'We believe such high-order structural information is\nuseful for graph pooling and should be explicitly captured while learning clustering assignments.'
+For a set of graphs with different node numbers, with a pre-defined k, our proposed STRUCTPOOL can produce k vectors for each graphs.
 <EOS>
-b'To'
+Hence, our method can be easily generalized and coupled to any deep graph classification model.
 <EOS>
-b'this end, we propose a novel structured graph pooling technique, known as STRUCTPOOL, which\ngenerates the assignment matrix by considering the feature matrix X and the relationships between\nthe assignments of different nodes.'
+Specially, our model for graph classification is developed based on DGCNN (Zhang et al, 2018).
 <EOS>
-b'We propose to formulate this as a conditional random \xef\xac\x81eld'
+Given any input graph, our model first employs several layers of GCNs (Equation (2)) to aggregate features from neighbors and learn representations for nodes.
 <EOS>
-b'(CRF) problem.'
+Next, we perform one STRUCTPOOL layer to obtain k vectors for each graph.
 <EOS>
-b'The CRFs model a set of random variables with a Markov Random Field (MRF),\nconditioned on a global observation (Lafferty et al., 2001).'
+Finally, 1D convolutional layers and fully-connected layers are used to classify the graph.
 <EOS>
-b'We formally de\xef\xac\x81ne Y = {Y1, \xc2\xb7 \xc2\xb7 \xc2\xb7 , Yn}\nas a random \xef\xac\x81eld where Yi \xe2\x88\x88 {1, \xc2\xb7 \xc2\xb7 \xc2\xb7 , k} is a random variable.'
+ 4 EXPERIMENTAL STUDIES  4.1 DATASETS AND EXPERIMENTAL SETTINGS  We evaluate our proposed STRUCTPOOL on eight benchmark datasets, including five bioinformatics protein datasets: ENZYMES, PTC, MUTAG, PROTEINS (Borgwardt et al, 2005), D&D (Dobson & Doig, 2003), and three social network datasets: COLLAB (Yanardag & Vishwanathan, 2015b), IMDB-B, IMDB-M (Yanardag & Vishwanathan, 2015a).
 <EOS>
-b'Each Yi indicates to which cluster'
+Most of them are relatively large-scale and hence suitable for evaluating deep graph models.
 <EOS>
-b'the node i is assigned.'
+We report the statistics and properties of them in Supplementary Table 6.
 <EOS>
-b'Here the feature representation X is treated as global observation.'
+Please see the Supplementary Section A for experimental settings.
 <EOS>
-b'We build\na graphical model on Y , which is de\xef\xac\x81ned as G(cid:48).'
+ We compare our method with several state-of-the-art deep GNN methods.
 <EOS>
-b'Then the pair (Y, X) can be de\xef\xac\x81ned as a CRF,\ncharacterized by the Gibbs distribution as\n\nP (Y |X) ='
+PATCHYSAN (Niepert et al, 2016) learns node representations and a canonical node ordering to perform classification.
 <EOS>
-b'exp'
+DCNN (Atwood & Towsley, 2016) learns multi-scale substructure features by diffusion graph con- volutions and performs global sum pooling.
 <EOS>
-b'\xef\xa3\xad\xe2\x88\x92'
+DGK (Yanardag & Vishwanathan, 2015a) models latent representations for sub-structures in graphs, which is similar to learn word embeddings.
 <EOS>
-b'\xcf\x88c(Yc|X)'
+ECC (Si- monovsky & Komodakis, 2017) performs GCNs conditioning on both node features and edge in- formation and uses global sum pooling before the final classifier.
 <EOS>
-b'\xef\xa3\xb8 ,\n\n(4)\n\n1'
+GRAPHSAGE (Hamilton et al, 2017) is an inductive framework which generates node embeddings by sampling and aggregating features from local neighbors, and it employs global mean pooling.
 <EOS>
-b'Z(X)'
+SET2SET (Vinyals et al, 2015) proposes an aggregation method to replace the global pooling operations in deep graph networks.
 <EOS>
-b'(cid:88)\n\nc\xe2\x88\x88CG(cid:48)'
+DGCNN (Zhang et al, 2018) proposes a pooling strategy named SORTPOOL which sorts all nodes  6  Published as a conference paper at ICLR 2020  Table 2: Comparisons between different pooling techniques under the same framework.
 <EOS>
-b'\xef\xa3\xb6'
+ Method  Dataset  ENZYMES D&D COLLAB  PROTEINS  IMDB-B IMDB-M  SUM POOL SORTPOOL TOPK POOL DIFFPOOL SAGPOOL  STRUCTPOOL  47.33 52.83 53.67 60.33 64.17  63.83  78.72 80.60 81.71 80.94 81.03  84.19  69.45 73.92 73.34 71.78 73.28  74.22  76.26 76.83 77.47 77.74 78.82  80.36  51.69 70.00 72.80 72.40 73.40  74.70  42.76 46.26 49.00 50.13 51.13  52.47  by learning and selects the first k nodes to form a new graph.
 <EOS>
-b'where c denotes a clique, CG(cid:48) is a set of cliques in G(cid:48), Z(X)'
+DIFFPOOL (Ying et al, 2018) is built based on GRAPHSAGE architecture but with their proposed differentiable pooling.
 <EOS>
-b'is the partition function, and \xcf\x88c(\xc2\xb7) is a\npotential function induced by c (Kr\xc2\xa8ahenb\xc2\xa8uhl & Koltun, 2011; Lafferty et al., 2001).'
+Note that for most of these methods, pooling operations are employed to obtain graph-level representations before the final classifier.
 <EOS>
-b'Then the Gibbs\n\n\xef\xa3\xab'
+In addition, we compare our STRUCTPOOL with three graph kernels: Graphlet (Shervashidze et al, 2009), Shortest-path (Borgwardt & Kriegel, 2005), and Weisfeiler- Lehman subtree kernel (WL) (Weisfeiler & Lehman, 1968).
 <EOS>
-b'3'
+ 4.2 CLASSIFICATION RESULTS  We evaluate our proposed method on six benchmark datasets and compare with several state-of-the- art approaches.
 <EOS>
-b'Published as a conference paper at ICLR 2020'
+The results are reported in Table 1 where the best results are shown in bold and the second best results are shown with underlines.
 <EOS>
-b'Figure 1:'
+For our STRUCTPOOL, we perform 10-fold cross validations and report the average accuracy for each dataset.
 <EOS>
-b'Illustrations of our proposed STRUCTPOOL.'
+The 10-fold splitting is the same as DGCNN.
 <EOS>
-b'Given a graph with 6 nodes, the color of each\nnode represents its features.'
+For all comparing methods, the results are taken from existing work (Ying et al, 2018; Zhang et al, 2018).
 <EOS>
-b'We perform graph pooling to obtain a new graph with k = 4 nodes.'
+We can observe that our STRUCTPOOL obtains the best performance on 5 out of 6 benchmark datasets.
 <EOS>
-b'The unary energy matrix can be obtained by multiple GCN layers using X and A.'
+For these 5 datasets, the classification results of our method are significantly better than all comparing methods, including advanced models DGCNN and DIFFPOOL.
 <EOS>
-b'The pairwise'
+Notably, our model outperforms the second-best performance by an average of 3.58% on these 5 datasets.
 <EOS>
-b'energy is measured by attention matrix using node feature X and topology information A. Then by\nperforming iterative updating,'
+In addition, the graph kernel method WL obtains the best performance on COLLAB dataset and none of these deep models can achieve similar performance.
 <EOS>
-b'the mean \xef\xac\x81eld approximation yields the most probable assignment\nmatrix.'
+Our model can obtain competitive performance compared with the second best model.
 <EOS>
-b'Finally, we obtain the new graph with 4 nodes, represented by \xcb\x9cX and \xcb\x9cA.'
+This is because many graphs in COLLAB only have simple structures and deep models may be too complex to capture them.
 <EOS>
-b'(5)\n\n(6)\n\nenergy function for an assignment y = {y1, \xc2\xb7 \xc2\xb7 \xc2\xb7 , yn} for all variables can be written as\n\nE(y|X) =\n\n\xcf\x88c(yc|X).'
+ 4.3 COMPARISONS OF DIFFERENT POOLING METHODS  To demonstrate the effectiveness of our proposed pooling technique, we compare different pooling techniques under the same network framework.
 <EOS>
-b'(cid:88)\n\nc\xe2\x88\x88CG(cid:48)'
+Specifically, we compare our STRUCTPOOL with the global sum pool, SORTPOOL, TOPKPOOL, DIFFPOOL, and SAGPOOL.
 <EOS>
-b'Finding the optimal assignment is equivalent to maximizing P (Y |X), which can also be interpreted\nas minimizing the Gibbs energy.'
+All pooling methods are employed in the network framework introduced in Section 3.5. In addition, the same 10-fold cross validations from DGCNN are used for all pooling methods.
 <EOS>
-b'3.3 GIBBS ENERGY WITH TOPOLOGY INFORMATION'
+We report the results in Table 2 and the best results are shown in bold.
 <EOS>
-b'Now we de\xef\xac\x81ne the clique set CG(cid:48) in G(cid:48).'
+Obviously, our method achieves the best performance on five of six datasets, and significantly outperforms all comparing pooling techniques.
 <EOS>
-b'Similar to the existing CRF model (Kr\xc2\xa8ahenb\xc2\xa8uhl & Koltun,\n2011), we include all unary cliques in CG(cid:48) since we need to measure the energy for assigning\neach node.'
+For the dataset EN- ZYMES, our obtained result is competitive since SAGPOOL only slightly outperforms our proposed method by 0.34%.
 <EOS>
-b'For pairwise cliques, we generalize our method to control the pairwise clique set by\nincorporating the graph topological information A. We consider (cid:96)-hop connectivity based on A\nto de\xef\xac\x81ne the pairwise cliques, which builds pairwise relationships between different nodes.'
+Such observations demonstrate the structural information in graphs is useful for graph pooling and the relationships between different nodes should be explicitly modeled.
 <EOS>
-b'Let'
+ 4.4 STUDY OF COMPUTATIONAL COMPLEXITY  As mentioned in Section 3.4, our pro- posed STRUCTPOOL yields O((m + i)n3) computational complexity.
 <EOS>
-b'A(cid:96) \xe2\x88\x88 {0, 1}n\xc3\x97n represent the (cid:96)-hop connectivity of graph G'
+The complexity of DIFFPOOL is O(jn3) if we assume it employs j layers of GCNs to obtain the assignment matrix.
 <EOS>
-b'where a(cid:96)\ni,j = 1 indicates node i and'
+In our ex- periments, i is usually set to 2 or 3 which  Table 3: The prediction accuracy with different iteration number m.  Dataset  m = 1 m = 3 m = 5 m = 10  ENZYMES D&D PROTEINS  62.67 82.82 80.09  63.00 83.08 80.00  63.83 83.59 80.18  63.50 84.19 80.18  7  Published as a conference paper at ICLR 2020  is much smaller than n. We conduct experiments to show how different iteration number m affects the prediction accuracy and the results are reported in Table 3.
 <EOS>
-b'node j are reachable in G within (cid:96) hops.'
+Note that we employ the dense CRF form for all different m. We can observe that the performance generally increases with m increasing, especially for large-scale dataset D&D.
 <EOS>
-b'Then we include all pairwise cliques (i, j) in CG(cid:48)'
+We also observe m = 5 is a good trade-off between time complexity and prediction performance.
 <EOS>
-b'if\na(cid:96)'
+Notably, our method can even outperform other approaches when m = 1.
 <EOS>
-b'i,j = 1.'
+Furthermore, we evaluate the running time of our STRUCTPOOL and compare it with DIFFPOOL.
 <EOS>
-b'Altogether, the Gibbs energy for a cluster assignment y can be written as\n\nE(y) ='
+For 500 graphs from large-scale dataset D&D, we set i = j = 3 and show the aver- aging time cost to perform pooling for each graph.
 <EOS>
-b'\xcf\x88u(yi) +'
+The time cost for DIFFPOOL is 0.042 second, while our STRUCTPOOL takes 0.049 second, 0.053 second and 0.058 second for m = 1, m = 3, m = 5 respectively.
 <EOS>
-b'\xcf\x88p(yi, yj)a(cid:96)'
+Even though our STRUCTPOOL has a relatively higher computational cost, it is still reasonable and acceptable given its superior performance.
 <EOS>
-b'i,j,\n\n(cid:88)'
+ 4.5 EFFECTS OF TOPOLOGY INFORMATION  in  (cid:96) = 5  (cid:96) = 1  (cid:96) = 10  Dataset  Table 4: The prediction accuracy using different A(cid:96) STRUCTPOOL.
 <EOS>
-b'i'
+ Next, we conduct experiments to show how the topology in- formation A(cid:96) affects the predic- tion performance.
 <EOS>
-b'(cid:88)\n\ni(cid:54)=j'
+We evaluate our STRUCTPOOL with different (cid:96) values and report the results in Ta- ble 4.
 <EOS>
-b'where \xcf\x88u(yi) represents the unary energy for node i to be assigned to cluster yi.'
+Note that when (cid:96) is large enough, our STRUCTPOOL considers all pairwise relationships between all nodes, and it is equiva- lent to the dense CRF.
 <EOS>
-b'In addition,\n\xcf\x88p(yi, yj) is the pairwise energy, which indicates the energy of assigning'
+For the datasets IMDB-M and PROTEINS, we can observe that the prediction accuracies are generally increasing with the increasing of (cid:96).
 <EOS>
-b'node'
+With the increasing of (cid:96), more pairwise relationships are considered by the model, and hence it is reasonable to obtain better performance.
 <EOS>
-b'i, j to cluster yi, yj\nrespectively.'
+In addition, for the dataset IMDB-B, the results remain similar with different (cid:96), and even (cid:96) = 1 yields competitive performance with dense CRF.
 <EOS>
-b'Note that we drop the condition information in Equation (6) for simplicity.'
+It is possible that 1-hop pairwise relationships are enough to learn good embeddings for such graph types.
 <EOS>
-b'If (cid:96) is\nlarge enough, our CRF is equivalent to the dense CRFs.'
+Overall, dense CRF consistently produces promising results and is a proper choice in practice.
 <EOS>
-b'If (cid:96) is equal to 1, we have A(cid:96)'
+ IMDB-B IMDB-M PROTEINS  74.70 52.47 80.18  74.30 52.00 79.83  74.40 51.67 79.61  74.60 51.53 79.73  74.70 51.96 80.36  (cid:96) = 15 DENSE  4.6 GRAPH ISOMORPHISM NETWORKS WITH STRUCTPOOL  PTC  Dataset  64.60 73.46  75.10 78.50  GINS OURS  IMDB-B MUTAG COLLAB  Table 5: Comparisons with Graph Isomorphism Networks.
 <EOS>
-b'='
+ Isomor- Recently, Graph phism Networks (GINs) are proposed and shown to be more powerful than traditional GNNs (Xu et al, 2019).
 <EOS>
-b'A so'
+To demonstrate the effectiveness of our STRUCTPOOL and show its generalizability, we build models based on GINs and evaluate their performance.
 <EOS>
-b'that only 1-hop information in the adjacent matrix is considered.'
+Specifically, we employ GINs to learn node representations and perform one layer of the dense form of our STRUCTPOOL, followed by 1D convolutional layers and fully-connected layers as the classifier.
 <EOS>
-b'These two types of energy can be\nobtained directly by neural networks (Zheng et al., 2015).'
+The results are reported in the Table 5, where we employ the same 10-fold splitting as GINs (Xu et al, 2019) and the GIN results are taken from its released results.
 <EOS>
-b'Given the global observations X and the\ntopology information A, we employ multiple graph convolution layers to obtain the unary energy'
+These five datasets include both bioinformatic data and social media data, and both small-scale data and large-scale data.
 <EOS>
-b'\xce\xa8u \xe2\x88\x88'
+Obviously, incorporating our proposed STRUCTPOOL in GINs consistently and significantly improves the prediction performance.
 <EOS>
-b'Rn\xc3\x97k.'
+It leads to an average of 4.52% prediction accuracy improvement, which is promising.
 <EOS>
-b'Existing work on image tasks (Kr\xc2\xa8ahenb\xc2\xa8uhl & Koltun, 2011) proposes to employ Gaus-'
+ 89.40 93.59  80.20 84.06  52.30 54.60  IMDB-M  5 CONCLUSIONS  Graph pooling is an appealing way to learn good graph-level representations, and several advaned pooling techiques are proposed.
 <EOS>
-b'sian kernels to measure the pairwise energy.'
+However, none of existing graph pooling techniques explicitly considers the relationship between different nodes.
 <EOS>
-b'However, due to computational inef\xef\xac\x81ciency, we cannot\ndirectly apply it to our CRF model.'
+We propose a novel graph pooling technique, known as STRUCTPOOL, which is developed based on the conditional random fields.
 <EOS>
-b'The pairwise energy proposed in (Kr\xc2\xa8ahenb\xc2\xa8uhl & Koltun, 2011)\ncan be written as\n\n\xcf\x88p(yi, yj) ='
+We consider the graph pooling as a node clustering problem and employ the CRF to build relationships between the assignments of different nodes.
 <EOS>
-b'\xc2\xb5(yi, yj)'
+In addition, we generalize our method by incorporating the graph topological information so that our method can control the pairwise clique set in our CRFs.
 <EOS>
-b'w(m)k(m)(xi, xj),'
+Finally,  8  Published as a conference paper at ICLR 2020  we evaluate our proposed STRUCTPOOL on several benchmark datasets and our method can achieve new state-of-the-art results on five out of six datasets.
 <EOS>
-b'(7)\n\nwhere k(m)'
+ This work was supported in part by National Science Foundation grants DBI-1661289 and IIS- 1908198.
 <EOS>
-b'(\xc2\xb7, \xc2\xb7) represents the mth Gaussian kernel, xi is the feature vector for node'
+ ACKNOWLEDGEMENT  REFERENCES  James Atwood and Don Towsley.
 <EOS>
-b'i in X, w(m)'
+Diffusion-convolutional neural networks.
 <EOS>
-b'denotes learnable weights, and \xc2\xb5(yi, yj) is a compatibility function that models the compatibility'
+In Advances in Neural  Information Processing Systems, pp 1993–2001, 2016.
 <EOS>
-b'K\n(cid:88)'
+ Karsten M Borgwardt and Hans-Peter Kriegel.
 <EOS>
-b'm=1\n\n4'
+Shortest-path kernels on graphs.
 <EOS>
-b'1234561234Original GraphNew Graph'
+ In Fifth IEEE  international conference on data mining (ICDM’05), pp 8–pp.
 <EOS>
-b'GCNsAttention'
+IEEE, 2005.
 <EOS>
-b'Iteratively UpdateUnary EnergyAssignment MatrixSoftmaxPairwise Energy'
+ Karsten M Borgwardt, Cheng Soon Ong, Stefan Sch¨onauer, SVN Vishwanathan, Alex J Smola, and Hans-Peter Kriegel.
 <EOS>
-b'Published as a conference paper at ICLR 2020'
+Protein function prediction via graph kernels.
 <EOS>
-b'Algorithm'
+Bioinformatics, 21(suppl 1): i47–i56, 2005.
 <EOS>
-b'1 STRUCTPOOL'
+ Lei Cai and Shuiwang Ji. A multi-scale approach for graph link prediction.
 <EOS>
-b'1'
+In Thirty-Fourth AAAI  Conference on Artificial Intelligence, 2020.
 <EOS>
-b': Given a graph G with n nodes represented by X \xe2\x88\x88 Rn\xc3\x97c and A \xe2\x88\x88 {0, 1}n\xc3\x97n, the goal is to\nobtain \xcb\x9cG with k nodes'
+ Paul D Dobson and Andrew J Doig.
 <EOS>
-b'that \xcb\x9cX \xe2\x88\x88'
+Distinguishing enzyme structures from non-enzymes without  alignments.
 <EOS>
-b'Rk\xc3\x97\xcb\x9cc and \xcb\x9cA \xe2\x88\x88 {0, 1}k\xc3\x97k.'
+Journal of molecular biology, 330(4):771–783, 2003.
 <EOS>
-b'The (cid:96)-hop connectivity matrix A(cid:96)\ncan be easily obtained from A.\n\n2:'
+ Hongchang Gao, Jian Pei, and Heng Huang.
 <EOS>
-b'Perform GCNs to obtain unary energy matrix'
+Conditional random field enhanced graph convolu- tional neural networks.
 <EOS>
-b'\xce\xa8u \xe2\x88\x88 Rn\xc3\x97k.'
+In Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining, pp 276–284.
 <EOS>
-b'3: Initialize that Q(i, j)'
+ACM, 2019.
 <EOS>
-b'='
+ Hongyang Gao and Shuiwang Ji. Graph u-nets.
 <EOS>
-b'1'
+In International Conference on Machine Learning,  pp 2083–2092, 2019a.
 <EOS>
-b'Zi'
+ Hongyang Gao and Shuiwang Ji. Graph representation learning via hard and channel-wise attention In Proceedings of the 25th ACM SIGKDD International Conference on Knowledge  networks.
 <EOS>
-b'4: while not converged do\n\nexp (\xce\xa8u(i, j)) for all 0 \xe2\x89\xa4 i \xe2\x89\xa4 n and 0 \xe2\x89\xa4 j \xe2\x89\xa4 k.'
+Discovery & Data Mining, pp 741–749, 2019b.
 <EOS>
-b'xT'
+ Hongyang Gao, Zhengyang Wang, and Shuiwang Ji. Large-scale learnable graph convolutional In Proceedings of the 24th ACM SIGKDD International Conference on Knowledge  networks.
 <EOS>
-b'i xj'
+Discovery & Data Mining, pp 1416–1424, 2018.
 <EOS>
-b'm(cid:54)=i'
+ Justin Gilmer, Samuel S Schoenholz, Patrick F Riley, Oriol Vinyals, and George E Dahl.
 <EOS>
-b'xT'
+Neural message passing for quantum chemistry.
 <EOS>
-b'(cid:80)\n\n6:\n\n5:'
+In Proceedings of the 34th International Conference on Machine Learning-Volume 70, pp 1263–1272.
 <EOS>
-b'i xm'
+JMLR. org, 2017.
 <EOS>
-b'm(cid:54)=i'
+ Will Hamilton, Zhitao Ying, and Jure Leskovec.
 <EOS>
-b'wi,mQ(m, j).'
+Inductive representation learning on large graphs.
 <EOS>
-b'Calculate attention map W that wi,j ='
+ In Advances in Neural Information Processing Systems, pp 1024–1034, 2017.
 <EOS>
-b'Message passing that \xcb\x9cQ(i, j) ='
+ Diederik P Kingma and Jimmy Ba. Adam: A method for stochastic optimization.
 <EOS>
-b'(cid:80)'
+In Proceedings of  the 3rd International Conference on Learning Representations, 2014.
 <EOS>
-b'Compatibility transform that \xcb\x86Q(i, j) ='
+ Thomas N Kipf and Max Welling.
 <EOS>
-b'(cid:80)'
+Semi-supervised classification with graph convolutional net-  works.
 <EOS>
-b'Local update that \xc2\xafQ(i, j) = \xce\xa8u(i, j) \xe2\x88\x92 \xcb\x86Q(i, j).'
+In Proceedings of the International Conference on Learning Representations, 2017.
 <EOS>
-b'Perform normalization'
+ Philipp Kr¨ahenb¨uhl and Vladlen Koltun.
 <EOS>
-b'that Q(i, j) ='
+Efficient inference in fully connected crfs with gaussian  edge potentials.
 <EOS>
-b'1'
+In Advances in neural information processing systems, pp 109–117, 2011.
 <EOS>
-b'Zi\n\n7:\n8:\n9:\n10'
+ John Lafferty, Andrew McCallum, and Fernando CN Pereira.
 <EOS>
-b': end'
+Conditional random fields: Probabilis- tic models for segmenting and labeling sequence data.
 <EOS>
-b'while\n11'
+In International conference on machine learning, pp 282–289, 2001.
 <EOS>
-b': For soft assignments, the assignment matrix is M = softmax(Q).'
+ Junhyun Lee, Inyeop Lee, and Jaewoo Kang.
 <EOS>
-b'12: For hard assignments, the assignment matrix is M = argmax(Q) for each row.'
+Self-attention graph pooling.
 <EOS>
-b'13'
+In International Confer-  ence on Machine Learning, pp 3734–3743, 2019.
 <EOS>
-b': Obtain new graph \xcb\x9cQ that \xcb\x9cX = M T X, \xcb\x9cA = g(M T AM ).'
+ 9  Published as a conference paper at ICLR 2020  Tengfei Ma, Cao Xiao, Junyuan Shang, and Jimeng Sun.
 <EOS>
-b'exp (cid:0) \xc2\xafQ(i, j)(cid:1)'
+CGNF: Conditional graph neural fields,  2019.
 <EOS>
-b'for all i and j.'
+URL https://openreview.net/forum?id=ryxMX2R9YQ.
 <EOS>
-b'm \xc2\xb5(m, j)'
+ Mathias Niepert, Mohamed Ahmed, and Konstantin Kutzkov.
 <EOS>
-b'\xcb\x9cQ(i, m).'
+Learning convolutional neural net-  works for graphs.
 <EOS>
-b'a(cid:96)\ni,j for all i (cid:54)= j and 0 \xe2\x89\xa4'
+In International conference on machine learning, pp 2014–2023, 2016.
 <EOS>
-b'i, j \xe2\x89\xa4'
+ Adam Paszke, Sam Gross, Soumith Chintala, Gregory Chanan, Edward Yang, Zachary DeVito, Zeming Lin, Alban Desmaison, Luca Antiga, and Adam Lerer.
 <EOS>
-b'n.'
+Automatic differentiation in pytorch.
 <EOS>
-b'between different assignment pairs.'
+In Proceedings of the International Conference on Learning Representations, 2017.
 <EOS>
-b'However, it is computationally inef\xef\xac\x81cient to accurately com-'
+ Meng Qu, Yoshua Bengio, and Jian Tang.
 <EOS>
-b'pute the outputs of Gaussian kernels, especially for graph data when the feature vectors are high-'
+GMNN: Graph Markov neural networks.
 <EOS>
-b'dimensional.'
+In Kamalika Chaudhuri and Ruslan Salakhutdinov (eds.), Proceedings of the 36th International Conference on Machine Learning, volume 97 of Proceedings of Machine Learning Research, pp 5241–5250, Long Beach, California, USA, 09–15 Jun 2019.
 <EOS>
-b'Hence, in this work, we propose to employ the attention matrix as the measurement\nof pairwise energy.'
+PMLR.
 <EOS>
-b'Intuitively, Gaussian kernels indicate how strongly different feature vectors are\nconnected with each other.'
+ Nino Shervashidze, SVN Vishwanathan, Tobias Petri, Kurt Mehlhorn, and Karsten Borgwardt.
 <EOS>
-b'Similarly, the attention matrix re\xef\xac\x82ects similarities between different fea-'
+Ef- ficient graphlet kernels for large graph comparison.
 <EOS>
-b'ture vectors but with a signi\xef\xac\x81cantly less computational cost.'
+In Artificial Intelligence and Statistics, pp 488–495, 2009.
 <EOS>
-b'Speci\xef\xac\x81cally, each feature vector xi is\nattended to any other feature vector xj if the pair (i, j) is existing in clique set CG(cid:48).'
+ Martin Simonovsky and Nikos Komodakis.
 <EOS>
-b'Hence, the\npairwise energy can be obtained by\n\n\xcf\x88p(yi, yj) ='
+Dynamic edge-conditioned filters in convolutional neu- ral networks on graphs.
 <EOS>
-b'\xc2\xb5(yi, yj)'
+In Proceedings of the IEEE conference on computer vision and pattern recognition, pp 3693–3702, 2017.
 <EOS>
-b'xT'
+ Jost Tobias Springenberg, Alexey Dosovitskiy, Thomas Brox, and Martin Riedmiller.
 <EOS>
-b'i xj'
+Striving for simplicity: The all convolutional net.
 <EOS>
-b'k(cid:54)=i'
+In Proceedings of the International Conference on Learning Representations, 2014.
 <EOS>
-b'xT'
+ Petar Veliˇckovi´c, Guillem Cucurull, Arantxa Casanova, Adriana Romero, Pietro Li`o, and Yoshua Bengio.
 <EOS>
-b'i xk\n\n,'
+Graph attention networks.
 <EOS>
-b'(cid:80)'
+In International Conference on Learning Representations, 2018.
 <EOS>
-b'(8)'
+URL https://openreview.net/forum?id=rJXMpikCZ.
 <EOS>
-b'It can be ef\xef\xac\x81ciently computed by matrix multiplication and normalization.'
+ Oriol Vinyals, Samy Bengio, and Manjunath Kudlur.
 <EOS>
-b'Minimizing the Gibbs en-\nergy in Equation (6) results in the most probable cluster assignments for'
+Order matters: Sequence to sequence for sets.
 <EOS>
-b'a given graph G. However,\nsuch minimization is intractable, and hence a mean \xef\xac\x81eld approximation is proposed (Kr\xc2\xa8ahenb\xc2\xa8uhl &\nKoltun, 2011), which is an iterative updating algorithm.'
+ In International Conference on Learning Representations, 2015.
 <EOS>
-b'We follow the mean-\xef\xac\x81eld approximation\nto obtain the most probable cluster assignments.'
+ Boris Weisfeiler and Andrei A Lehman.
 <EOS>
-b'Altogether, the steps of our proposed STRUCT-\nPOOL are shown in Algorithm 1.'
+A reduction of a graph to a canonical form and an algebra  arising during this reduction.
 <EOS>
-b'All operations in our proposed STRUCTPOOL can be implemented\nas GNN operations, and hence the STRUCTPOOL can be employed in any deep graph model and\ntrained in an end-to-end fashion.'
+Nauchno-Technicheskaya Informatsia, 2(9):12–16, 1968.
 <EOS>
-b'The unary energy matrix can be obtained by stacking several\nGCN layers, and the normalization operations (step 3&9 in Algorithm 1) are equivalent to softmax\noperations.'
+ Keyulu Xu, Weihua Hu, Jure Leskovec, and Stefanie Jegelka.
 <EOS>
-b'All other steps can be computed by matrix computations.'
+How powerful are graph neural In International Conference on Learning Representations, 2019.
 <EOS>
-b'It is noteworthy that the com-\npatibility function \xc2\xb5(yi, yj) can be implemented as a trainable matrix N \xe2\x88\x88 Rk\xc3\x97k, and automatically\nlearned during training.'
+URL https:  networks? //openreview.net/forum?id=ryGs6iA5Km.
 <EOS>
-b'Hence, no prior domain knowledge is required for designing the compatibil-\nity function.'
+ Pinar Yanardag and SVN Vishwanathan.
 <EOS>
-b'We illustrate our proposed STRUCTPOOL in Figure 1 where we perform STRUCTPOOL\non a graph G with 6 nodes, and obtain a new graph \xcb\x9cG with 4 nodes.'
+Deep graph kernels.
 <EOS>
-b'3.4 COMPUTATIONAL COMPLEXITY ANALYSIS'
+ In Proceedings of the 21th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, pp 1365–1374.
 <EOS>
-b'We theoretically analyze the computational ef\xef\xac\x81ciency of our proposed STRUCTPOOL.'
+ACM, 2015a.
 <EOS>
-b'Since\ncomputational ef\xef\xac\x81ciency is especially important for large-scale graph datasets, we assume that\nn > k, c, \xcb\x9cc.'
+ Pinar Yanardag and SVN Vishwanathan.
 <EOS>
-b'The computational complexity of one GCN layer is O(n3 + n2c + nc\xcb\x9cc) \xe2\x89\x88 O(n3).'
+A structural smoothing framework for robust graph com-  parison.
 <EOS>
-b'Assuming we employ i layers of GCNs to obtain the unary energy, its computational cost is\nO(in3).'
+In Advances in neural information processing systems, pp 2134–2142, 2015b.
 <EOS>
-b'Assuming there are m iterations in our updating algorithm, the computational com-\nplexity is O(m(n2c + n2k + nk2))'
+ Zhitao Ying, Jiaxuan You, Christopher Morris, Xiang Ren, Will Hamilton, and Jure Leskovec.
 <EOS>
-b'\xe2\x89\x88 O(mn3).'
+Hi- erarchical graph representation learning with differentiable pooling.
 <EOS>
-b'The \xef\xac\x81nal step for computing \xcb\x9cA and \xcb\x9cX takes'
+In Advances in Neural Infor- mation Processing Systems, pp 4800–4810, 2018.
 <EOS>
-b'O(nkc'
+ Fisher Yu and Vladlen Koltun.
 <EOS>
-b'+ n2k'
+Multi-scale context aggregation by dilated convolutions.
 <EOS>
-b'+ nk2)'
+In Proceed-  ings of the International Conference on Learning Representations, 2016.
 <EOS>
-b'\xe2\x89\x88'
+ Muhan Zhang and Yixin Chen.
 <EOS>
-b'O(n3) computational complexity.'
+Link prediction based on graph neural networks.
 <EOS>
-b'Altogether, the complexity STRUCT-\nPOOL is O((m + i)n3), which is close to the complexity of stacking m'
+In Advances in  Neural Information Processing Systems, pp 5165–5175, 2018.
 <EOS>
-b'+ i layers of GCNs.'
+ Muhan Zhang, Zhicheng Cui, Marion Neumann, and Yixin Chen.
 <EOS>
-b'5'
+An end-to-end deep learning  architecture for graph classification.
 <EOS>
-b'Published as a conference paper at ICLR 2020'
+In AAAI, pp 4438–4445, 2018.
 <EOS>
-b'Table 1:'
+ Shuai Zheng, Sadeep Jayasumana, Bernardino Romera-Paredes, Vibhav Vineet, Zhizhong Su, Da- long Du, Chang Huang, and Philip HS Torr.
 <EOS>
-b'Classi\xef\xac\x81cation results for six benchmark datasets.'
+Conditional random fields as recurrent neural net- works.
 <EOS>
-b'Note that none of these deep methods\ncan outperform the traditional method WL on COLLAB.'
+In Proceedings of the IEEE international conference on computer vision, pp 1529–1537, 2015.
 <EOS>
-b'We believe the reason is the graphs in\nCOLLAB only have single-layer structures while deep models are too complex to capture them.'
+ 10  Published as a conference paper at ICLR 2020  A APPENDIX  A.1 DATASETS AND EXPERIMENTAL SETTINGS  Table 6: Statistics and properties of eight benchmark datasets.
 <EOS>
-b'Method'
+ ENZYMES  D&D  COLLAB  PROTEINS  # of Edges (avg) # of Nodes (avg) # of Graphs # of Classes  124.20 32.63 600 6  Dataset  1431.3 284.32 1178  2  2457.78 74.49 5000  3  Dataset  IMDB-B  IMDB-M  # of Edges (avg) # of Nodes (avg) # of Graphs # of Classes  96.53 19.77 1000  2  65.94 13.00 1500  3  PTC  14.69 14.30 344 2  72.82 39.06 1113  2  MUTAG  19.79 17.93 188  2  We report the statistics and properties of eight benchmark datasets in Supplementary Table 6.
 <EOS>
-b'Dataset'
+For our STRUCTPOOL, we implement our models using Pytorch (Paszke et al, 2017) and conduct exper- iments on one GeForce GTX 1080 Ti GPU.
 <EOS>
-b'ENZYMES D&D COLLAB'
+The model is trained using Stochastic gradient descent (SGD) with the ADAM optimizer (Kingma & Ba, 2014).
 <EOS>
-b'PROTEINS\n\nIMDB-B IMDB-M'
+For the models built on DGCNN (Zhang et al, 2018) in Section 4.2, 4.3, 4.4, 4.5, we employ GCNs to obtain the node features and the unary energy matrix.
 <EOS>
-b'GRAPHLET\nSHORTEST-PATH'
+All experiments in these sections perform 10-fold cross validations and we report the averaging results.
 <EOS>
-b'WL\n\nPATCHYSAN'
+The 10-fold splitting is exactly the same as DGCNN (Zhang et al, 2018).
 <EOS>
-b'DCNN'
+For the non-linear function, we employ tanh for GCNs and relu for 1D convolution layers.
 <EOS>
-b'DGK'
+For the models built on GINs in Section 4.6, we employ GINs to learn node features and unary energy.
 <EOS>
-b'ECC'
+Here the 10- fold splitting is exactly the same as GINs.
 <EOS>
-b'GRAPHSAGE'
+We employ relu for all layers as the non-linear function.
 <EOS>
-b'SET2SET'
+For all models, 1D convolutional layers and fully-connected layers are used after our STRUCTPOOL.
 <EOS>
-b'DGCNN'
+Hard clustering assignments are employed in all experiments.
 <EOS>
-b'DIFFPOOL'
+ A.2 EFFECTS OF PAIRWISE ENERGY  Table 7: Comparison with the baseline which excludes pairwise energy.
 <EOS>
-b'STRUCTPOOL'
+ Dataset  ENZYMES D&D COLLAB  PROTEINS  IMDB-B IMDB-M  BASELINE OURS  60.83 63.83  81.30 84.19  70.58 74.22  78.18 80.36  72.40 74.70  50.13 52.47  We conduct experiments to show the importance of the pairwise energy.
 <EOS>
-b'41.03\n42.32'
+If the pairwise energy is removed, the relations between different node assignments are not explicitly considered.
 <EOS>
-b'53.43\n\n-'
+Then the method is similar to the DIFFPOOL.
 <EOS>
-b'-\n-\n\n53.50\n54.25\n60.15'
+We compare our method with such a baseline that removes the pairwise energy.
 <EOS>
-b'57.12'
+Experimental results are reported in Table 7.
 <EOS>
-b'62.53'
+The network framework is the same as introduced in Section 3.5 and the same 10-fold cross validations from DGCNN are used.
 <EOS>
-b'63.83'
+Obvi- ously, our proposed method consistently and significantly outperforms the baseline which excludes pairwise energy.
 <EOS>
-b'74.85'
+It indicates the importance and effectiveness of incorporating pairwise energy and considering high-order relationships between different node assignments.
 <EOS>
-b'78.86\n78.34'
+ A.3 STUDY OF HIERARCHICAL NETWORK STRUCTURE  To demonstrate how the network depth and multiple pooling layers affects the prediction perfor- mance, we conduct experiments to evaluate different hierarchical network structures.
 <EOS>
-b'76.27\n58.09'
+We first define a network block contains two GCN layers and one STRUCTPOOL layer.
 <EOS>
-b'-'
+Then we compare three  11  Published as a conference paper at ICLR 2020  Table 8: Comparison with different hierarchical network structures.
 <EOS>
-b'72.54'
+ Dataset  1 BLOCK  2 BLOCKS  3 BLOCKS  PROTEINS D&D  79.73 81.87  77.42 83.59  74.95 81.63  different network settings: 1 block with the final classifier, 2 blocks with the final classifier, and 3 blocks with the final classifier.
 <EOS>
-b'75.42'
+The results are reported in Table 8.
 <EOS>
-b'78.12\n79.37'
+For the dataset Proteins, we observe that the network with one block can obtain better performance than deeper networks.
 <EOS>
-b'80.64'
+We believe the main reason is dataset Proteins is a small-scale dataset with an average number of nodes equal to 39.06.
 <EOS>
-b'84.19'
+A relatively simpler network is powerful enough to learn its data distribution while stacking multiple GCN layers and pooling layers may lead to a serious overfitting problems.
 <EOS>
-b'64.66'
+For the dataset D&D, the network with 2 blocks performs better than the one with 1 block.
 <EOS>
-b'59.10'
+Since D&D is relatively large scale, stacking 2 blocks increases the power of network and hence increases the performance.
 <EOS>
-b'78.61'
+However, going very deep, e.g., stacking 3 blocks, will cause the overfitting problem.
 <EOS>
-b'72.60'
+ A.4 STUDY OF GRAPH POOLING RATE  Table 9: Comparison with different pooling rates.
 <EOS>
-b'52.11'
+ r = 0.1  r = 0.3  r = 0.5  r = 0.7  r = 0.9  k ACC  91  80.77  160 81.53  241 81.53  331 81.97  503 80.68  We follow the DGCNN (Zhang et al, 2018) to select the number of clusters k. Specifically, we use a pooling rate r ∈ (0, 1) to control k. Then k is set to an integer so that r × 100% of graphs have nodes less than this integer in the current dataset.
 <EOS>
-b'73.09'
+As suggested in DGCNN, generally, r = 0.9 is a proper choice for bioinformatics datasets and r = 0.6 is good for social network datasets.
 <EOS>
-b'67.79'
+In addition, we conduct experiments to show the performance with the respect to different r values.
 <EOS>
-b'68.25'
+We set r = 0.1, 0.3, 0.5, 0.7, 0.9 to evaluate the performance on a large-scale social network dataset D&D.
 <EOS>
-b'71.75'
+The average number of nodes in dataset D&D is 284.32 and the maximum number of nodes is 5748.
 <EOS>
-b'73.76'
+The results are reported in Table 9 where the first row shows different pooling rates, the second row reports the corresponding k values and the final row shows the results.
 <EOS>
-b'75.48'
+For simplicity, we employ the network structure with 1 block and a final classifier (as defined in Section A.3).
 <EOS>
-b'74.22'
+We can observe that the performance drops when r, k is relatively large or small.
 <EOS>
-b'72.91'
+In addition, the model can obtain competitive performance when r is set to a proper range, for example, r ∈ [0.3, 0.7] for dataset D&D.
 <EOS>
-b'76.43'
-<EOS>
-b'74.68'
-<EOS>
-b'75.00'
-<EOS>
-b'61.29'
-<EOS>
-b'71.68\n72.65'
-<EOS>
-b'70.48'
-<EOS>
-b'74.29\n75.54\n76.25'
-<EOS>
-b'80.36\n\n-'
-<EOS>
-b'-\n-\n\n-\n-\n-\n\n-\n\n71.00'
-<EOS>
-b'49.06'
-<EOS>
-b'66.96'
-<EOS>
-b'45.23\n33.49'
-<EOS>
-b'44.55\n\n70.03'
-<EOS>
-b'47.83'
-<EOS>
-b'74.70'
-<EOS>
-b'52.47\n\n-'
-<EOS>
-b'-\n-\n\n-\n-\n-\n\n-\n\n3.5 DEEP GRAPH NETWORKS FOR GRAPH CLASSIFICATION'
-<EOS>
-b'In this section, we investigate graph classi\xef\xac\x81cation tasks which require both good node-level and\ngraph-level representations.'
-<EOS>
-b'For most state-of-the-art deep graph classi\xef\xac\x81cation models, they share\na similar pipeline that \xef\xac\x81rst produces node representations using GNNs, then performs pooling op-'
-<EOS>
-b'erations to obtain high-level representations, and \xef\xac\x81nally employs fully-connected layers to perform\nclassi\xef\xac\x81cation.'
-<EOS>
-b'Note that the high-level representations can be either a vector or a group of k vectors.'
-<EOS>
-b'For a set of graphs with different node numbers, with a pre-de\xef\xac\x81ned k, our proposed STRUCTPOOL\ncan produce k vectors for each graphs.'
-<EOS>
-b'Hence, our method can be easily generalized and coupled\nto any deep graph classi\xef\xac\x81cation model.'
-<EOS>
-b'Specially, our model for graph classi\xef\xac\x81cation is developed\nbased on DGCNN (Zhang et al., 2018).'
-<EOS>
-b'Given any input graph, our model \xef\xac\x81rst employs several\nlayers of GCNs (Equation (2)) to aggregate features from neighbors and learn representations for\nnodes.'
-<EOS>
-b'Next, we perform one STRUCTPOOL layer to obtain k vectors for each graph.'
-<EOS>
-b'Finally, 1D\nconvolutional layers and fully-connected layers are used to classify the graph.'
-<EOS>
-b'4 EXPERIMENTAL STUDIES\n\n4.1 DATASETS AND EXPERIMENTAL SETTINGS'
-<EOS>
-b'We evaluate our proposed STRUCTPOOL on eight benchmark datasets, including \xef\xac\x81ve bioinformatics'
-<EOS>
-b'protein datasets: ENZYMES, PTC, MUTAG,'
-<EOS>
-b'PROTEINS (Borgwardt et al., 2005), D&D ('
-<EOS>
-b'Dobson\n& Doig, 2003), and three social network datasets: COLLAB (Yanardag & Vishwanathan, 2015b),\nIMDB-B, IMDB-M (Yanardag & Vishwanathan, 2015a).'
-<EOS>
-b'Most of them are relatively large-scale and\nhence suitable for evaluating deep graph models.'
-<EOS>
-b'We report the statistics and properties of them in\nSupplementary Table 6.'
-<EOS>
-b'Please see the Supplementary Section A for experimental settings.'
-<EOS>
-b'We compare our method with several state-of-the-art deep GNN methods.'
-<EOS>
-b'PATCHYSAN (Niepert\net al., 2016) learns node representations and a canonical node ordering to perform classi\xef\xac\x81cation.'
-<EOS>
-b'DCNN (Atwood & Towsley, 2016) learns multi-scale substructure features by diffusion graph con-\nvolutions and performs global sum pooling.'
-<EOS>
-b'DGK (Yanardag & Vishwanathan, 2015a) models latent'
-<EOS>
-b'representations for sub-structures in graphs, which is similar to learn word embeddings.'
-<EOS>
-b'ECC (Si-\nmonovsky & Komodakis, 2017) performs GCNs conditioning on both node features and edge in-\nformation and uses global sum pooling before the \xef\xac\x81nal classi\xef\xac\x81er.'
-<EOS>
-b'GRAPHSAGE (Hamilton et al.,\n2017) is an inductive framework which generates node embeddings by sampling and aggregating\nfeatures from local neighbors, and it employs global mean pooling.'
-<EOS>
-b'SET2SET'
-<EOS>
-b'(Vinyals et al., 2015)\nproposes an aggregation method to replace the global pooling operations in deep graph networks.'
-<EOS>
-b'DGCNN (Zhang et al., 2018) proposes a pooling strategy named SORTPOOL which sorts all nodes'
-<EOS>
-b'6'
-<EOS>
-b'Published as a conference paper at ICLR 2020'
-<EOS>
-b'Table 2: Comparisons between different pooling techniques under the same framework.'
-<EOS>
-b'Method'
-<EOS>
-b'Dataset'
-<EOS>
-b'ENZYMES D&D COLLAB'
-<EOS>
-b'PROTEINS\n\nIMDB-B IMDB-M'
-<EOS>
-b'SUM POOL'
-<EOS>
-b'SORTPOOL'
-<EOS>
-b'TOPK POOL'
-<EOS>
-b'DIFFPOOL'
-<EOS>
-b'SAGPOOL'
-<EOS>
-b'STRUCTPOOL\n\n47.33\n52.83\n53.67'
-<EOS>
-b'60.33\n64.17'
-<EOS>
-b'63.83'
-<EOS>
-b'78.72\n80.60'
-<EOS>
-b'81.71\n80.94'
-<EOS>
-b'81.03'
-<EOS>
-b'84.19'
-<EOS>
-b'69.45'
-<EOS>
-b'73.92'
-<EOS>
-b'73.34\n71.78\n73.28'
-<EOS>
-b'74.22'
-<EOS>
-b'76.26'
-<EOS>
-b'76.83\n77.47\n77.74'
-<EOS>
-b'78.82'
-<EOS>
-b'80.36'
-<EOS>
-b'51.69\n70.00\n72.80\n72.40'
-<EOS>
-b'73.40'
-<EOS>
-b'74.70'
-<EOS>
-b'42.76\n46.26'
-<EOS>
-b'49.00'
-<EOS>
-b'50.13'
-<EOS>
-b'51.13'
-<EOS>
-b'52.47'
-<EOS>
-b'by learning and selects the \xef\xac\x81rst k nodes to form a new graph.'
-<EOS>
-b'DIFFPOOL ('
-<EOS>
-b'Ying et al., 2018)'
-<EOS>
-b'is\nbuilt based on GRAPHSAGE architecture but with their proposed differentiable pooling.'
-<EOS>
-b'Note that\nfor most of these methods, pooling operations are employed to obtain graph-level representations\nbefore the \xef\xac\x81nal classi\xef\xac\x81er.'
-<EOS>
-b'In addition, we compare our STRUCTPOOL with three graph kernels:\nGraphlet (Shervashidze et al., 2009), Shortest-path (Borgwardt & Kriegel, 2005), and Weisfeiler-'
-<EOS>
-b'Lehman subtree kernel (WL) (Weisfeiler & Lehman, 1968).'
-<EOS>
-b'4.2 CLASSIFICATION RESULTS'
-<EOS>
-b'We evaluate our proposed method on six benchmark datasets and compare with several state-of-the-\nart approaches.'
-<EOS>
-b'The results are reported in Table 1 where the best results are shown in bold and the\nsecond best results are shown with underlines.'
-<EOS>
-b'For our STRUCTPOOL, we perform 10-fold cross\nvalidations and report the average accuracy for each dataset.'
-<EOS>
-b'The 10-fold splitting is the same as\nDGCNN.'
-<EOS>
-b'For all comparing methods, the results are taken from existing work ('
-<EOS>
-b'Ying et al., 2018;\nZhang et al., 2018).'
-<EOS>
-b'We can observe that our STRUCTPOOL obtains the best performance on 5 out of\n6 benchmark datasets.'
-<EOS>
-b'For these 5 datasets, the classi\xef\xac\x81cation results of our method are signi\xef\xac\x81cantly\nbetter than all comparing methods, including advanced models DGCNN and DIFFPOOL.'
-<EOS>
-b'Notably,\nour model outperforms the second-best performance by an average of 3.58% on these 5 datasets.'
-<EOS>
-b'In addition, the graph kernel method WL obtains the best performance on COLLAB dataset and'
-<EOS>
-b'none of these deep models can achieve similar performance.'
-<EOS>
-b'Our model can obtain competitive\nperformance compared with the second best model.'
-<EOS>
-b'This is because many graphs in COLLAB only\nhave simple structures and deep models may be too complex to capture them.'
-<EOS>
-b'4.3 COMPARISONS OF DIFFERENT POOLING METHODS'
-<EOS>
-b'To demonstrate the effectiveness of our proposed pooling technique, we compare different pooling'
-<EOS>
-b'techniques under the same network framework.'
-<EOS>
-b'Speci\xef\xac\x81cally, we compare our STRUCTPOOL with\nthe global sum pool, SORTPOOL, TOPKPOOL, DIFFPOOL, and SAGPOOL.'
-<EOS>
-b'All pooling methods\nare employed in the network framework introduced in Section 3.5.'
-<EOS>
-b'In addition, the same 10-fold\ncross validations from DGCNN are used for all pooling methods.'
-<EOS>
-b'We report the results in Table 2\nand the best results are shown in bold.'
-<EOS>
-b'Obviously, our method achieves the best performance on \xef\xac\x81ve\nof six datasets, and signi\xef\xac\x81cantly outperforms all comparing pooling techniques.'
-<EOS>
-b'For the dataset EN-\nZYMES, our obtained result is competitive since SAGPOOL only slightly outperforms our proposed\nmethod by 0.34%.'
-<EOS>
-b'Such observations demonstrate the structural information in graphs is useful for\ngraph pooling and the relationships between different nodes should be explicitly modeled.'
-<EOS>
-b'4.4 STUDY OF COMPUTATIONAL COMPLEXITY'
-<EOS>
-b'As mentioned in Section 3.4, our pro-\nposed STRUCTPOOL yields O((m'
-<EOS>
-b'+'
-<EOS>
-b'i)n3) computational complexity.'
-<EOS>
-b'The\ncomplexity of DIFFPOOL is O(jn3)'
-<EOS>
-b'if\nwe assume it employs j layers of GCNs to\nobtain the assignment matrix.'
-<EOS>
-b'In our ex-'
-<EOS>
-b'periments, i is usually set to 2 or 3 which\n\nTable 3:'
-<EOS>
-b'The prediction accuracy with different iteration'
-<EOS>
-b'number m.'
-<EOS>
-b'Dataset\n\nm'
-<EOS>
-b'='
-<EOS>
-b'1 m ='
-<EOS>
-b'3 m'
-<EOS>
-b'= 5 m = 10'
-<EOS>
-b'ENZYMES'
-<EOS>
-b'D&D'
-<EOS>
-b'PROTEINS\n\n62.67'
-<EOS>
-b'82.82'
-<EOS>
-b'80.09'
-<EOS>
-b'63.00'
-<EOS>
-b'83.08\n80.00'
-<EOS>
-b'63.83'
-<EOS>
-b'83.59'
-<EOS>
-b'80.18'
-<EOS>
-b'63.50\n84.19\n80.18'
-<EOS>
-b'7'
-<EOS>
-b'Published as a conference paper at ICLR 2020'
-<EOS>
-b'is much smaller than n.'
-<EOS>
-b'We conduct experiments to show how different iteration number m affects'
-<EOS>
-b'the prediction accuracy and the results are reported in Table 3.'
-<EOS>
-b'Note that we employ the dense CRF\nform for all different m.'
-<EOS>
-b'We can observe that the performance generally increases with m increasing,\nespecially for large-scale dataset'
-<EOS>
-b'D&D. We also observe m = 5'
-<EOS>
-b'is a good trade-off between time\ncomplexity and prediction performance.'
-<EOS>
-b'Notably, our method can even outperform other approaches\nwhen m = 1.'
-<EOS>
-b'Furthermore, we evaluate the running time of our STRUCTPOOL and compare it with\nDIFFPOOL.'
-<EOS>
-b'For 500 graphs from large-scale dataset D&D, we set i'
-<EOS>
-b'= j = 3 and show the aver-\naging time cost to perform pooling for each graph.'
-<EOS>
-b'The time cost for DIFFPOOL is 0.042 second,\nwhile our STRUCTPOOL takes 0.049 second, 0.053 second and 0.058'
-<EOS>
-b'second for m = 1'
-<EOS>
-b', m = 3,'
-<EOS>
-b'm = 5 respectively.'
-<EOS>
-b'Even though our STRUCTPOOL has a relatively higher computational cost, it is\nstill reasonable and acceptable given its superior performance.'
-<EOS>
-b'4.5 EFFECTS OF TOPOLOGY INFORMATION'
-<EOS>
-b'in\n\n(cid:96)'
-<EOS>
-b'= 5'
-<EOS>
-b'(cid:96) = 1'
-<EOS>
-b'(cid:96) ='
-<EOS>
-b'10'
-<EOS>
-b'Dataset'
-<EOS>
-b'Table 4:'
-<EOS>
-b'The prediction accuracy using different A(cid:96)\nSTRUCTPOOL.'
-<EOS>
-b'Next, we conduct experiments\nto show how the topology in-'
-<EOS>
-b'formation A(cid:96) affects the predic-\ntion performance.'
-<EOS>
-b'We evaluate'
-<EOS>
-b'our STRUCTPOOL with different (cid:96)\nvalues and report the results in Ta-\nble 4.'
-<EOS>
-b'Note that when (cid:96) is large\nenough, our STRUCTPOOL considers all pairwise relationships between all nodes, and it is equiva-\nlent to the dense CRF.'
-<EOS>
-b'For the datasets IMDB-M and PROTEINS, we can observe that the prediction\naccuracies are generally increasing with the increasing of (cid:96).'
-<EOS>
-b'With the increasing of (cid:96), more pairwise\nrelationships are considered by the model, and hence it is reasonable to obtain better performance.'
-<EOS>
-b'In addition, for the dataset IMDB-B, the results remain similar with different (cid:96), and even (cid:96) = 1'
-<EOS>
-b'yields competitive performance with dense CRF.'
-<EOS>
-b'It is possible that 1-hop pairwise relationships are\nenough to learn good embeddings for such graph types.'
-<EOS>
-b'Overall, dense CRF consistently produces\npromising results and is a proper choice in practice.'
-<EOS>
-b'IMDB-B\nIMDB-M\nPROTEINS\n\n74.70'
-<EOS>
-b'52.47'
-<EOS>
-b'80.18'
-<EOS>
-b'74.30'
-<EOS>
-b'52.00'
-<EOS>
-b'79.83'
-<EOS>
-b'74.40'
-<EOS>
-b'51.67'
-<EOS>
-b'79.61'
-<EOS>
-b'74.60'
-<EOS>
-b'51.53'
-<EOS>
-b'79.73'
-<EOS>
-b'74.70\n51.96\n80.36'
-<EOS>
-b'(cid:96) ='
-<EOS>
-b'15 DENSE\n\n4.6 GRAPH ISOMORPHISM NETWORKS WITH STRUCTPOOL\n\nPTC'
-<EOS>
-b'Dataset\n\n64.60'
-<EOS>
-b'73.46'
-<EOS>
-b'75.10'
-<EOS>
-b'78.50'
-<EOS>
-b'GINS'
-<EOS>
-b'OURS'
-<EOS>
-b'IMDB-B MUTAG COLLAB'
-<EOS>
-b'Table 5: Comparisons with Graph Isomorphism Networks.'
-<EOS>
-b'Isomor-'
-<EOS>
-b'Recently, Graph\nphism Networks\n(GINs)\nare proposed and shown\nto be more powerful\nthan\ntraditional GNNs'
-<EOS>
-b'(Xu et al.,\n2019).'
-<EOS>
-b'To demonstrate the\neffectiveness of our STRUCTPOOL and show its generalizability, we build models based on GINs\nand evaluate their performance.'
-<EOS>
-b'Speci\xef\xac\x81cally, we employ GINs to learn node representations and\nperform one layer of the dense form of our STRUCTPOOL, followed by 1D convolutional layers\nand fully-connected layers as the classi\xef\xac\x81er.'
-<EOS>
-b'The results are reported in the Table 5, where we\nemploy the same 10-fold splitting as GINs (Xu et al., 2019) and'
-<EOS>
-b'the GIN results are taken from\nits released results.'
-<EOS>
-b'These \xef\xac\x81ve datasets include both bioinformatic data and social media data, and\nboth small-scale data and large-scale data.'
-<EOS>
-b'Obviously, incorporating our proposed STRUCTPOOL in\nGINs consistently and signi\xef\xac\x81cantly improves the prediction performance.'
-<EOS>
-b'It leads to an average of\n4.52% prediction accuracy improvement, which is promising.'
-<EOS>
-b'89.40'
-<EOS>
-b'93.59'
-<EOS>
-b'80.20'
-<EOS>
-b'84.06'
-<EOS>
-b'52.30'
-<EOS>
-b'54.60'
-<EOS>
-b'IMDB-M\n\n5 CONCLUSIONS'
-<EOS>
-b'Graph pooling is an appealing way to learn good graph-level representations, and several advaned'
-<EOS>
-b'pooling techiques are proposed.'
-<EOS>
-b'However, none of existing graph pooling techniques explicitly\nconsiders the relationship between different nodes.'
-<EOS>
-b'We propose a novel graph pooling technique,\nknown as STRUCTPOOL, which is developed based on the conditional random \xef\xac\x81elds.'
-<EOS>
-b'We consider\nthe graph pooling as a node clustering problem and employ the CRF to build relationships between\nthe assignments of different nodes.'
-<EOS>
-b'In addition, we generalize our method by incorporating the graph\ntopological information so that our method can control the pairwise clique set in our CRFs.'
-<EOS>
-b'Finally,\n\n8'
-<EOS>
-b'Published as a conference paper at ICLR 2020'
-<EOS>
-b'we evaluate our proposed STRUCTPOOL on several benchmark datasets and our method can achieve\nnew state-of-the-art results on \xef\xac\x81ve out of six datasets.'
-<EOS>
-b'This work was supported in part by National Science Foundation grants DBI-1661289 and IIS-'
-<EOS>
-b'1908198.'
-<EOS>
-b'ACKNOWLEDGEMENT'
-<EOS>
-b'REFERENCES'
-<EOS>
-b'James Atwood and Don Towsley.'
-<EOS>
-b'Diffusion-convolutional neural networks.'
-<EOS>
-b'In Advances in Neural\n\nInformation Processing Systems, pp. 1993\xe2\x80\x932001, 2016.'
-<EOS>
-b'Karsten M Borgwardt and Hans-Peter Kriegel.'
-<EOS>
-b'Shortest-path kernels on graphs.'
-<EOS>
-b'In Fifth IEEE'
-<EOS>
-b'international conference on data mining (ICDM\xe2\x80\x9905), pp.'
-<EOS>
-b'8\xe2\x80\x93pp.'
-<EOS>
-b'IEEE, 2005.'
-<EOS>
-b'Karsten M Borgwardt, Cheng Soon Ong, Stefan Sch\xc2\xa8onauer, SVN Vishwanathan, Alex J Smola, and\nHans-Peter Kriegel.'
-<EOS>
-b'Protein function prediction via graph kernels.'
-<EOS>
-b'Bioinformatics, 21(suppl 1):\ni47\xe2\x80\x93i56, 2005.'
-<EOS>
-b'Lei Cai and Shuiwang Ji.'
-<EOS>
-b'A multi-scale approach for graph link prediction.'
-<EOS>
-b'In Thirty-Fourth AAAI\n\nConference on Arti\xef\xac\x81cial Intelligence, 2020.'
-<EOS>
-b'Paul D Dobson and Andrew J Doig.'
-<EOS>
-b'Distinguishing enzyme structures from non-enzymes without\n\nalignments.'
-<EOS>
-b'Journal of molecular biology, 330(4):771\xe2\x80\x93783, 2003.'
-<EOS>
-b'Hongchang Gao, Jian Pei, and Heng Huang.'
-<EOS>
-b'Conditional random \xef\xac\x81eld enhanced graph convolu-'
-<EOS>
-b'tional neural networks.'
-<EOS>
-b'In Proceedings of the 25th ACM SIGKDD International Conference on\nKnowledge Discovery & Data Mining, pp. 276\xe2\x80\x93284.'
-<EOS>
-b'ACM, 2019.'
-<EOS>
-b'Hongyang Gao and Shuiwang Ji.'
-<EOS>
-b'Graph u-nets.'
-<EOS>
-b'In International Conference on Machine Learning,\n\npp. 2083\xe2\x80\x932092, 2019a.'
-<EOS>
-b'Hongyang Gao and Shuiwang Ji.'
-<EOS>
-b'Graph representation learning via hard and channel-wise attention'
-<EOS>
-b'In Proceedings of the 25th ACM SIGKDD International Conference on Knowledge\n\nnetworks.'
-<EOS>
-b'Discovery & Data Mining, pp.'
-<EOS>
-b'741\xe2\x80\x93749, 2019b.'
-<EOS>
-b'Hongyang Gao, Zhengyang Wang, and Shuiwang Ji.'
-<EOS>
-b'Large-scale learnable graph convolutional'
-<EOS>
-b'In Proceedings of the 24th ACM SIGKDD International Conference on Knowledge\n\nnetworks.'
-<EOS>
-b'Discovery & Data Mining, pp. 1416\xe2\x80\x931424, 2018.'
-<EOS>
-b'Justin Gilmer, Samuel S Schoenholz, Patrick F Riley, Oriol Vinyals, and George E Dahl.'
-<EOS>
-b'Neural\nmessage passing for quantum chemistry.'
-<EOS>
-b'In Proceedings of the 34th International Conference on\nMachine Learning-Volume 70, pp. 1263\xe2\x80\x931272.'
-<EOS>
-b'JMLR.'
-<EOS>
-b'org, 2017.'
-<EOS>
-b'Will Hamilton, Zhitao Ying, and Jure Leskovec.'
-<EOS>
-b'Inductive representation learning on large graphs.'
-<EOS>
-b'In Advances in Neural Information Processing Systems, pp. 1024\xe2\x80\x931034, 2017.'
-<EOS>
-b'Diederik P Kingma and Jimmy Ba.'
-<EOS>
-b'Adam:'
-<EOS>
-b'A method for stochastic optimization.'
-<EOS>
-b'In Proceedings of\n\nthe 3rd International Conference on Learning Representations, 2014.'
-<EOS>
-b'Thomas N Kipf and Max Welling.'
-<EOS>
-b'Semi-supervised classi\xef\xac\x81cation with graph convolutional net-\n\nworks.'
-<EOS>
-b'In Proceedings of the International Conference on Learning Representations, 2017.'
-<EOS>
-b'Philipp Kr\xc2\xa8ahenb\xc2\xa8uhl and Vladlen Koltun.'
-<EOS>
-b'Ef\xef\xac\x81cient inference in fully connected crfs with gaussian'
-<EOS>
-b'edge potentials.'
-<EOS>
-b'In Advances in neural information processing systems, pp. 109\xe2\x80\x93117, 2011.'
-<EOS>
-b'John Lafferty, Andrew McCallum, and Fernando CN Pereira.'
-<EOS>
-b'Conditional random \xef\xac\x81elds: Probabilis-'
-<EOS>
-b'tic models for segmenting and labeling sequence data.'
-<EOS>
-b'In International conference on machine\nlearning, pp. 282\xe2\x80\x93289, 2001.'
-<EOS>
-b'Junhyun Lee, Inyeop Lee, and Jaewoo Kang.'
-<EOS>
-b'Self-attention graph pooling.'
-<EOS>
-b'In International Confer-\n\nence on Machine Learning, pp. 3734\xe2\x80\x933743, 2019.'
-<EOS>
-b'9'
-<EOS>
-b'Published as a conference paper at ICLR 2020'
-<EOS>
-b'Tengfei Ma, Cao Xiao, Junyuan Shang, and Jimeng Sun.'
-<EOS>
-b'CGNF:'
-<EOS>
-b'Conditional graph neural \xef\xac\x81elds,\n\n2019.'
-<EOS>
-b'URL https://openreview.net/forum?id=ryxMX2R9YQ.'
-<EOS>
-b'Mathias Niepert, Mohamed Ahmed, and Konstantin Kutzkov.'
-<EOS>
-b'Learning convolutional neural net-\n\nworks for graphs.'
-<EOS>
-b'In International conference on machine learning, pp. 2014\xe2\x80\x932023, 2016.'
-<EOS>
-b'Adam Paszke, Sam Gross, Soumith Chintala, Gregory Chanan, Edward Yang, Zachary DeVito,'
-<EOS>
-b'Zeming Lin, Alban Desmaison, Luca Antiga, and Adam Lerer.'
-<EOS>
-b'Automatic differentiation in\npytorch.'
-<EOS>
-b'In Proceedings of the International Conference on Learning Representations, 2017.'
-<EOS>
-b'Meng Qu, Yoshua Bengio, and Jian Tang.'
-<EOS>
-b'GMNN:'
-<EOS>
-b'Graph Markov neural networks.'
-<EOS>
-b'In Kamalika\nChaudhuri and Ruslan Salakhutdinov (eds.), Proceedings of the 36th International Conference on\nMachine Learning, volume 97 of Proceedings of Machine Learning Research, pp.'
-<EOS>
-b'5241\xe2\x80\x935250,\nLong Beach, California, USA, 09\xe2\x80\x9315 Jun 2019.'
-<EOS>
-b'PMLR.'
-<EOS>
-b'Nino Shervashidze, SVN Vishwanathan, Tobias Petri, Kurt Mehlhorn, and Karsten Borgwardt.'
-<EOS>
-b'Ef-\n\xef\xac\x81cient graphlet kernels for large graph comparison.'
-<EOS>
-b'In Arti\xef\xac\x81cial Intelligence and Statistics, pp.\n488\xe2\x80\x93495, 2009.'
-<EOS>
-b'Martin Simonovsky and Nikos Komodakis.'
-<EOS>
-b'Dynamic edge-conditioned \xef\xac\x81lters in convolutional neu-\nral networks on graphs.'
-<EOS>
-b'In Proceedings of the IEEE conference on computer vision and pattern\nrecognition, pp. 3693\xe2\x80\x933702, 2017.'
-<EOS>
-b'Jost Tobias Springenberg, Alexey Dosovitskiy, Thomas Brox, and Martin Riedmiller.'
-<EOS>
-b'Striving for\nsimplicity:'
-<EOS>
-b'The all convolutional net.'
-<EOS>
-b'In Proceedings of the International Conference on Learning\nRepresentations, 2014.'
-<EOS>
-b'Petar Veli\xcb\x87ckovi\xc2\xb4c, Guillem Cucurull, Arantxa Casanova, Adriana Romero, Pietro Li`o, and Yoshua\nBengio.'
-<EOS>
-b'Graph attention networks.'
-<EOS>
-b'In International Conference on Learning Representations,\n2018.'
-<EOS>
-b'URL https://openreview.net/forum?id=rJXMpikCZ.'
-<EOS>
-b'Oriol Vinyals, Samy Bengio, and Manjunath Kudlur.'
-<EOS>
-b'Order matters:'
-<EOS>
-b'Sequence to sequence for sets.'
-<EOS>
-b'In International Conference on Learning Representations, 2015.'
-<EOS>
-b'Boris Weisfeiler and Andrei A Lehman.'
-<EOS>
-b'A reduction of a graph to a canonical form and an algebra\n\narising during this reduction.'
-<EOS>
-b'Nauchno-Technicheskaya Informatsia, 2(9):12\xe2\x80\x9316, 1968.'
-<EOS>
-b'Keyulu Xu, Weihua Hu, Jure Leskovec, and Stefanie Jegelka.'
-<EOS>
-b'How powerful are graph neural'
-<EOS>
-b'In International Conference on Learning Representations, 2019.'
-<EOS>
-b'URL https:\n\nnetworks?'
-<EOS>
-b'//openreview.net'
-<EOS>
-b'/forum?id=ryGs6iA5Km.'
-<EOS>
-b'Pinar Yanardag and SVN Vishwanathan.'
-<EOS>
-b'Deep graph kernels.'
-<EOS>
-b'In Proceedings of the 21th ACM\nSIGKDD International Conference on Knowledge Discovery and Data Mining, pp. 1365\xe2\x80\x931374.'
-<EOS>
-b'ACM, 2015a.'
-<EOS>
-b'Pinar Yanardag and SVN Vishwanathan.'
-<EOS>
-b'A structural smoothing framework for robust graph com-\n\nparison.'
-<EOS>
-b'In Advances in neural information processing systems, pp. 2134\xe2\x80\x932142, 2015b.'
-<EOS>
-b'Zhitao Ying, Jiaxuan You, Christopher Morris, Xiang Ren, Will Hamilton, and Jure Leskovec.'
-<EOS>
-b'Hi-'
-<EOS>
-b'erarchical graph representation learning with differentiable pooling.'
-<EOS>
-b'In Advances in Neural Infor-'
-<EOS>
-b'mation Processing Systems, pp. 4800\xe2\x80\x934810, 2018.'
-<EOS>
-b'Fisher Yu and Vladlen Koltun.'
-<EOS>
-b'Multi-scale context aggregation by dilated convolutions.'
-<EOS>
-b'In Proceed-\n\nings of the International Conference on Learning Representations, 2016.'
-<EOS>
-b'Muhan Zhang and Yixin Chen.'
-<EOS>
-b'Link prediction based on graph neural networks.'
-<EOS>
-b'In Advances in\n\nNeural Information Processing Systems, pp.'
-<EOS>
-b'5165\xe2\x80\x935175, 2018.'
-<EOS>
-b'Muhan Zhang, Zhicheng Cui, Marion Neumann, and Yixin Chen.'
-<EOS>
-b'An end-to-end deep learning\n\narchitecture for graph classi\xef\xac\x81cation.'
-<EOS>
-b'In AAAI, pp.'
-<EOS>
-b'4438\xe2\x80\x934445, 2018.'
-<EOS>
-b'Shuai Zheng, Sadeep Jayasumana, Bernardino Romera-Paredes, Vibhav Vineet, Zhizhong Su, Da-'
-<EOS>
-b'long Du, Chang Huang, and Philip HS Torr.'
-<EOS>
-b'Conditional random \xef\xac\x81elds as recurrent neural net-\nworks.'
-<EOS>
-b'In Proceedings of the IEEE international conference on computer vision, pp. 1529\xe2\x80\x931537,\n2015.'
-<EOS>
-b'10'
-<EOS>
-b'Published as a conference paper at ICLR 2020'
-<EOS>
-b'A APPENDIX'
-<EOS>
-b'A.1 DATASETS AND EXPERIMENTAL SETTINGS'
-<EOS>
-b'Table 6: Statistics and properties of eight benchmark datasets.'
-<EOS>
-b'ENZYMES'
-<EOS>
-b'D&D'
-<EOS>
-b'COLLAB'
-<EOS>
-b'PROTEINS\n\n# of Edges (avg)'
-<EOS>
-b'# of Nodes (avg)\n# of Graphs\n# of Classes\n\n124.20'
-<EOS>
-b'32.63'
-<EOS>
-b'600'
-<EOS>
-b'6'
-<EOS>
-b'Dataset'
-<EOS>
-b'1431.3'
-<EOS>
-b'284.32'
-<EOS>
-b'1178'
-<EOS>
-b'2'
-<EOS>
-b'2457.78'
-<EOS>
-b'74.49'
-<EOS>
-b'5000'
-<EOS>
-b'3'
-<EOS>
-b'Dataset'
-<EOS>
-b'IMDB-B'
-<EOS>
-b'IMDB-M\n\n# of Edges (avg)'
-<EOS>
-b'# of Nodes (avg)\n# of Graphs\n# of Classes\n\n96.53'
-<EOS>
-b'19.77\n1000'
-<EOS>
-b'2'
-<EOS>
-b'65.94'
-<EOS>
-b'13.00'
-<EOS>
-b'1500'
-<EOS>
-b'3'
-<EOS>
-b'PTC\n\n14.69'
-<EOS>
-b'14.30'
-<EOS>
-b'344'
-<EOS>
-b'2'
-<EOS>
-b'72.82'
-<EOS>
-b'39.06'
-<EOS>
-b'1113'
-<EOS>
-b'2'
-<EOS>
-b'MUTAG'
-<EOS>
-b'19.79\n17.93'
-<EOS>
-b'188'
-<EOS>
-b'2'
-<EOS>
-b'We report the statistics and properties of eight benchmark datasets in Supplementary Table 6.'
-<EOS>
-b'For\nour STRUCTPOOL, we implement our models using Pytorch (Paszke et al., 2017) and conduct exper-\niments on one GeForce GTX 1080 Ti GPU.'
-<EOS>
-b'The model is trained using Stochastic gradient descent'
-<EOS>
-b'(SGD) with the ADAM optimizer (Kingma & Ba, 2014).'
-<EOS>
-b'For the models built on DGCNN (Zhang\net al., 2018) in Section 4.2, 4.3, 4.4, 4.5, we employ GCNs to obtain the node features and the unary\nenergy matrix.'
-<EOS>
-b'All experiments in these sections perform 10-fold cross validations and we report the\naveraging results.'
-<EOS>
-b'The 10-fold splitting is exactly the same as DGCNN (Zhang et al., 2018).'
-<EOS>
-b'For the\nnon-linear function, we employ tanh for GCNs and relu for 1D convolution layers.'
-<EOS>
-b'For the models\nbuilt on GINs in Section 4.6, we employ GINs to learn node features and unary energy.'
-<EOS>
-b'Here the 10-\nfold splitting is exactly the same as GINs.'
-<EOS>
-b'We employ relu for all layers as the non-linear function.'
-<EOS>
-b'For all models, 1D convolutional layers and fully-connected layers are used after our STRUCTPOOL.'
-<EOS>
-b'Hard clustering assignments are employed in all experiments.'
-<EOS>
-b'A.2 EFFECTS OF PAIRWISE ENERGY'
-<EOS>
-b'Table 7:'
-<EOS>
-b'Comparison with the baseline which excludes pairwise energy.'
-<EOS>
-b'Dataset'
-<EOS>
-b'ENZYMES D&D COLLAB'
-<EOS>
-b'PROTEINS\n\nIMDB-B IMDB-M'
-<EOS>
-b'BASELINE'
-<EOS>
-b'OURS\n\n60.83'
-<EOS>
-b'63.83'
-<EOS>
-b'81.30'
-<EOS>
-b'84.19'
-<EOS>
-b'70.58'
-<EOS>
-b'74.22\n\n78.18'
-<EOS>
-b'80.36\n\n72.40'
-<EOS>
-b'74.70'
-<EOS>
-b'50.13'
-<EOS>
-b'52.47'
-<EOS>
-b'We conduct experiments to show the importance of the pairwise energy.'
-<EOS>
-b'If the pairwise energy is\nremoved, the relations between different node assignments are not explicitly considered.'
-<EOS>
-b'Then the\nmethod is similar to the DIFFPOOL.'
-<EOS>
-b'We compare our method with such a baseline that removes the\npairwise energy.'
-<EOS>
-b'Experimental results are reported in Table 7.'
-<EOS>
-b'The network framework is the same\nas introduced in Section 3.5 and the same 10-fold cross validations from DGCNN are used.'
-<EOS>
-b'Obvi-'
-<EOS>
-b'ously, our proposed method consistently and signi\xef\xac\x81cantly outperforms the baseline which excludes'
-<EOS>
-b'pairwise energy.'
-<EOS>
-b'It indicates the importance and effectiveness of incorporating pairwise energy and'
-<EOS>
-b'considering high-order relationships between different node assignments.'
-<EOS>
-b'A.3 STUDY OF HIERARCHICAL NETWORK STRUCTURE'
-<EOS>
-b'To demonstrate how the network depth and multiple pooling layers affects the prediction perfor-'
-<EOS>
-b'mance, we conduct experiments to evaluate different hierarchical network structures.'
-<EOS>
-b'We \xef\xac\x81rst de\xef\xac\x81ne'
-<EOS>
-b'a network block contains two GCN layers and one STRUCTPOOL layer.'
-<EOS>
-b'Then we compare three'
-<EOS>
-b'11'
-<EOS>
-b'Published as a conference paper at ICLR 2020'
-<EOS>
-b'Table 8: Comparison with different hierarchical network structures.'
-<EOS>
-b'Dataset\n\n1'
-<EOS>
-b'BLOCK'
-<EOS>
-b'2 BLOCKS\n\n3 BLOCKS'
-<EOS>
-b'PROTEINS'
-<EOS>
-b'D&D\n\n79.73'
-<EOS>
-b'81.87'
-<EOS>
-b'77.42'
-<EOS>
-b'83.59'
-<EOS>
-b'74.95'
-<EOS>
-b'81.63'
-<EOS>
-b'different network settings:'
-<EOS>
-b'1 block with the \xef\xac\x81nal classi\xef\xac\x81er, 2 blocks with the \xef\xac\x81nal classi\xef\xac\x81er, and\n3 blocks with the \xef\xac\x81nal classi\xef\xac\x81er.'
-<EOS>
-b'The results are reported in Table 8.'
-<EOS>
-b'For the dataset Proteins, we\nobserve that the network with one block can obtain better performance than deeper networks.'
-<EOS>
-b'We\nbelieve the main reason is dataset'
-<EOS>
-b'Proteins is a small-scale dataset with an average number of nodes\nequal to 39.06.'
-<EOS>
-b'A relatively simpler network is powerful enough to learn its data distribution'
-<EOS>
-b'while\nstacking multiple GCN layers and pooling layers may lead to a serious over\xef\xac\x81tting problems.'
-<EOS>
-b'For\nthe dataset D&D, the network with 2 blocks performs better than the one with 1 block.'
-<EOS>
-b'Since D&D\nis relatively large scale, stacking 2 blocks increases the power of network and hence increases the\nperformance.'
-<EOS>
-b'However, going very deep, e.g., stacking 3 blocks, will cause the over\xef\xac\x81tting problem.'
-<EOS>
-b'A.4 STUDY OF GRAPH POOLING RATE'
-<EOS>
-b'Table 9: Comparison with different pooling rates.'
-<EOS>
-b'r'
-<EOS>
-b'= 0.1'
-<EOS>
-b'r = 0.3'
-<EOS>
-b'r = 0.5'
-<EOS>
-b'r = 0.7'
-<EOS>
-b'r ='
-<EOS>
-b'0.9'
-<EOS>
-b'k'
-<EOS>
-b'ACC'
-<EOS>
-b'91'
-<EOS>
-b'80.77'
-<EOS>
-b'160'
-<EOS>
-b'81.53'
-<EOS>
-b'241'
-<EOS>
-b'81.53'
-<EOS>
-b'331'
-<EOS>
-b'81.97'
-<EOS>
-b'503'
-<EOS>
-b'80.68'
-<EOS>
-b'We follow the DGCNN (Zhang et al., 2018) to select the number of clusters'
-<EOS>
-b'k. Speci\xef\xac\x81cally, we use\na pooling rate r \xe2\x88\x88 (0, 1) to control k.'
-<EOS>
-b'Then k is set to an integer so that r \xc3\x97 100% of graphs have'
-<EOS>
-b'nodes less than this integer in the current dataset.'
-<EOS>
-b'As suggested in DGCNN, generally, r = 0.9\nis a proper choice for bioinformatics datasets and r = 0.6'
-<EOS>
-b'is good for social network datasets.'
-<EOS>
-b'In\naddition, we conduct experiments to show the performance with the respect to different r values.'
-<EOS>
-b'We set r = 0.1, 0.3, 0.5, 0.7, 0.9 to evaluate the performance on a large-scale social network dataset'
-<EOS>
-b'D&D.'
-<EOS>
-b'The average number of nodes in dataset D&D is 284.32 and the maximum number of nodes\nis 5748.'
-<EOS>
-b'The results are reported in Table 9 where the \xef\xac\x81rst row shows different pooling rates, the\nsecond row reports the corresponding k values and the \xef\xac\x81nal row shows the results.'
-<EOS>
-b'For simplicity,\nwe employ the network structure with 1 block and a \xef\xac\x81nal classi\xef\xac\x81er (as de\xef\xac\x81ned in Section A.3).'
-<EOS>
-b'We\ncan observe that the performance drops when r, k is relatively large or small.'
-<EOS>
-b'In addition, the model\ncan obtain competitive performance when r is set to a proper range, for example, r \xe2\x88\x88 [0.3, 0.7] for\ndataset D&D.\n\n12'
+ 12  
 <EOS>
