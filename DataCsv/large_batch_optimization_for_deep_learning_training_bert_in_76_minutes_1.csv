@@ -40,7 +40,7 @@ However, the implicit staleness introduced due to the asynchrony limits the para
 <EOS>
 The feasibility of computing gradient on large minibatches in parallel due to recent hardware advances has seen the resurgence of simply using synchronous SGD with large minibatches as an alternative to asynchronous SGD.
 <EOS>
-However, naïvely increasing the batch size typically results in degradation of generalization performance and reduces computational benefits (Goyal et al, 2017).
+However, naïvely increasing the batch size typically results in degradation of generalization performance and reduces computational benefits .
 <EOS>
  Synchronous SGD on large minibatches benefits from reduced variance of the stochastic gradients used in SGD.
 <EOS>
@@ -56,7 +56,7 @@ While these works demonstrate the feasibility of this strategy for reducing the 
 <EOS>
  Variants of SGD using layerwise adaptive learning rates have been recently proposed to address this problem.
 <EOS>
-The most successful in this line of research is the LARS algorithm (You et al, 2017), which was initially proposed for training RESNET.
+The most successful in this line of research is the LARS algorithm , which was initially proposed for training RESNET.
 <EOS>
 Using LARS, ResNet-50 can be trained on ImageNet in just a few minutes!
 <EOS>
@@ -108,7 +108,7 @@ To avoid optimization instability due to linear scaling of learning rate, Goyal 
 <EOS>
 Using LR warm-up and linear scaling, Goyal et al (2017) managed to train RESNET-50 with batch size 8192 without loss in generalization performance.
 <EOS>
-However, empirical study (Shallue et al, 2018) shows that learning rate scaling heuristics with the batch size do not hold across all problems or across all batch sizes.
+However, empirical study  shows that learning rate scaling heuristics with the batch size do not hold across all problems or across all batch sizes.
 <EOS>
  More recently, to reduce hand-tuning of hyperparameters, adaptive learning rates for large batch training garnered significant interests.
 <EOS>
@@ -206,7 +206,7 @@ We now discuss different instantiations of the strategy discussed above.
 <EOS>
 In particular, we focus on two algorithms: LARS (3.1) and the proposed method, LAMB (3.2).
 <EOS>
- , which can also be interpreted as an estimate on the inverse of Lipschitz constant of the  3.1 LARS ALGORITHM  The first instantiation of the general strategy is LARS algorithm (You et al, 2017), which is obtained by using momentum optimizer as the base algorithm A in the framework.
+ , which can also be interpreted as an estimate on the inverse of Lipschitz constant of the  3.1 LARS ALGORITHM  The first instantiation of the general strategy is LARS algorithm , which is obtained by using momentum optimizer as the base algorithm A in the framework.
 <EOS>
 LARS was earlier proposed for large batch learning for RESNET on ImageNet.
 <EOS>
@@ -236,7 +236,7 @@ Unlike LARS, the adaptivity of LAMB is two-fold: (i) per dimension normalization
 <EOS>
 The pseudocode for LAMB is provided in Algorithm 2.
 <EOS>
-When β1 = 0 and β2 = 0, the algorithm reduces to be Sign SGD where the learning rate is scaled by square root of the layer dimension (Bernstein et al, 2018).
+When β1 = 0 and β2 = 0, the algorithm reduces to be Sign SGD where the learning rate is scaled by square root of the layer dimension .
 <EOS>
  The following result provides convergence rate for LAMB in general nonconvex settings.
 <EOS>
@@ -262,7 +262,7 @@ The convergence rates of LARS and SGD differ in two ways: (1) the convergence cr
 <EOS>
 Brieﬂy, the convergence rate of LARS is better than SGD when the gradient is denser than curvature and stochasticity.
 <EOS>
-This convergence rate comparison is similar in spirit to the one obtained in (Bernstein et al, 2018).
+This convergence rate comparison is similar in spirit to the one obtained in .
 <EOS>
 Assuming that the convergence criterion in Theorem 1 and Theorem 2 is of similar order (which happens when gradients are fairly dense), convergence rate of LARS and LAMB depend on Lavg instead of L∞ and are thus, significantly better than that of SGD.
 <EOS>
@@ -336,7 +336,7 @@ Below we describe two different training choices for training BERT and discuss t
 <EOS>
 We run with the same number of epochs as the baseline but with batch size scaled from 512 to 32K.
 <EOS>
-The choice of 32K batch size (with sequence length 512) is mainly due to memory limits of TPU Pod.
+The choice of 32K batch size  is mainly due to memory limits of TPU Pod.
 <EOS>
 Our results are shown in Table 1.
 <EOS>
@@ -382,7 +382,7 @@ The data in this table is collected from the untuned version.
 <EOS>
  Solver  batch size  steps  F1 score on dev set TPUs  Time  Baseline LAMB LAMB LAMB LAMB LAMB LAMB LAMB  512 512 1k 2k 4k 8k 16k 32k  1000k 1000k 500k 250k 125k 62500 31250 15625  LAMB  64k/32k  8599  90.395 91.752 91.761 91.946 91.137 91.263 91.345 91.475  90.584  16 16 32 64 128 256 512 1024  1024  81.4h 82.8h 43.2h 21.4h 693.6m 390.5m 200.0m 101.2m  76.19m  procedure.
 <EOS>
-Increasing the batch size is able to warm-up and stabilize the optimization process (Smith et al, 2017), but decreasing the batch size brings chaos to the optimization process and can cause divergence.
+Increasing the batch size is able to warm-up and stabilize the optimization process , but decreasing the batch size brings chaos to the optimization process and can cause divergence.
 <EOS>
 In our experiments, we found a technique that is useful to stabilize the second stage optimization.
 <EOS>
@@ -418,7 +418,7 @@ Thus, LARS stops scaling at the batch size of 16K.
 <EOS>
  ImageNet training with ResNet-50 is an industry standard metric that is being used in MLPerf4.
 <EOS>
-The baseline can get 76.3% top-1 accuracy in 90 epochs (Goyal et al, 2017).
+The baseline can get 76.3% top-1 accuracy in 90 epochs .
 <EOS>
 All the successful implementations are based on momentum SGD (He et al, 2016; Goyal et al, 2017) or LARS optimizer (Ying et al, 2018; Jia et al, 2018; Mikami et al, 2018; You et al, 2018; Yamazaki et al, 2019).
 <EOS>
@@ -444,9 +444,9 @@ At a batch size of 2K, LAMB is able to achieve 77.11% top-1 accuracy while LARS 
 <EOS>
  Table 3: Top-1 validation accuracy of ImageNet/RESNET-50 training at the batch size of 16K (90 epochs).
 <EOS>
-The performance of momentum was reported by (Goyal et al, 2017). + means adding the learning rate scheme of Goyal et al (2017) to the optimizer: (1) 5-epoch warmup to stablize the initial stage; and (2) multiply the learning rate by 0.1 at 30th, 60th, and 80th epoch.
+The performance of momentum was reported by . + means adding the learning rate scheme of Goyal et al (2017) to the optimizer: (1) 5-epoch warmup to stablize the initial stage; and (2) multiply the learning rate by 0.1 at 30th, 60th, and 80th epoch.
 <EOS>
-The target accuracy is around 0.763 (Goyal et al, 2017).
+The target accuracy is around 0.763 .
 <EOS>
 All the adaptive solvers were comprehensively tuned.
 <EOS>
@@ -472,7 +472,7 @@ We use square root LR scaling and linear-epoch warmup.
 <EOS>
 The baseline Goyal et al (2017) gets 76.3% top-1 accuracy in 90 epochs.
 <EOS>
-Stanford DAWN Bench (Coleman et al, 2017) baseline achieves 93% top-5 accuracy.
+Stanford DAWN Bench  baseline achieves 93% top-5 accuracy.
 <EOS>
 LAMB achieves both of them.
 <EOS>
@@ -495,540 +495,4 @@ LAMB is also the first large batch adaptive solver that can achieve state-of-the
  6 ACKNOWLEDGEMENT We want to thank the comments from George Dahl and Jeff Dean.
 <EOS>
 We want to thank Michael Banfield, Dehao Chen, Youlong Cheng, Sameer Kumar, and Zak Stone for TPU Pod support.
-<EOS>
- REFERENCES  Takuya Akiba, Shuji Suzuki, and Keisuke Fukuda.
-<EOS>
-Extremely large minibatch sgd: Training resnet-50  on imagenet in 15 minutes. arXiv preprint arXiv:1711.04325, 2017.
-<EOS>
- Yoshua Bengio.
-<EOS>
-Practical recommendations for gradient-based training of deep architectures.
-<EOS>
-In  Neural networks: Tricks of the trade, pp 437–478.
-<EOS>
-Springer, 2012.
-<EOS>
- Jeremy Bernstein, Yu-Xiang Wang, Kamyar Azizzadenesheli, and Anima Anandkumar. signsgd:  compressed optimisation for non-convex problems.
-<EOS>
-CoRR, abs/1802.04434, 2018.
-<EOS>
- Valeriu Codreanu, Damian Podareanu, and Vikram Saletore.
-<EOS>
-Scale out for large minibatch sgd: Residual network training on imagenet-1k with improved accuracy and reduced time to train. arXiv preprint arXiv:1711.04291, 2017.
-<EOS>
- Cody Coleman, Deepak Narayanan, Daniel Kang, Tian Zhao, Jian Zhang, Luigi Nardi, Peter Bailis, Kunle Olukotun, Chris Ré, and Matei Zaharia.
-<EOS>
-Dawnbench: An end-to-end deep learning bench- mark and competition.
-<EOS>
-Training, 100(101):102, 2017.
-<EOS>
- Jeffrey Dean, Greg Corrado, Rajat Monga, Kai Chen, Matthieu Devin, Mark Mao, Andrew Senior, Paul Tucker, Ke Yang, Quoc V Le, et al Large scale distributed deep networks.
-<EOS>
-In Advances in neural information processing systems, pp 1223–1231, 2012.
-<EOS>
- Aditya Devarakonda, Maxim Naumov, and Michael Garland.
-<EOS>
-Adabatch: Adaptive batch sizes for  training deep neural networks. arXiv preprint arXiv:1712.02029, 2017.
-<EOS>
- Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova.
-<EOS>
-Bert: Pre-training of deep  bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805, 2018.
-<EOS>
- Timothy Dozat.
-<EOS>
-Incorporating nesterov momentum into adam.
-<EOS>
-2016.
-<EOS>
- Saeed Ghadimi and Guanghui Lan.
-<EOS>
-Stochastic first- and zeroth-order methods for nonconvex stochastic programming.
-<EOS>
-SIAM Journal on Optimization, 23(4):2341–2368, 2013a. doi: 10.1137/ 120880811.
-<EOS>
- Saeed Ghadimi and Guanghui Lan.
-<EOS>
-Stochastic first-and zeroth-order methods for nonconvex stochastic  programming.
-<EOS>
-SIAM Journal on Optimization, 23(4):2341–2368, 2013b.
-<EOS>
- Saeed Ghadimi, Guanghui Lan, and Hongchao Zhang.
-<EOS>
-Mini-batch stochastic approximation methods for nonconvex stochastic composite optimization.
-<EOS>
-Mathematical Programming, 155(1-2):267–305, 2014.
-<EOS>
- Priya Goyal, Piotr Dollár, Ross Girshick, Pieter Noordhuis, Lukasz Wesolowski, Aapo Kyrola, Andrew Tulloch, Yangqing Jia, and Kaiming He. Accurate, large minibatch sgd: Training imagenet in 1 hour. arXiv preprint arXiv:1706.02677, 2017.
-<EOS>
- Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun.
-<EOS>
-Deep residual learning for image recognition.
-<EOS>
-In Proceedings of the IEEE conference on computer vision and pattern recognition, pp 770–778, 2016.
-<EOS>
- Elad Hoffer, Itay Hubara, and Daniel Soudry.
-<EOS>
-Train longer, generalize better: closing the generalization  gap in large batch training of neural networks. arXiv preprint arXiv:1705.08741, 2017.
-<EOS>
- 9  Published as a conference paper at ICLR 2020  Forrest N Iandola, Matthew W Moskewicz, Khalid Ashraf, and Kurt Keutzer.
-<EOS>
-Firecaffe: near-linear acceleration of deep neural network training on compute clusters.
-<EOS>
-In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pp 2592–2600, 2016.
-<EOS>
- Xianyan Jia, Shutao Song, Wei He, Yangzihao Wang, Haidong Rong, Feihu Zhou, Liqiang Xie, Zhenyu Guo, Yuanzhou Yang, Liwei Yu, et al Highly scalable deep learning training system with mixed-precision: Training imagenet in four minutes. arXiv preprint arXiv:1807.11205, 2018.
-<EOS>
- Nitish Shirish Keskar, Dheevatsa Mudigere, Jorge Nocedal, Mikhail Smelyanskiy, and Ping Tak Peter Tang.
-<EOS>
-On large-batch training for deep learning: Generalization gap and sharp minima. arXiv preprint arXiv:1609.04836, 2016.
-<EOS>
- Alex Krizhevsky.
-<EOS>
-One weird trick for parallelizing convolutional neural networks. arXiv preprint  Mu Li. Scaling Distributed Machine Learning with System and Algorithm Co-design.
-<EOS>
-PhD thesis,  arXiv:1404.5997, 2014.
-<EOS>
- Intel, 2017.
-<EOS>
- James Martens and Roger Grosse.
-<EOS>
-Optimizing neural networks with kronecker-factored approximate  curvature.
-<EOS>
-In International conference on machine learning, pp 2408–2417, 2015.
-<EOS>
- Hiroaki Mikami, Hisahiro Suganuma, Yoshiki Tanaka, Yuichi Kageyama, et al Imagenet/resnet-50  training in 224 seconds. arXiv preprint arXiv:1811.05233, 2018.
-<EOS>
- Yurii E Nesterov.
-<EOS>
-A method for solving the convex programming problem with convergence rate o  (1/kˆ 2).
-<EOS>
-In Dokl. akad. nauk Sssr, volume 269, pp 543–547, 1983.
-<EOS>
- Kazuki Osawa, Yohei Tsuji, Yuichiro Ueno, Akira Naruse, Rio Yokota, and Satoshi Matsuoka.
-<EOS>
-Second-order optimization method for large mini-batch: Training resnet-50 on imagenet in 35 epochs. arXiv preprint arXiv:1811.12019, 2018.
-<EOS>
- Benjamin Recht, Christopher Re, Stephen Wright, and Feng Niu.
-<EOS>
-Hogwild: A lock-free approach to parallelizing stochastic gradient descent.
-<EOS>
-In Advances in neural information processing systems, pp 693–701, 2011.
-<EOS>
- Christopher J Shallue, Jaehoon Lee, Joe Antognini, Jascha Sohl-Dickstein, Roy Frostig, and George E Dahl.
-<EOS>
-Measuring the effects of data parallelism on neural network training. arXiv preprint arXiv:1811.03600, 2018.
-<EOS>
- Samuel L Smith, Pieter-Jan Kindermans, and Quoc V Le. Don’t decay the learning rate, increase the  batch size. arXiv preprint arXiv:1711.00489, 2017.
-<EOS>
- Ilya Sutskever, James Martens, George Dahl, and Geoffrey Hinton.
-<EOS>
-On the importance of initialization and momentum in deep learning.
-<EOS>
-In International conference on machine learning, pp 1139–1147, 2013.
-<EOS>
- Masafumi Yamazaki, Akihiko Kasagi, Akihiro Tabuchi, Takumi Honda, Masahiro Miwa, Naoto Fukumoto, Tsuguchika Tabaru, Atsushi Ike, and Kohta Nakashima.
-<EOS>
-Yet another accelerated sgd: Resnet-50 training on imagenet in 74.7 seconds. arXiv preprint arXiv:1903.12650, 2019.
-<EOS>
- Chris Ying, Sameer Kumar, Dehao Chen, Tao Wang, and Youlong Cheng.
-<EOS>
-Image classification at  supercomputer scale. arXiv preprint arXiv:1811.06992, 2018.
-<EOS>
- Yang You, Igor Gitman, and Boris Ginsburg.
-<EOS>
-Scaling sgd batch size to 32k for imagenet training.
-<EOS>
- arXiv preprint arXiv:1708.03888, 2017.
-<EOS>
- Yang You, Zhao Zhang, Cho-Jui Hsieh, James Demmel, and Kurt Keutzer.
-<EOS>
-Imagenet training in minutes.
-<EOS>
-In Proceedings of the 47th International Conference on Parallel Processing, pp 1.
-<EOS>
-ACM, 2018.
-<EOS>
- Yang You, Jonathan Hseu, Chris Ying, James Demmel, Kurt Keutzer, and Cho-Jui Hsieh.
-<EOS>
-Large-batch  training for lstm and beyond. arXiv preprint arXiv:1901.08256, 2019.
-<EOS>
- 10  Published as a conference paper at ICLR 2020  APPENDIX  A PROOF OF THEOREM 2  Proof.
-<EOS>
-We analyze the convergence of LARS for general minibatch size here.
-<EOS>
-Recall that the update of LARS is the following  x(i) t+1 = x(i)  t − ηtφ((cid:107)x(i)  t (cid:107))  g(i) t (cid:107)g(i) t (cid:107)  ,  for all i ∈ [h].
-<EOS>
-For simplicity of notation, we reason the  Since the function f is L-smooth, we have the following:  f (xt+1) ≤ f (xt) + (cid:104)∇if (xt), x(i)  t+1 − x(i)  t (cid:105) +  (cid:107)x(i)  t+1 − x(i)  t (cid:107)2  = f (xt) − ηt  φ((cid:107)x(i)  t (cid:107)) ×  [∇if (xt)]j ×  ≤ f (xt) − ηt  φ((cid:107)x(i)  t (cid:107)) ×  [∇if (xt)]j ×  (cid:32)  (cid:32)  h (cid:88)  Liη2  t φ2((cid:107)x(i)  t (cid:107))  +  i=1  2  −  [∇if (xt)]j (cid:107)∇if (xt)(cid:107)  +  [∇if (xt)]j (cid:107)∇if (xt)(cid:107)  (cid:33)(cid:33)  +  t α2 η2 u 2  (cid:107)L(cid:107)1  = f (xt) − ηt  φ((cid:107)x(i)  t (cid:107)) × (cid:107)∇if (xt)(cid:107) − ηt  [∇if (xt)]j ×  (cid:32) g(i) t,j (cid:107)g(i) t (cid:107)  −  [∇if (xt)]j (cid:107)∇if (xt)(cid:107)  +  t α2 η2 u 2  (cid:107)L(cid:107)1  (cid:33)(cid:33)  (4)  h (cid:88)  i=1  Li 2  (cid:33)  g(i) t,j (cid:107)g(i) t (cid:107) (cid:32) g(i) t,j (cid:107)g(i) t (cid:107) (cid:32) di(cid:88)  h (cid:88)  i=1  j=1  The first inequality follows from the lipschitz continuous nature of the gradient.
-<EOS>
-Let ∆(i) ∇if (xt).
-<EOS>
-Then the above inequality can be rewritten in the following manner:  t = g(i)  t −  f (xt+1) ≤ f (xt) − ηt  φ((cid:107)x(i)  t (cid:107))(cid:107)∇if (xt)(cid:107)  h (cid:88)  i=1  − ηt  h (cid:88)  di(cid:88)  i=1  j=1  (cid:32)  φ((cid:107)x(i)  t (cid:107)) ×  [∇if (xt)]j ×  (cid:32) (∆(i) (cid:107)∆(i)  t,j + [∇if (xt)]j) t + ∇if (xt)(cid:107)  (cid:33)(cid:33)  −  [∇if (xt)]j (cid:107)∇if (xt)(cid:107)  +  t α2 η2 u 2  (cid:107)L(cid:107)1  = f (xt) − ηt  φ((cid:107)x(i)  t (cid:107))(cid:107)∇if (xt)(cid:107)  − ηt  φ((cid:107)x(i)  t (cid:107)) ×  (cid:32)  (cid:104)∆(i)  t + ∇if (xt), ∇if (xt)(cid:105) (cid:107)∆(i)  t + ∇if (xt)(cid:107)  − (cid:107)∇if (xt)(cid:107)  +  (cid:107)L(cid:107)1  (cid:33)  η2 t α2 u 2  = f (xt) − ηt  φ((cid:107)x(i)  t (cid:107))(cid:107)∇if (xt)(cid:107)  + ηt  φ((cid:107)x(i)  t (cid:107)) ×  (cid:32)  (cid:107)∇if (xt)(cid:107)(cid:107)∆(i)  t + ∇if (xt)(cid:107) − (cid:104)∆(i) t + ∇if (xt)(cid:107)  (cid:107)∆(i)  t + ∇if (xt), ∇if (xt)(cid:105)  (cid:33)  +  η2 t α2 u 2  (cid:107)L(cid:107)1  = f (xt) − ηt  φ((cid:107)x(i)  t (cid:107))(cid:107)∇if (xt)(cid:107) +  η2 t α2 u 2  (cid:107)L(cid:107)1  + ηt  φ((cid:107)x(i)  t (cid:107)) ×  h (cid:88)  i=1  (cid:32)  (cid:107)∇if (xt)(cid:107)(cid:107)∆(i)  t + ∇if (xt)(cid:107) − (cid:107)∆(i)  t + ∇if (xt)(cid:107)2 + (cid:104)∆(i)  t  , ∆(i)  t + ∇if (xt)(cid:105)  (cid:33)  (cid:107)∆(i)  t + ∇if (xt)(cid:107)  (5)  h (cid:88)  di(cid:88)  i=1  j=1  h (cid:88)  di(cid:88)  i=1  j=1  h (cid:88)  i=1  h (cid:88)  i=1  h (cid:88)  i=1  h (cid:88)  i=1  h (cid:88)  i=1  h (cid:88)  i=1  11  Published as a conference paper at ICLR 2020  Using Cauchy-Schwarz inequality in the above inequality, we have:  f (xt+1) ≤ f (xt) − ηt  φ((cid:107)x(i)  t (cid:107))(cid:107)∇if (xt)(cid:107)  h (cid:88)  i=1  h (cid:88)  i=1  h (cid:88)  i=1  h (cid:88)  i=1  h (cid:88)  i=1  h (cid:88)  i=1  h (cid:88)  i=1  + ηt  φ((cid:107)x(i)  t (cid:107)) ×  (cid:107)∇if (xt)(cid:107) − (cid:107)∆(i)  t + ∇if (xt)(cid:107) + (cid:107)∆(i) t (cid:107)  (cid:16)  (cid:17)  +  η2 t α2 u 2  (cid:107)L(cid:107)1  ≤ f (xt) − ηt  φ((cid:107)x(i)  t (cid:107))(cid:107)∇if (xt)(cid:107) + 2ηt  φ((cid:107)x(i)  t (cid:107)) × (cid:107)∆(i)  t (cid:107) +  η2 t α2 u 2  (cid:107)L(cid:107)1  Taking expectation, we obtain the following:  E[f (xt+1)] ≤ f (xt) − ηt  φ((cid:107)x(i)  t (cid:107))(cid:107)∇if (xt)(cid:107) + 2ηt  φ((cid:107)x(i)  t (cid:107)) × E[(cid:107)∆(i)  t (cid:107)] +  ≤ f (xt) − ηtαl  (cid:107)∇if (xt)(cid:107) + 2ηtαu  (cid:107)σ(cid:107)1√ b  +  t α2 η2 u 2  (cid:107)L(cid:107)1.
-<EOS>
- η2 t α2 u 2  (cid:107)L(cid:107)1  (6)  Summing the above inequality for t = 1 to T and using telescoping sum, we have the following inequality:  E[f (xT +1)] ≤ f (x1) − ηαl  E[(cid:107)∇if (xt)(cid:107)] + 2ηT  αu(cid:107)σ(cid:107)1√  +  b  η2α2 uT 2  (cid:107)L(cid:107)1.
-<EOS>
- T (cid:88)  h (cid:88)  t=1  i=1  Rearranging the terms of the above inequality, and dividing by ηT αl, we have:  1 T  T (cid:88)  h (cid:88)  t=1  i=1  E[(cid:107)∇if (xt)(cid:107)] ≤  f (x1) − E[f (xT +1)]  T ηαl  2αu(cid:107)σ(cid:107)1  +  √  +  bαl  ηα2 u 2αl  (cid:107)L(cid:107)1  f (x1) − f (x∗)  ≤  T ηαl  +  2αu(cid:107)σ(cid:107)1  √  αl  b  +  ηα2 u 2αl  (cid:107)L(cid:107)1.
-<EOS>
- B PROOF OF THEOREM 3  Proof.
-<EOS>
-We analyze the convergence of LAMB for general minibatch size here.
-<EOS>
-Recall that the update of LAMB is the following  t+1 = x(i) x(i)  t − ηtφ((cid:107)x(i)  t (cid:107))  r(i) t (cid:107)r(i) t (cid:107)  ,  for all i ∈ [h].
-<EOS>
-For simplicity of notation, we reason the  Since the function f is L-smooth, we have the following:  f (xt+1) ≤ f (xt) + (cid:104)∇if (xt), x(i)  t+1 − x(i)  t (cid:105) +  (cid:107)x(i)  t+1 − x(i)  t (cid:107)2  = f (xt) −ηt  φ((cid:107)x(i)  t (cid:107)) ×  [∇if (xt)]j ×  h (cid:88)  di(cid:88)  i=1  j=1  (cid:124)  r(i) t,j (cid:107)r(i) t (cid:107)  (cid:33)  (cid:125)  +  h (cid:88)  i=1  Liα2 uη2 t 2  (7)  h (cid:88)  i=1  Li 2  (cid:32)  (cid:123)(cid:122) T1  12  Published as a conference paper at ICLR 2020  The above inequality simply follows from the lipschitz continuous nature of the gradient.
-<EOS>
-We bound term T1 in the following manner:  T1 ≤ −ηt  φ((cid:107)x(i)  t (cid:107)) ×  [∇if (xt)]j ×  (cid:32)  (cid:33)  r(i) t,j (cid:107)r(i) t (cid:107)  ≤ −ηt  (cid:114) 1 − β2 G2di  (cid:16)  φ((cid:107)x(i)  t (cid:107)) × [∇if (xt)]j × g(i)  t,j  (cid:17)  h (cid:88)  di(cid:88)  i=1  j=1  h (cid:88)  di(cid:88)  i=1  j=1  φ((cid:107)x(i)  t (cid:107)) × [∇if (xt)]j ×  1(sign(∇if (xt)]j) (cid:54)= sign(r(i)  t,j ))  (cid:33)  r(i) t,j (cid:107)r(i) t (cid:107)  (cid:33)  r(i) t,j (cid:107)r(i) t (cid:107)  − ηt  h (cid:88)  di(cid:88)  (cid:32)  i=1  j=1  h (cid:88)  di(cid:88)  i=1  j=1  (cid:16)  (cid:114) 1 di  − ηt  h (cid:88)  di(cid:88)  (cid:32)  i=1  j=1  This follows from the fact that (cid:107)r(i) as follows:  t (cid:107) ≤  (cid:113) di 1−β2  √  and  vt ≤ G. If β2 = 0, then T1 can be bounded  T1 ≤ −ηt  φ((cid:107)x(i)  t (cid:107)) × |[∇if (xt)]j|  (cid:17)  φ((cid:107)x(i)  t (cid:107)) × [∇if (xt)]j ×  1(sign(∇if (xt)]j) (cid:54)= sign(r(i)  t,j ))  The rest of the proof for β2 = 0 is similar to argument for the case β2 > 0, which is shown below.
-<EOS>
-Taking expectation, we have the following:  E[T1] ≤ −ηt  h (cid:88)  di(cid:88)  i=1  j=1  (cid:114) 1 − β2 G2di  (cid:104) φ((cid:107)x(i)  E  t (cid:107)) ×  (cid:16)  [∇if (xt)]j × g(i) t,j  (cid:17)(cid:105)  h (cid:88)  di(cid:88)  (cid:34) φ((cid:107)x(i)  E  − ηt  (cid:32)  t (cid:107)) ×  [∇if (xt)]j ×  1(sign(∇if (xt)]j) (cid:54)= sign(g(i)  t,j ))  (cid:35)  ≤ −ηt  h (cid:88)  di(cid:88)  i=1  j=1  i=1  j=1  (cid:114) 1 − β2 G2di  (cid:104)(cid:16)  E  φ((cid:107)x(i)  t (cid:107)) × [∇if (xt)]j × g(i)  t,j  (cid:33)  r(i) t,j (cid:107)r(i) t (cid:107)  (cid:17)(cid:105)  E  (cid:104) αu|[∇if (xt)]j|1(sign(∇if (xt)]j) (cid:54)= sign(g(i)  (cid:105)  t,j ))  h (cid:88)  di(cid:88)  + ηt  i=1  j=1  (cid:114) 1 − β2 G2di  h (cid:88)  di(cid:88)  i=1  j=1  − ηt  h (cid:88)  di(cid:88)  i=1  j=1  ≤ −ηt  (cid:104) φ((cid:107)x(i)  E  t (cid:107)) ×  (cid:16)  [∇if (xt)]j × g(i) t,j  (cid:17)(cid:105)  αu|[∇if (xt)]j|P(sign(∇if (xt)]j) (cid:54)= sign(g(i)  t,j ))  (8)  (9)  Using the bound on the probability that the signs differ, we get:  E[T1] ≤ −ηtαl  (cid:107)∇f (xt)(cid:107)2 + ηtαu  (cid:114)  h(1 − β2)  G2d  h (cid:88)  di(cid:88)  i=1  j=1  σi,j√ b  Substituting the above bound on T1 in equation 7, we have the following bound:  E[f (xt+1)] ≤ f (xt) − ηtαl  (cid:107)∇f (xt)(cid:107)2 + ηtαu  (cid:107)˜σ(cid:107)1√ b  +  t α2 η2 u(cid:107)L(cid:107)1 2  (10)  (cid:114)  h(1 − β2)  G2d  13  Published as a conference paper at ICLR 2020  Algorithm 3 N-LAMB  Input: x1 ∈ Rd, learning rate {ηt}T t=1, parame- ters 0 < β1, β2 < 1, scaling function φ, (cid:15) > 0, parameters 0 < {βt Set m0 = 0, v0 = 0 for t = 1 to T do  t=1 < 1  1}T  Algorithm 4 NN-LAMB  Input: x1 ∈ Rd, learning rate {ηt}T t=1, parameters 0 < β1, β2 < 1, scaling function φ, (cid:15) > 0, parame- ters 0 < {βt Set m0 = 0, v0 = 0 for t = 1 to T do  t=1 < 1  1}T  ∇(cid:96)(xt, st).
-<EOS>
- ∇(cid:96)(xt, st).
-<EOS>
- (cid:80)  + (1−βt 1−Πt  Draw b samples St from P. Compute gt = 1 st∈St |St| mt = β1mt−1 + (1 − β1)gt ˆm = βt+1 1 mt 1)gt i=1βi 1−Πt+1 i=1 βi 1 1 vt = β2vt−1 + (1 − β2)g2 t ˆv = β2vt 1−βt 2 Compute ratio rt = ˆm√ x(i) t+1 = x(i)  t − ηt  ˆv+(cid:15) (i) t (cid:107)) (i) t (cid:107)  φ((cid:107)x (i) t +λx  (cid:107)r  (cid:80)  + (1−βt 1−Πt  Draw b samples St from P. Compute gt = 1 st∈St |St| mt = β1mt−1 + (1 − β1)gt ˆm = βt+1 1 mt 1)gt i=1βi 1−Πt+1 i=1 βi 1 1 vt = β2vt−1 + (1 − β2)g2 t ˆv = βt+1 2)g2 + (1−βt vt t 1−Πt i=1βi 1−Πt+1 2 Compute ratio rt = ˆm√ x(i) t+1 = x(i)  t − ηt  i=1 βi 2  ˆv+(cid:15) (i) t (cid:107)) (i) t (cid:107)  φ((cid:107)x (i) t +λx  (cid:107)r  2  end for  end for  (r(i)  t + λxt)  (r(i)  t + λxt)  Summing the above inequality for t = 1 to T and using telescoping sum, we have the following inequality:  E[f (xT +1)] ≤ f (x1) − ηtαl  E[(cid:107)∇f (xt)(cid:107)2] + ηT αu  (cid:114)  h(1 − β2)  G2d  T (cid:88)  t=1  (cid:107)˜σ(cid:107)1√ b  +  η2α2 uT 2  (cid:107)L(cid:107)1.
-<EOS>
- Rearranging the terms of the above inequality, and dividing by ηT αl, we have:  (cid:114)  h(1 − β2)  G2d  1 T  T (cid:88)  t=1  E[(cid:107)∇f (xt)(cid:107)2] ≤  f (x1) − E[f (xT +1)]  T ηαl  f (x1) − f (x∗)  ≤  T ηαl  +  αu(cid:107)˜σ(cid:107)1 αl b  √  +  √  αu(cid:107)˜σ(cid:107)1 b αl ηα2 u 2αl  +  +  (cid:107)L(cid:107)1  η 2  (cid:107)L(cid:107)1.
-<EOS>
- C COMPARISON OF CONVERGENCE RATES OF LARS AND SGD  Inspired by the comparison used by (Bernstein et al, 2018) for comparing SIGN SGD with SGD, we define the following quantities:  (cid:33)2  (cid:107)∇if (xt)(cid:107)  =  (cid:32) h (cid:88)  i=1  ψ(∇f (xt))d(cid:107)∇f (xt)(cid:107)2  ψgd(cid:107)∇f (xt)(cid:107)2  ≥  h  Then LARS convergence rate can be written in the following manner:  (E[(cid:107)∇f (xa)(cid:107))2 ≤ O  (cid:18) (f (x1) − f (x∗))L∞  ψL ψ2 g  +  (cid:107)σ(cid:107)2  T  (cid:19)  ψ2 σ ψ2 g  If ψL (cid:28) ψ2 we gain over SGD.
-<EOS>
-Otherwise, SGD’s upper bound on convergence rate is better.
-<EOS>
- g then LARS (i.e., gradient is more denser than curvature or stochasticity),  g and ψσ (cid:28) ψ2  (cid:107)L(cid:107)2  1 ≤  (cid:107)σ(cid:107)2  1 =  ψLd2(cid:107)L(cid:107)2 ∞  h2  ψσd(cid:107)σ(cid:107)2  h  h  T  14  Published as a conference paper at ICLR 2020  Figure 1: This figure shows N-LAMB and NN-LAMB can achieve a comparable accuracy compared to LAMB optimizer.
-<EOS>
-Their performances are much better than momentum solver.
-<EOS>
-The result of momentum optimizer was reported by Goyal et al (2017).
-<EOS>
-For Nadam, we use the learning rate recipe of (Goyal et al, 2017): (1) 5-epoch warmup to stablize the initial stage; and (2) multiply the learning rate by 0.1 at 30th, 60th, and 80th epoch.
-<EOS>
-The target accuracy is around 0.763 (Goyal et al, 2017).
-<EOS>
-We also tuned the learning rate of Nadam in {1e-4, 2e-4, ..., 9e-4, 1e-3, 2e-3, ..., 9e-3, 1e-2}.
-<EOS>
- D N-LAMB: NESTEROV MOMENTUM FOR LAMB  Sutskever et al (2013) report that Nesterov’s accelerated gradient (NAG) proposed by Nesterov (1983) is conceptually and empirically better than the regular momentum method for convex, non-stochastic objectives.
-<EOS>
-Dozat (2016) incorporated Nesterov’s momentum into Adam optimizer and proposed the Nadam optimizer.
-<EOS>
-Specifically, only the first moment of Adam was modified and the second moment of Adam was unchanged.
-<EOS>
-The results on several applications (Word2Vec, Image Recognition, and LSTM Language Model) showed that Nadam optimizer improves the speed of convergence and the quality of the learned models.
-<EOS>
-We also tried using Nesterov’s momentum to replace the regular momentum of LAMB optimizer’s first moment.
-<EOS>
-In this way, we got a new algorithm named as N-LAMB (Nesterov LAMB).
-<EOS>
-The complete algorithm is in Algorithm 3.
-<EOS>
-We can also Nesterov’s momentum to replace the regular momentum of LAMB optimizer’s second moment.
-<EOS>
-We refer to this algorithm as NN-LAMB (Nesterov’s momentum for both the first moment and the second moment).
-<EOS>
-The details of NN-LAMB were shown in Algorithm 4.
-<EOS>
- Dozat (2016) suggested the best performance of Nadam was achieved by β1 = 0.975, β2 = 0.999, and (cid:15) = 1e-8.
-<EOS>
-We used the same settings for N-LAMB and NN-LAMB.
-<EOS>
-We scaled the batch size to 32K for ImageNet training with ResNet-50.
-<EOS>
-Our experimental results show that N-LAMB and NN-LAMB can achieve a comparable accuracy compared to LAMB optimizer.
-<EOS>
-Their performances are much better than momentum solver (Figure 1).
-<EOS>
- E LAMB WITH LEARNING RATE CORRECTION  There are two operations at each iteration in original Adam optimizer (let us call it adam-correction):  mt = mt/(1 − βt 1)  vt = vt/(1 − βt 2) It has an impact on the learning rate by ηt := ηt∗(cid:112)(1 − βt 1).
-<EOS>
-According to our experimental results, adam-correction essentially has the same effect as learning rate warmup (see Figure 2).
-<EOS>
-The warmup function often was implemented in the modern deep learning system.
-<EOS>
-Thus, we can remove adam-correction from the LAMB optimizer.
-<EOS>
-We did not observe any drop in the test or validation accuracy for BERT and ImageNet training.
-<EOS>
- 2)/(1 − βt  15  Published as a conference paper at ICLR 2020  Figure 2: The figure shows that adam-correction has the same effect as learning rate warmup.
-<EOS>
-We removed adam-correction from the LAMB optimizer.
-<EOS>
-We did not observe any drop in the test or validation accuracy for BERT and ImageNet training.
-<EOS>
- Figure 3: We tried different norms in LAMB optimizer.
-<EOS>
-However, we did not observe a significant difference in the validation accuracy of ImageNet training with ResNet-50.
-<EOS>
-We use L2 norm as the default.
-<EOS>
- F LAMB WITH DIFFERENT NORMS  We need to compute the matrix/tensor norm for each layer when we do the parameter updating in the LAMB optimizer.
-<EOS>
-We tried different norms in LAMB optimizer.
-<EOS>
-However, we did not observe a significant difference in the validation accuracy of ImageNet training with ResNet-50.
-<EOS>
-In our experiments, the difference in validation accuracy is less than 0.1 percent (Figure 3).
-<EOS>
-We use L2 norm as the default.
-<EOS>
- G REGULAR BATCH SIZES FOR SMALL DATASETS: MNIST AND CIFAR-10.
-<EOS>
- According to DAWNBench, DavidNet (a custom 9-layer Residual ConvNet) is the fastest model for CIFAR-10 dataset (as of April 1st, 2019)5.
-<EOS>
-The baseline uses the momentum SGD optimizer.
-<EOS>
-Table 6 and Figure 4 show the test accuracy of CIFAR-10 training with DavidNet.
-<EOS>
-The PyTorch implementation (momentum SGD optimizer) on GPUs was reported on Standford DAWNBench’s website, which achieves 94.06% in 24 epochs.
-<EOS>
-The Tensorﬂow implementation (momentum SGD optimizer) on TPU achieves a 93.72% accuracy in 24 epochs6.
-<EOS>
-We use the implementation of TensorFlow on TPUs.
-<EOS>
-LAMB optimizer is able to achieve 94.08% test accuracy in 24 epochs, which is better than other adaptive optimizers and momentum SGD.
-<EOS>
-Even on the smaller tasks like MNIST training with LeNet, LAMB is able to achieve a better accuracy than existing solvers (Table 7).
-<EOS>
- 5https://dawn.cs.stanford.edu/benchmark/CIFAR10/train.html 6https://github.com/fenwickslab/dl_tutorials/blob/master/tutorial3_cifar10_davidnet_fix.ipynb  16  Published as a conference paper at ICLR 2020  Figure 4: LAMB is better than the existing solvers (batch size = 512).
-<EOS>
-We make sure all the solvers are carefully tuned.
-<EOS>
-The learning rate tuning space of Adam, AdamW, Adagrad and LAMB is {0.0001, 0.0002, 0.0004, 0.0006, 0.0008, 0.001, 0.002, 0.004, 0.006, 0.008, 0.01, 0.02, 0.04, 0.06, 0.08, 0.1, 0.2, 0.4, 0.6, 0.8, 1, 2, 4, 6, 8, 10, 15, 20, 25, 30, 35, 40, 45, 50}.
-<EOS>
-The momentum optimizer was tuned by the baseline implementer.
-<EOS>
-The weight decay term of AdamW was tuned by {0.0001, 0.001, 0.01, 0.1, 1.0}.
-<EOS>
- Table 6: CIFAR-10 training with DavidNet (batch size = 512).
-<EOS>
-All of them run 24 epochs and finish the training under one minute on one cloud TPU.
-<EOS>
-We make sure all the solvers are carefully tuned.
-<EOS>
-The learning rate tuning space of Adam, AdamW, Adagrad and LAMB is {0.0001, 0.0002, 0.0004, 0.0006, 0.0008, 0.001, 0.002, 0.004, 0.006, 0.008, 0.01, 0.02, 0.04, 0.06, 0.08, 0.1, 0.2, 0.4, 0.6, 0.8, 1, 2, 4, 6, 8, 10, 15, 20, 25, 30, 35, 40, 45, 50}.
-<EOS>
-The momentum optimizer was tuned by the baseline implementer.
-<EOS>
-The weight decay term of AdamW was tuned by {0.0001, 0.001, 0.01, 0.1, 1.0}.
-<EOS>
- Optimizer  ADAGRAD ADAM ADAMW momentum LAMB  Test Accuracy  0.9074  0.9225  0.9271  0.9372  0.9408  H IMPLEMENTATION DETAILS AND ADDITIONAL RESULTS  There are several hyper-parameters in LAMB optimizer.
-<EOS>
-Although users do not need to tune them, we explain them to help users to have a better understanding. β1 is used for decaying the running average of the gradient. β2 is used for decaying the running average of the square of gradient.
-<EOS>
-The default setting for other parameters: weight decay rate λ=0.01, β1=0.9, β2=0.999, (cid:15)=1e-6.
-<EOS>
-We did not tune β1 and β2.
-<EOS>
-However, our experiments show that tuning them may get a higher accuracy.
-<EOS>
- Based on our experience, learning rate is the most important hyper-parameter that affects the learning efficiency and final accuracy.
-<EOS>
-Bengio (2012) suggests that it is often the single most important hyper-parameter and that it always should be tuned.
-<EOS>
-Thus, to make sure we have a solid baseline, we carefully tune the learning rate of ADAM, ADAMW, ADAGRAD, and momentum SGD  In our experiments, we found that the validation loss is not reliable for large-batch training.
-<EOS>
-A lower validation loss does not necessarily lead to a higher validation accuracy (Figure 5).
-<EOS>
-Thus, we use the test/val accuracy or F1 score on dev set to evaluate the optimizers.
-<EOS>
- H.0.1 BERT  Table 8 shows some of the tuning information from BERT training with ADAMW optimizer.
-<EOS>
-ADAMW stops scaling at the batch size of 16K.
-<EOS>
-The target F1 score is 90.5. LAMB achieves a F1 score of 91.345.
-<EOS>
-The table shows the tuning information of ADAMW.
-<EOS>
-In Table 8, we report the best F1 score we observed from our experiments.
-<EOS>
- The loss curves of BERT training by LAMB for different batch sizes are shown in Figure 6.
-<EOS>
-We observe that the loss curves are almost identical to each other, which means our optimizer scales well with the batch size.
-<EOS>
- The training loss curve of BERT mixed-batch pre-training with LAMB is shown in Figure 7.
-<EOS>
-This figure shows that LAMB can make the training converge smoothly at the batch size of 64K.
-<EOS>
- Figure 8 shows that we can achieve 76.8% scaling efficiency by scaling the batch size (49.1 times speedup by 64 times computational resources) and 101.8% scaling efficiency with mixed-batch (65.2 times speedup by 64 times computational resources)  17  Published as a conference paper at ICLR 2020  Table 7: Test Accuracy by MNIST training with LeNet (30 epochs for Batch Size = 1024).
-<EOS>
-The tuning space of learning rate for all the optimizers is {0.0001, 0.001, 0.01, 0.1}.
-<EOS>
-We use the same learning rate warmup and decay schedule for all of them.
-<EOS>
- Optimizer  Momentum Addgrad ADAM ADAMW LAMB  Average accuracy over 5 runs  0.9933  0.9928  0.9936  0.9941  0.9945  Figure 5: Our experiments show that even the validation loss is not reliable in the large-scale training.
-<EOS>
-A lower validation loss may lead to a worse accuracy.
-<EOS>
-Thus, we use the test/val accuracy or F1 score on dev set to evaluate the optimizers.
-<EOS>
- H.0.2  IMAGENET  Figures 9 - 14 show the LAMB trust ratio at different iterations for ImageNet training with ResNet-50.
-<EOS>
-From these figures we can see that these ratios are very different from each other for different layers.
-<EOS>
-LAMB uses the trust ratio to help the slow learners to train faster.
-<EOS>
- H.1 BASELINE TUNING DETAILS FOR IMAGENET TRAINING WITH RESNET-50  If you are not interested in the baseline tuning details, please skip this section.
-<EOS>
- Goyal et al (2017) suggested a proper learning rate warmup and decay scheme may help improve the ImageNet classification accuracy.
-<EOS>
-We included these techniques in Adam/AdamW/AdaGrad tuning.
-<EOS>
-Specifically, we use the learning rate recipe of Goyal et al (2017): (1) 5-epoch warmup to stablize the initial stage; and (2) multiply the learning rate by 0.1 at 30th, 60th, and 80th epoch.
-<EOS>
-The target accuracy is around 76.3% (Goyal et al, 2017).
-<EOS>
-There techniques help to im- prove the accuracy of Adam/AdamW/AdaGrad to around 73%.
-<EOS>
-However, even with these techniques, Adam/AdamW/AdaGrad stil can not achieve the target validation accuracy.
-<EOS>
- To make sure our baseline is solid, we carefully tuned the hyper-parameters.
-<EOS>
-Table 9 shows the tuning information of standard Adagrad.
-<EOS>
-Table 10 shows the tuning information of adding the learning rate scheme of Goyal et al (2017) to standard Adagrad.
-<EOS>
-Table 11 shows the tuning information of standard Adam.
-<EOS>
-Table shows the tuning information of adding the learning rate scheme of Goyal et al (2017) to standard Adam.
-<EOS>
-It is tricky to tune the AdamW optimizer since both the L2 regularization and weight decay have the effect on the performance.
-<EOS>
-Thus we have four tuning sets.
-<EOS>
- The first tuning set is based on AdamW with default L2 regularization.
-<EOS>
-We tune the learning rate and weight decay.
-<EOS>
-The tuning information is in Figures 13, 14, 15, and 16.
-<EOS>
- The second tuning set is based on AdamW with disabled L2 regularization.
-<EOS>
-We tune the learning rate and weight decay.
-<EOS>
-The tuning information is in Figures 17, 18, 19, and 20.
-<EOS>
- 18  Published as a conference paper at ICLR 2020  Table 8: ADAMW stops scaling at the batch size of 16K.
-<EOS>
-The target F1 score is 90.5. LAMB achieves a F1 score of 91.345.
-<EOS>
-The table shows the tuning information of ADAMW.
-<EOS>
-In this table, we report the best F1 score we observed from our experiments.
-<EOS>
-LR  batch size warmup steps  last step infomation  F1 score on dev set  Solver  ADAMW ADAMW ADAMW ADAMW ADAMW ADAMW ADAMW ADAMW ADAMW  16K 16K 16K 16K 16K 16K 16K 16K 16K  0.05×31250 0.05×31250 0.05×31250 0.10×31250 0.10×31250 0.10×31250 0.20×31250 0.20×31250 0.20×31250  0.0001 0.0002 0.0003 0.0001 0.0002 0.0003 0.0001 0.0002 0.0003  loss=8.04471, step=28126 loss=7.89673, step=28126 loss=8.35102, step=28126 loss=2.01419, step=31250 loss=1.04689, step=31250 loss=8.05845, step=20000 loss=1.53706, step=31250 loss=1.15500, step=31250 loss=1.48798, step=31250  diverged diverged diverged 86.034 88.540 diverged 85.231 88.110 85.653  Figure 6: This figure shows the training loss curve of LAMB optimizer.
-<EOS>
-We just want to use this figure to show that LAMB can make the training converge smoothly.
-<EOS>
-Even if we scale the batch size to the extremely large cases, the loss curves are almost identical to each other.
-<EOS>
- Then we add the learning rate scheme of Goyal et al (2017) to AdamW and refer to it as AdamW+.
-<EOS>
- The third tuning set is based on AdamW+ with default L2 regularization.
-<EOS>
-We tune the learning rate and weight decay.
-<EOS>
-The tuning information is Figure 21 and 22.
-<EOS>
- The fourth tuning set is based on AdamW+ with disabled L2 regularization.
-<EOS>
-We tune the learning rate and weight decay.
-<EOS>
-The tuning information is in Figures 23, 24, 25.
-<EOS>
- Based on our comprehensive tuning results, we conclude the existing adaptive solvers do not perform well on ImageNet training or at least it is hard to tune them.
-<EOS>
- 19  Published as a conference paper at ICLR 2020  Figure 7: This figure shows the training loss curve of LAMB optimizer.
-<EOS>
-This figure shows that LAMB can make the training converge smoothly at the extremely large batch size (e.g. 64K).
-<EOS>
- Figure 8: We achieve 76.8% scaling efficiency (49 times speedup by 64 times computational resources) and 101.8% scaling efficiency with a mixed, scaled batch size (65.2 times speedup by 64 times computational resources).
-<EOS>
-1024-mixed means the mixed-batch training on 1024 TPUs.
-<EOS>
- Figure 9: The LAMB trust ratio.
-<EOS>
- 20  Published as a conference paper at ICLR 2020  Figure 10: The LAMB trust ratio.
-<EOS>
- Figure 11: The LAMB trust ratio.
-<EOS>
- Figure 12: The LAMB trust ratio.
-<EOS>
- Figure 13: The LAMB trust ratio.
-<EOS>
- 21  Published as a conference paper at ICLR 2020  Figure 14: The LAMB trust ratio.
-<EOS>
- Table 9: The accuracy information of tuning default AdaGrad optimizer for ImageNet training with ResNet-50 (batch size = 16384, 90 epochs, 7038 iterations).
-<EOS>
- Learning Rate Top-1 Validation Accuracy  0.0001 0.001 0.002 0.004 0.008 0.010 0.020 0.040 0.080 0.100 0.200 0.400 0.800 1.000 2.000 4.000 6.000 8.000 10.00 12.00 14.00 16.00 18.00 20.00 30.00 40.00 50.00  0.0026855469 0.015563965 0.022684732 0.030924479 0.04486084 0.054158527 0.0758667 0.1262614 0.24037679 0.27357993 0.458313 0.553833 0.54103595 0.5489095 0.47680664 0.5295207 0.36950684 0.31081137 0.30670166 0.3091024 0.3227946  0.0063680015 0.11287435 0.21602376 0.08315023 0.0132039385 0.0009969076  22  Published as a conference paper at ICLR 2020  Table 10: The accuracy information of tuning AdaGrad optimizer for ImageNet training with ResNet- 50 (batch size = 16384, 90 epochs, 7038 iterations).
-<EOS>
-We use the learning rate recipe of (Goyal et al, 2017): (1) 5-epoch warmup to stablize the initial stage; and (2) multiply the learning rate by 0.1 at 30th, 60th, and 80th epoch.
-<EOS>
-The target accuracy is around 0.763 (Goyal et al, 2017).
-<EOS>
- Learning Rate Top-1 Validation Accuracy  0.0001 0.001 0.002 0.004 0.008 0.010 0.020 0.040 0.080 0.100 0.200 0.400 0.800 1.000 2.000 4.000 6.000 8.000 10.00 12.00 14.00 16.00 18.00 20.00 30.00 40.00 50.00  0.0011189779 0.00793457 0.012573242 0.019022623 0.027079264 0.029012045 0.0421346 0.06618246 0.10970052 0.13429768 0.26550293 0.41918945 0.5519816 0.58614093 0.67252606 0.70306396 0.709493 0.7137858 0.71797687 0.7187703 0.72007245 0.7194214 0.7149251 0.71293133 0.70458984 0.69085693 0.67976886  23  Published as a conference paper at ICLR 2020  Table 11: The accuracy information of tuning default Adam optimizer for ImageNet training with ResNet-50 (batch size = 16384, 90 epochs, 7038 iterations).
-<EOS>
-The target accuracy is around 0.763 (Goyal et al, 2017).
-<EOS>
- Learning Rate Top-1 Validation Accuracy  Table 12: The accuracy information of tuning Adam optimizer for ImageNet training with ResNet-50 (batch size = 16384, 90 epochs, 7038 iterations).
-<EOS>
-We use the learning rate recipe of (Goyal et al, 2017): (1) 5-epoch warmup to stablize the initial stage; and (2) multiply the learning rate by 0.1 at 30th, 60th, and 80th epoch.
-<EOS>
-The target accuracy is around 0.763 (Goyal et al, 2017).
-<EOS>
- Learning Rate Top-1 Validation Accuracy  0.0001 0.0002 0.0004 0.0006 0.0008 0.001 0.002 0.004 0.006 0.008 0.010  0.0001 0.0002 0.0004 0.0006 0.0008 0.001 0.002 0.004 0.006 0.008 0.010 0.012 0.014 0.016 0.020 0.040 0.060 0.080 0.100  0.5521 0.6089 0.6432 0.6465 0.6479 0.6604 0.6408 0.5687 0.5165 0.4812 0.3673  0.410319 0.55263263 0.6455485 0.6774495 0.6996867 0.71010333 0.73476154 0.73286945 0.72648114 0.72214764 0.71466064 0.7081502 0.6993001 0.69108075 0.67997235 0.58658856 0.51090497 0.45174155 0.40297446  24  Published as a conference paper at ICLR 2020  Table 13: The accuracy information of tuning default AdamW optimizer for ImageNet training with ResNet-50 (batch size = 16384, 90 epochs, 7038 iterations).
-<EOS>
-The target accuracy is around 0.763 (Goyal et al, 2017).
-<EOS>
- learning rate weight decay L2 regularization Top-1 Validation Accuracy  0.0001 0.0002 0.0004 0.0006 0.0008 0.001 0.002 0.004 0.006 0.008 0.010 0.012 0.014 0.016 0.018 0.020 0.025 0.030 0.040 0.050  0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001  default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01)  0.53312176 0.5542806 0.48769125 0.46317545 0.40903726 0.42401123 0.33870444 0.12339274 0.122924805 0.08099365 0.016764322 0.032714844 0.018147787 0.0066731772 0.010294597 0.008260091 0.008870442 0.0064493814 0.0018107096 0.003540039  25  Published as a conference paper at ICLR 2020  Table 14: The accuracy information of tuning default AdamW optimizer for ImageNet training with ResNet-50 (batch size = 16384, 90 epochs, 7038 iterations).
-<EOS>
-The target accuracy is around 0.763 (Goyal et al, 2017).
-<EOS>
- learning rate weight decay L2 regularization Top-1 Validation Accuracy  0.0001 0.0002 0.0004 0.0006 0.0008 0.001 0.002 0.004 0.006 0.008 0.010 0.012 0.014 0.016 0.018 0.020 0.025 0.030 0.040 0.050  0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001  default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01)  0.55489093 0.56514484 0.4986979 0.47595215 0.44685873 0.41029868 0.2808024 0.08111572 0.068115234 0.057922363 0.05222575 0.017313639 0.029785156 0.016540527 0.00575765 0.0102335615 0.0060831704 0.0036417644 0.0010782877 0.0037638347  26  Published as a conference paper at ICLR 2020  Table 15: The accuracy information of tuning default AdamW optimizer for ImageNet training with ResNet-50 (batch size = 16384, 90 epochs, 7038 iterations).
-<EOS>
-The target accuracy is around 0.763 (Goyal et al, 2017).
-<EOS>
- learning rate weight decay L2 regularization Top-1 Validation Accuracy  0.0001 0.0002 0.0004 0.0006 0.0008 0.001 0.002 0.004 0.006 0.008 0.010 0.012 0.014 0.016 0.018 0.020 0.025 0.030 0.040 0.050  0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001  default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01)  0.21142578 0.4289144 0.13537598 0.33803305 0.32611084 0.22194417 0.1833903 0.08256022 0.020507812 0.018269857 0.007507324 0.020080566 0.010762532 0.0021362305 0.007954915 0.005859375 0.009724935 0.0019124349 0.00390625 0.0009969076  27  Published as a conference paper at ICLR 2020  Table 16: The accuracy information of tuning default AdamW optimizer for ImageNet training with ResNet-50 (batch size = 16384, 90 epochs, 7038 iterations).
-<EOS>
-The target accuracy is around 0.763 (Goyal et al, 2017).
-<EOS>
- learning rate weight decay L2 regularization Top-1 Validation Accuracy  0.0001 0.0002 0.0004 0.0006 0.0008 0.001 0.002 0.004 0.006 0.008 0.010 0.012 0.014 0.016 0.018 0.020 0.025 0.030 0.040 0.050  0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01  0.0009765625 0.0009969076 0.0010172526 0.0009358724 0.0022379558 0.001566569 0.009480794 0.0033569336 0.0029907227 0.0018513998 0.009134929 0.0022176106 0.0040690103 0.0017293295 0.00061035156 0.0022379558 0.0017089844 0.0014241537 0.0020345051 0.0012817383  default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01)  28  Published as a conference paper at ICLR 2020  Table 17: The accuracy information of tuning default AdamW optimizer for ImageNet training with ResNet-50 (batch size = 16384, 90 epochs, 7038 iterations).
-<EOS>
-The target accuracy is around 0.763 (Goyal et al, 2017).
-<EOS>
- learning rate weight decay L2 regularization Top-1 Validation Accuracy  0.0001 0.0002 0.0004 0.0006 0.0008 0.001 0.002 0.004 0.006 0.008 0.010 0.012 0.014 0.016 0.018 0.020 0.025 0.030 0.040 0.050  0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001  0.48917642 0.58152264 0.63460284 0.64849854 0.6598918 0.6662801 0.67266846 0.6692708 0.6573079 0.6639404 0.65230304 0.6505534 0.64990234 0.65323895 0.67026776 0.66086835 0.65425617 0.6476237 0.55478925 0.61869305  disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable  29  Published as a conference paper at ICLR 2020  Table 18: The accuracy information of tuning default AdamW optimizer for ImageNet training with ResNet-50 (batch size = 16384, 90 epochs, 7038 iterations).
-<EOS>
-The target accuracy is around 0.763 (Goyal et al, 2017).
-<EOS>
- learning rate weight decay L2 regularization Top-1 Validation Accuracy  0.0001 0.0002 0.0004 0.0006 0.0008 0.001 0.002 0.004 0.006 0.008 0.010 0.012 0.014 0.016 0.018 0.020 0.025 0.030 0.040 0.050  0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001  0.5033366 0.5949707 0.62561035 0.6545207 0.66326904 0.6677043 0.67244464 0.6702881 0.66033936 0.66426593 0.66151935 0.6545817 0.65509033 0.6529338 0.65651447 0.65334064 0.655009 0.64552814 0.6425374 0.5988159  disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable  30  Published as a conference paper at ICLR 2020  Table 19: The accuracy information of tuning default AdamW optimizer for ImageNet training with ResNet-50 (batch size = 16384, 90 epochs, 7038 iterations).
-<EOS>
-The target accuracy is around 0.763 (Goyal et al, 2017).
-<EOS>
- learning rate weight decay L2 regularization Top-1 Validation Accuracy  0.0001 0.0002 0.0004 0.0006 0.0008 0.001 0.002 0.004 0.006 0.008 0.010 0.012 0.014 0.016 0.018 0.020 0.025 0.030 0.040 0.050  0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001  0.4611206  0.0076293945 0.29233804 0.57295734 0.5574748 0.5988566 0.586263 0.62076825 0.61503094 0.4697876 0.619751 0.54243976 0.5429077 0.55281574 0.5819295 0.5938924 0.541097 0.45890298 0.56193036 0.5279134  disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable  31  Published as a conference paper at ICLR 2020  Table 20: The accuracy information of tuning default AdamW optimizer for ImageNet training with ResNet-50 (batch size = 16384, 90 epochs, 7038 iterations).
-<EOS>
-The target accuracy is around 0.763 (Goyal et al, 2017).
-<EOS>
- learning rate weight decay L2 regularization Top-1 Validation Accuracy  0.0001 0.0002 0.0004 0.0006 0.0008 0.001 0.002 0.004 0.006 0.008 0.010 0.012 0.014 0.016 0.018 0.020 0.025 0.030 0.040 0.050  0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01  0.0009969076 0.0008951823 0.00095621747 0.0012817383 0.016886393 0.038146973 0.0015258789 0.0014241537 0.081441246 0.028116861 0.011820476 0.08138021 0.010111491 0.0041910806 0.0038248699 0.002746582 0.011555989 0.0065104165 0.016438803 0.007710775  disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable  32  Published as a conference paper at ICLR 2020  Table 21: The accuracy information of tuning AdamW optimizer for ImageNet training with ResNet- 50 (batch size = 16384, 90 epochs, 7038 iterations).
-<EOS>
-We use the learning rate recipe of (Goyal et al, 2017): (1) 5-epoch warmup to stablize the initial stage; and (2) multiply the learning rate by 0.1 at 30th, 60th, and 80th epoch.
-<EOS>
-The target accuracy is around 0.763 (Goyal et al, 2017).
-<EOS>
- learning rate weight decay L2 regularization Top-1 Validation Accuracy  0.0001 0.0002 0.0004 0.0006 0.0008 0.001 0.002 0.004 0.006 0.008 0.0001 0.0002 0.0004 0.0006 0.0008 0.001 0.002 0.004 0.006 0.008  0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001  default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01)  0.0009969076 0.0009969076 0.0009969076 0.0009358724 0.0009969076 0.0009765625 0.0010172526 0.0010172526 0.0010172526 0.0010172526 0.0010172526 0.0010172526 0.0010172526 0.0009969076 0.0010172526 0.0010172526 0.0010172526 0.0038452148 0.011881511 0.0061442056  33  Published as a conference paper at ICLR 2020  Table 22: The accuracy information of tuning AdamW optimizer for ImageNet training with ResNet- 50 (batch size = 16384, 90 epochs, 7038 iterations).
-<EOS>
-We use the learning rate recipe of (Goyal et al, 2017): (1) 5-epoch warmup to stablize the initial stage; and (2) multiply the learning rate by 0.1 at 30th, 60th, and 80th epoch.
-<EOS>
-The target accuracy is around 0.763 (Goyal et al, 2017).
-<EOS>
- learning rate weight decay L2 regularization Top-1 Validation Accuracy  0.0001 0.0002 0.0004 0.0006 0.0008 0.001 0.002 0.004 0.006 0.008 0.0001 0.0002 0.0004 0.0006 0.0008 0.001 0.002 0.004 0.006 0.008  0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001  default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01) default (0.01)  0.3665975 0.5315755 0.6369222 0.6760457 0.69557697 0.7076009 0.73065186 0.72806805 0.72161865  0.71816  0.49804688 0.6287028 0.6773885 0.67348224 0.6622111 0.6468709 0.5846761 0.4868978 0.34969077 0.31193033  34  Published as a conference paper at ICLR 2020  Table 23: The accuracy information of tuning AdamW optimizer for ImageNet training with ResNet- 50 (batch size = 16384, 90 epochs, 7038 iterations).
-<EOS>
-We use the learning rate recipe of (Goyal et al, 2017): (1) 5-epoch warmup to stablize the initial stage; and (2) multiply the learning rate by 0.1 at 30th, 60th, and 80th epoch.
-<EOS>
-The target accuracy is around 0.763 (Goyal et al, 2017).
-<EOS>
- learning rate weight decay L2 regularization Top-1 Validation Accuracy  0.0001 0.0002 0.0004 0.0006 0.0008 0.001 0.002 0.004 0.006 0.008 0.0001 0.0002 0.0004 0.0006 0.0008 0.001 0.002 0.004 0.006 0.008  0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001  0.0010172526 0.0009765625 0.0010172526 0.0009969076 0.0010172526 0.0009765625 0.0009969076 0.0009969076 0.0009765625 0.0010172526 0.0009765625 0.0010172526 0.0010172526 0.0010172526 0.0010172526 0.0009969076 0.0010579427 0.0016886393 0.019714355 0.1329956  disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable  35  Published as a conference paper at ICLR 2020  Table 24: The accuracy information of tuning AdamW optimizer for ImageNet training with ResNet- 50 (batch size = 16384, 90 epochs, 7038 iterations).
-<EOS>
-We use the learning rate recipe of (Goyal et al, 2017): (1) 5-epoch warmup to stablize the initial stage; and (2) multiply the learning rate by 0.1 at 30th, 60th, and 80th epoch.
-<EOS>
-The target accuracy is around 0.763 (Goyal et al, 2017).
-<EOS>
- learning rate weight decay L2 regularization Top-1 Validation Accuracy  0.28515625 0.44055176 0.56815594 0.6234741 0.6530762 0.6695964 0.70048016  0.71698  0.72021484 0.7223918 0.72017413 0.72058105 0.7188924 0.71695966 0.7154134 0.71358234 0.7145386 0.7114258 0.7066447 0.70284015  0.0001 0.0002 0.0004 0.0006 0.0008 0.001 0.002 0.004 0.006 0.008 0.010 0.012 0.014 0.016 0.018 0.020 0.025 0.030 0.040 0.050  0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001 0.0001  disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable  36  Published as a conference paper at ICLR 2020  Table 25: The accuracy information of tuning AdamW optimizer for ImageNet training with ResNet- 50 (batch size = 16384, 90 epochs, 7038 iterations).
-<EOS>
-We use the learning rate recipe of (Goyal et al, 2017): (1) 5-epoch warmup to stablize the initial stage; and (2) multiply the learning rate by 0.1 at 30th, 60th, and 80th epoch.
-<EOS>
-The target accuracy is around 0.763 (Goyal et al, 2017).
-<EOS>
- learning rate weight decay L2 regularization Top-1 Validation Accuracy  0.31247965 0.4534912 0.57765704 0.6277669 0.65321857 0.6682129 0.69938153 0.7095947 0.710612 0.70857745 0.7094116 0.70717365 0.7109375 0.7058309 0.7052409 0.7064412 0.7035319 0.6994629 0.6972656 0.6971232  0.0001 0.0002 0.0004 0.0006 0.0008 0.001 0.002 0.004 0.006 0.008 0.010 0.012 0.014 0.016 0.018 0.020 0.025 0.030 0.040 0.050  0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001 0.00001  disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable disable  37  
 <EOS>

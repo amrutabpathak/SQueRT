@@ -8,7 +8,7 @@ In fact, our results suggest that RL practices in MT are likely to improve perfo
 <EOS>
 Our findings further suggest that observed gains may be due to effects unrelated to the training signal, concretely, changes in the shape of the distribution curve.
 <EOS>
- 1  INTRODUCTION  Reinforcement learning (RL) is an appealing path for advancement in Machine Translation (MT), as it allows training systems to optimize non-differentiable score functions, common in MT evaluation, as well as tackling the “exposure bias” (Ranzato et al, 2015) in standard training, namely that the model is not exposed during training to incorrectly generated tokens, and is thus unlikely to recover from generating such tokens at test time.
+ 1  INTRODUCTION  Reinforcement learning (RL) is an appealing path for advancement in Machine Translation (MT), as it allows training systems to optimize non-differentiable score functions, common in MT evaluation, as well as tackling the “exposure bias”  in standard training, namely that the model is not exposed during training to incorrectly generated tokens, and is thus unlikely to recover from generating such tokens at test time.
 <EOS>
 These motivations have led to much interest in RL for text generation in general and MT in particular (see §2).
 <EOS>
@@ -46,13 +46,13 @@ For brevity, we omit parameters where they are fixed within context.
 <EOS>
 For simplicity, we assume r does not depend on following tokens y>i.
 <EOS>
- We also assume there is exactly one valid target token, as de facto, training is done against a single reference (Schulz et al, 2018).
+ We also assume there is exactly one valid target token, as de facto, training is done against a single reference .
 <EOS>
 In practice, either a token-level reward is approximated using Monte- Carlo methods (e.g., Yang et al, 2018), or a sentence-level (sparse) reward is given at the end of the episode (sentence).
 <EOS>
 The latter is equivalent to a uniform token-level reward.
 <EOS>
- r is often the negative log-likelihood, or a standard MT metric, e.g., BLEU (Papineni et al, 2002).
+ r is often the negative log-likelihood, or a standard MT metric, e.g., BLEU .
 <EOS>
 RL’s goal is to maximize the expected episode reward (denoted with R); i.e., to find  θ∗ = arg max  R(θ) = arg max  Ey∼Pθ [r(y)]  θ  θ  2.1 REINFORCE  For a given source sentence, and past predictions y<i, REINFORCE (Williams, 1992) samples k tokens (k is a hyperparameter) S = (cid:0)y(1), ..., y(k)(cid:1) from Pθ and updates θ according to this rule:  (1)  (2)  ∆θ ∝  r(yi)∇ log(Pθ(yi))  1 k  k  (cid:88)  i=1  The right-hand side of equation 2 is an unbiased estimator of the gradient of the objective function, i.e., E [∆θ] ∝ ∇θR (θ).
 <EOS>
@@ -62,7 +62,7 @@ From here follows that if R is constant with respect to θ, then the expected �
 <EOS>
 We note that r may be shifted by a constant term (called a “baseline”), without affecting the optimal value for θ.
 <EOS>
- REINFORCE is used in MT, text generation, and image-to-text tasks (Liu et al, 2016; Wu et al, 2018; Rennie et al, 2017; Shetty et al, 2017; Hendricks et al, 2016) – in isolation, or as a part of training (Ranzato et al, 2015).
+ REINFORCE is used in MT, text generation, and image-to-text tasks (Liu et al, 2016; Wu et al, 2018; Rennie et al, 2017; Shetty et al, 2017; Hendricks et al, 2016) – in isolation, or as a part of training .
 <EOS>
 Lately, an especially prominent use for REINFORCE is adversarial training with discrete data, where another network predicts the reward (GAN).
 <EOS>
@@ -72,7 +72,7 @@ For some recent work on RL for NMT, see (Zhang et al, 2016; Li et al, 2017; Wu e
 <EOS>
 CMRT was proposed by Och (2003), adapted to NMT by Shen et al (2016), and often used since (Ayana et al, 2016; Neubig, 2016; Shen et al, 2017; Edunov et al, 2018; Makarov & Clematide, 2018; Neubig et al, 2018).
 <EOS>
- The method works as follows: at each iteration, sample k tokens S = {y1,., yk} from Pθ, and update θ according to the gradient of  where  (cid:101)R(θ, S) =  Qθ,S(yi)r(yi) = Ey∼Q  (cid:2)r(y)(cid:3)  k  (cid:88)  i=1  Qθ,S(yi) =  P (yi)α yj ∈S P (yj)α  (cid:80)  Commonly (but not universally), deduplication is performed, so (cid:101)R sums over a set of unique values (Sennrich et al, 2017).
+ The method works as follows: at each iteration, sample k tokens S = {y1,., yk} from Pθ, and update θ according to the gradient of  where  (cid:101)R(θ, S) =  Qθ,S(yi)r(yi) = Ey∼Q  (cid:2)r(y)(cid:3)  k  (cid:88)  i=1  Qθ,S(yi) =  P (yi)α yj ∈S P (yj)α  (cid:80)  Commonly (but not universally), deduplication is performed, so (cid:101)R sums over a set of unique values .
 <EOS>
 This changes little in our empirical results and theoretical analysis.
 <EOS>
@@ -110,7 +110,7 @@ However, not much is known about its convergence rate under the prevailing condi
 <EOS>
  We begin with a qualitative, motivating analysis of these questions.
 <EOS>
-As work on language generation empirically showed, RNNs quickly learn to output very peaky distributions (Press et al, 2017).
+As work on language generation empirically showed, RNNs quickly learn to output very peaky distributions .
 <EOS>
 This tendency is advantageous for generating ﬂuent sentences with high probability, but may also entail slower convergence rates when using RL to fine-tune the model, because RL methods used in text generation sample from the (pretrained) policy distribution, which means they mostly sample what the pretrained model deems to be likely.
 <EOS>
@@ -134,7 +134,7 @@ We assess the rate of convergence empirically in §5, finding this to be indeed 
 <EOS>
  1Sakaguchi et al (2017) discuss the relation between CMRT and REINFORCE, claiming that CMRT is a  variantAppendix A.1 shows that CMRT does not in fact optimize the same objective.
 <EOS>
- 2Not performing deduplication (e.g. in THUMT (Zhang et al, 2017)) results in assigning higher relative  weight to high-probability tokens, which may have an adverse effect on convergence rate.
+ 2Not performing deduplication (e.g. in THUMT ) results in assigning higher relative  weight to high-probability tokens, which may have an adverse effect on convergence rate.
 <EOS>
  3  Published as a conference paper at ICLR 2020  Figure 1: A histogram of the up- date size (x-axis) to the total pre- dicted probability of the 10 most probable tokens (left) or the most probable token (right) in the Con- stant Reward setting.
 <EOS>
@@ -156,11 +156,11 @@ Fur- thermore, given their findings, it is reasonable to assume that our results
 <EOS>
 This model simulates the top of any MT decoder (cid:80) that ends with a softmax layer, as essentially all NMT decoders do.
 <EOS>
-To make experiments realistic, we use similar parameters as those reported in the inﬂuential Transformer NMT system (Vaswani et al, 2017).
+To make experiments realistic, we use similar parameters as those reported in the inﬂuential Transformer NMT system .
 <EOS>
 Specifically, the size of V (distinct BPE tokens) is 30,715, and the initial values for θ were sampled from 1,000 sets of logits taken from decoding the standard newstest2013 development set, using a pretrained Transformer model.
 <EOS>
-The model was pretrained on WMT2015 training data (Bojar et al, 2015).
+The model was pretrained on WMT2015 training data .
 <EOS>
 Hyperparameters are reported in Appendix A.3. We define one of the tokens in V to be the target token and denote it with ybest.
 <EOS>
@@ -228,13 +228,13 @@ Important differences between this and the previous simula- tions are: (1) it is
 <EOS>
 Expected BLEU is computed by sampling suffixes for the sentence, and averaging the BLEU score of the sampled sen- tences against the reference.
 <EOS>
- We use early stopping with a patience of 10 epochs, where each epoch consists of 5,000 sentences sampled from the WMT2015 (Bojar et al, 2015) German-English training data.
+ We use early stopping with a patience of 10 epochs, where each epoch consists of 5,000 sentences sampled from the WMT2015  German-English training data.
 <EOS>
 We use k = 1.
 <EOS>
 We retuned the learning-rate, and positive baseline settings against the development set.
 <EOS>
-Other hyper-parameters were an exact repli- cation of the experiments reported in (Yang et al, 2018).
+Other hyper-parameters were an exact repli- cation of the experiments reported in .
 <EOS>
  Figure 3: The cumulative distri- bution of the probability of the most likely token in the NMT ex- periments.
 <EOS>
@@ -360,7 +360,7 @@ This  improvement is very stable across metrics, trials and pretrained models.
 <EOS>
  7  Published as a conference paper at ICLR 2020  may play a role here.
 <EOS>
-Second, we observe more peakiness in the reinforced model and in such cases, we expect improvements in BLEU (Caccia et al, 2018).
+Second, we observe more peakiness in the reinforced model and in such cases, we expect improvements in BLEU .
 <EOS>
 Third, we achieve similar results with a constant reward in our NMT experiments (§5.2).
 <EOS>
@@ -370,11 +370,11 @@ Fourth, our controlled simulations show that asymptotic convergence is not reach
 <EOS>
 It should be avoided when using REINFORCE as it violates REINFORCE’s assumptions.
 <EOS>
- The per-token sampling as done in our experiments is more exploratory than beam search (Wu et al, 2018), reducing PKE.
+ The per-token sampling as done in our experiments is more exploratory than beam search , reducing PKE.
 <EOS>
 Furthermore, the latter does not sample from the behavior policy, but does not properly account for being off-policy in the parameter updates.
 <EOS>
- Adding the reference to the sample S, which some implementations allow (Sennrich et al, 2017) may help reduce the problems of never sampling the target tokens.
+ Adding the reference to the sample S, which some implementations allow  may help reduce the problems of never sampling the target tokens.
 <EOS>
 However, as Edunov et al (2018) point out, this practice may lower results, as it may destabilize training by leading the model to improve over outputs it cannot generalize over, as they are very different from anything the model assigns a high probability to, at the cost of other outputs.
 <EOS>
@@ -382,7 +382,7 @@ However, as Edunov et al (2018) point out, this practice may lower results, as i
 <EOS>
 First, the action space in MT problems is a high-dimensional discrete space (generally in the size of the vocabulary of the target language or the product thereof for sentences).
 <EOS>
-This contrasts with the more common sce- nario studied by contemporary RL methods, which focuses mostly on much smaller discrete action spaces (e.g., video games (Mnih et al, 2015; 2016)), or continuous action spaces of relatively low dimensions (e.g., simulation of robotic control tasks (Lillicrap et al, 2015)).
+This contrasts with the more common sce- nario studied by contemporary RL methods, which focuses mostly on much smaller discrete action spaces (e.g., video games (Mnih et al, 2015; 2016)), or continuous action spaces of relatively low dimensions (e.g., simulation of robotic control tasks ).
 <EOS>
 Second, reward for MT is naturally very sparse – almost all possible sentences are “wrong” (hence, not rewarding) in a given context.
 <EOS>
@@ -406,7 +406,7 @@ Moreover, a key mo- tivation for using α in CMRT is smoothing; off-policy sampl
 <EOS>
  In its basic form, exploration in REINFORCE relies on stochasticity in the action-selection (in MT, this is due to sampling).
 <EOS>
-More sophisticated exploration methods have been extensively studied, for example using measures for the exploratory usefulness of states or actions (Fox et al, 2018), or relying on parameter-space noise rather than action-space noise (Plappert et al, 2017).
+More sophisticated exploration methods have been extensively studied, for example using measures for the exploratory usefulness of states or actions , or relying on parameter-space noise rather than action-space noise .
 <EOS>
  For MT, an additional challenge is that even effective exploration (sampling diverse sets of obser- vations), may not be enough, since the state-action space is too large to be effectively covered, with almost all sentences being not rewarding.
 <EOS>
@@ -417,356 +417,4 @@ We believe the adoption of such methods is a promising path forward for the appl
  8  Published as a conference paper at ICLR 2020  9 ACKNOWLEDGMENTS  This work was supported by the Israel Science Foundation (grant no.
 <EOS>
 929/17) and by the HUJI Cyber Security Research Center in conjunction with the Israel National Cyber Bureau in the Prime Minister’s Office.
-<EOS>
- REFERENCES  Marcin Andrychowicz, Filip Wolski, Alex Ray, Jonas Schneider, Rachel Fong, Peter Welinder, Bob McGrew, Josh Tobin, OpenAI Pieter Abbeel, and Wojciech Zaremba.
-<EOS>
-Hindsight experience re- play.
-<EOS>
-In Advances in Neural Information Processing Systems, pp 5048–5058, 2017.
-<EOS>
- Shiqi Shen Ayana, Zhiyuan Liu, and Maosong Sun.
-<EOS>
-Neural headline generation with minimum risk  training. arXiv preprint arXiv:1604.01904, 2016.
-<EOS>
- Ondrej Bojar, Rajen Chatterjee, Christian Federmann, Barry Haddow, Matthias Huck, Chris Hokamp, Philipp Koehn, Varvara Logacheva, Christof Monz, Matteo Negri, Matt Post, Carolina Scarton, Lucia Specia, and Marco Turchi.
-<EOS>
-Findings of the 2015 workshop on statistical machine translation.
-<EOS>
-In WMT@EMNLP, 2015.
-<EOS>
- Massimo Caccia, Lucas Caccia, William Fedus, Hugo Larochelle, Joelle Pineau, and Laurent Char- lin.
-<EOS>
-Language gans falling short. arXiv preprint arXiv:1811.02549, 2018.
-<EOS>
-URL https: //arxiv.org/pdf/1811.02549.pdf.
-<EOS>
- Thomas Degris, Martha White, and Richard S Sutton.
-<EOS>
-Off-policy actor-critic. arXiv preprint  arXiv:1205.4839, 2012.
-<EOS>
- Sergey Edunov, Myle Ott, Michael Auli, David Grangier, and Marc’Aurelio Ranzato.
-<EOS>
-Classical structured prediction losses for sequence to sequence learning.
-<EOS>
-In Proceedings of the 2018 Con- ference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long Papers), pp 355–364.
-<EOS>
-Association for Computational Linguistics, 2018. doi: 10.18653/v1/N18-1033.
-<EOS>
-URL http://aclweb.org/anthology/ N18-1033.
-<EOS>
- Benjamin Eysenbach, Abhishek Gupta, Julian Ibarz, and Sergey Levine.
-<EOS>
-Diversity is all you need: Learning skills without a reward function.
-<EOS>
-In International Conference on Learning Representa- tions, 2019.
-<EOS>
-URL https://openreview.net/forum?id=SJx63jRqFm.
-<EOS>
- Lior Fox, Leshem Choshen, and Yonatan Loewenstein.
-<EOS>
-Dora the explorer: Directed outreaching  reinforcement action-selection.
-<EOS>
-ICLR, abs/1804.04012, 2018.
-<EOS>
- Dibya Ghosh, Avi Singh, Aravind Rajeswaran, Vikash Kumar, and Sergey Levine.
-<EOS>
-Divide-and- conquer reinforcement learning.
-<EOS>
-In International Conference on Learning Representations, 2018.
-<EOS>
-URL https://openreview.net/forum?id=rJwelMbR-.
-<EOS>
- Lisa Anne Hendricks, Zeynep Akata, Marcus Rohrbach, Jeff Donahue, Bernt Schiele, and Trevor  Darrell.
-<EOS>
-Generating visual explanations.
-<EOS>
-In ECCV, 2016.
-<EOS>
- Diederik P. Kingma and Jimmy Ba. Adam: A method for stochastic optimization.
-<EOS>
-CoRR,  abs/1412.6980, 2015.
-<EOS>
- Philipp Koehn, Hieu Hoang, Alexandra Birch, Chris Callison-Burch, Marcello Federico, Nicola Bertoldi, Brooke Cowan, Wade Shen, Christine Moran, Richard Zens, Chris Dyer, Ondrej Bojar, Alexandra Constantin, and Evan Herbst.
-<EOS>
-Moses: Open source toolkit for statistical machine In Proceedings of the 45th Annual Meeting of the Association for Computational translation.
-<EOS>
-Linguistics Companion Volume Proceedings of the Demo and Poster Sessions, pp 177–180, 2007.
-<EOS>
- Jiwei Li, Will Monroe, Tianlin Shi, Sébastien Jean, Alan Ritter, and Dan Jurafsky.
-<EOS>
-Adversarial learn- ing for neural dialogue generation.
-<EOS>
-In Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing, pp 2157–2169, Copenhagen, Denmark, September 2017.
-<EOS>
-As- sociation for Computational Linguistics.
-<EOS>
-URL https://www.aclweb.org/anthology/ D17-1230.
-<EOS>
- 9  Published as a conference paper at ICLR 2020  Timothy P Lillicrap, Jonathan J Hunt, Alexander Pritzel, Nicolas Heess, Tom Erez, Yuval Tassa, David Silver, and Daan Wierstra.
-<EOS>
-Continuous control with deep reinforcement learning. arXiv preprint arXiv:1509.02971, 2015.
-<EOS>
- Siqi Liu, Zhenhai Zhu, Ning Ye, Sergio Guadarrama, and Kevin Murphy.
-<EOS>
-Optimization of image  description metrics using policy gradient methods.
-<EOS>
-CoRR, abs/1612.00370, 2, 2016.
-<EOS>
- Peter Makarov and Simon Clematide.
-<EOS>
-Neural transition-based string transduction for limited-  resource setting in morphology.
-<EOS>
-In COLING, 2018.
-<EOS>
- Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Andrei A Rusu, Joel Veness, Marc G Belle- mare, Alex Graves, Martin Riedmiller, Andreas K Fidjeland, Georg Ostrovski, et al Human-level control through deep reinforcement learning.
-<EOS>
-Nature, 518(7540):529–533, 2015.
-<EOS>
- Volodymyr Mnih, Adria Puigdomenech Badia, Mehdi Mirza, Alex Graves, Timothy Lillicrap, Tim Harley, David Silver, and Koray Kavukcuoglu.
-<EOS>
-Asynchronous methods for deep reinforcement learning.
-<EOS>
-In International conference on machine learning, pp 1928–1937, 2016.
-<EOS>
- Graham Neubig.
-<EOS>
-Lexicons and minimum risk training for neural machine translation: Naist-cmu at  wat2016.
-<EOS>
-In WAT@COLING, 2016.
-<EOS>
- Graham Neubig, Matthias Sperber, Xinyi Wang, Matthieu Felix, Austin Matthews, Sarguna Pad- manabhan, Ye Qi, Devendra Singh Sachan, Philip Arthur, Pierre Godard, John Hewitt, Rachid Riad, and Liming Wang.
-<EOS>
-Xnmt: The extensible neural machine translation toolkit.
-<EOS>
-In AMTA, 2018.
-<EOS>
- Franz Josef Och.
-<EOS>
-Minimum error rate training in statistical machine translation.
-<EOS>
-In Proceedings of the 41st Annual Meeting on Association for Computational Linguistics-Volume 1, pp 160–167.
-<EOS>
-Association for Computational Linguistics, 2003.
-<EOS>
- Kishore Papineni, Salim Roukos, Todd Ward, and Wei-Jing Zhu.
-<EOS>
-Bleu: a method for automatic evaluation of machine translation.
-<EOS>
-In Proceedings of the 40th annual meeting on association for computational linguistics, pp 311–318.
-<EOS>
-Association for Computational Linguistics, 2002.
-<EOS>
-URL https://www.aclweb.org/anthology/P02-1040.pdf.
-<EOS>
- Matthias Plappert, Rein Houthooft, Prafulla Dhariwal, Szymon Sidor, Richard Y Chen, Xi Chen, Tamim Asfour, Pieter Abbeel, and Marcin Andrychowicz.
-<EOS>
-Parameter space noise for exploration. arXiv preprint arXiv:1706.01905, 2017.
-<EOS>
- O. Press, A. Bar, B. Bogin, J. Berant, and L. Wolf.
-<EOS>
-Language generation with recurrent generative In Fist Workshop on Learning to Generate Natural  adversarial networks without pre-training.
-<EOS>
-Language@ICML, 2017.
-<EOS>
- Marc’Aurelio Ranzato, Sumit Chopra, Michael Auli, and Wojciech Zaremba.
-<EOS>
-Sequence level train-  ing with recurrent neural networks. arXiv preprint arXiv:1511.06732, 2015.
-<EOS>
- Steven J Rennie, Etienne Marcheret, Youssef Mroueh, Jerret Ross, and Vaibhava Goel.
-<EOS>
-Self-critical sequence training for image captioning.
-<EOS>
-In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pp 7008–7024, 2017.
-<EOS>
- Keisuke Sakaguchi, Matt Post, and Benjamin Van Durme.
-<EOS>
-Grammatical error correction with neural  reinforcement learning. arXiv preprint arXiv:1707.00299, 2017.
-<EOS>
- Philip Schulz, Wilker Aziz, and Trevor Cohn.
-<EOS>
-A stochastic decoder for neural machine translation.
-<EOS>
- In ACL, 2018.
-<EOS>
- Rico Sennrich, Barry Haddow, and Alexandra Birch.
-<EOS>
-Neural machine translation of rare words with subword units.
-<EOS>
-In Proceedings of the 54th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), volume 1, pp 1715–1725, 2016.
-<EOS>
-URL http://www. aclweb.org/anthology/P16-1162.
-<EOS>
- Rico Sennrich, Orhan Firat, Kyunghyun Cho, Alexandra Birch, Barry Haddow, Julian Hitschler, Marcin Junczys-Dowmunt, Samuel Läubli, Antonio Valerio Miceli Barone, Jozef Mokry, and Maria Nadejde.
-<EOS>
-Nematus: a toolkit for neural machine translation.
-<EOS>
-In EACL, 2017.
-<EOS>
- 10  Published as a conference paper at ICLR 2020  Shiqi Shen, Yong Cheng, Zhongjun He, Wei He, Hua Wu, Maosong Sun, and Yang Liu.
-<EOS>
-Minimum risk training for neural machine translation.
-<EOS>
-In Proceedings of the 54th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pp 1683–1692.
-<EOS>
-Association for Computational Linguistics, 2016. doi: 10.18653/v1/P16-1159.
-<EOS>
-URL http://aclweb. org/anthology/P16-1159.
-<EOS>
- Shiqi Shen, Yang Liu, and Maosong Sun.
-<EOS>
-Optimizing non-decomposable evaluation metrics for  neural machine translation.
-<EOS>
-Journal of Computer Science and Technology, 32:796–804, 2017.
-<EOS>
- Rakshith Shetty, Marcus Rohrbach, Lisa Anne Hendricks, Mario Fritz, and Bernt Schiele.
-<EOS>
-Speaking the same language: Matching machine to human captions by adversarial training.
-<EOS>
-In 2017 IEEE International Conference on Computer Vision (ICCV), pp 4155–4164.
-<EOS>
-IEEE, 2017.
-<EOS>
- David Silver, Guy Lever, Nicolas Heess, Thomas Degris, Daan Wierstra, and Martin Riedmiller.
-<EOS>
- Deterministic policy gradient algorithms.
-<EOS>
-In ICML, 2014.
-<EOS>
- Richard S Sutton and Andrew G Barto.
-<EOS>
-Reinforcement learning: An introduction.
-<EOS>
-MIT press, 1998.
-<EOS>
- G. Tevet, G. Habib, V. Shwartz, and J. Berant.
-<EOS>
-Evaluating text GANs as language models. arXiv  preprint arXiv:1810.12686, 2018.
-<EOS>
- Tijmen Tieleman and Geoffrey Hinton.
-<EOS>
-Lecture 6.5-rmsprop: Divide the gradient by a running average of its recent magnitude.
-<EOS>
-COURSERA: Neural networks for machine learning, 4(2):26– 31, 2012.
-<EOS>
- Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin.
-<EOS>
-Attention is all you need.
-<EOS>
-In Advances in Neural Informa- tion Processing Systems, pp 5998–6008, 2017.
-<EOS>
-URL https://papers.nips.cc/paper/ 7181-attention-is-all-you-need.pdf.
-<EOS>
- Christopher JCH Watkins and Peter Dayan.
-<EOS>
-Q-learning.
-<EOS>
-Machine learning, 8(3-4):279–292, 1992.
-<EOS>
- John Wieting, Taylor Berg-Kirkpatrick, Kevin Gimpel, and Graham Neubig.
-<EOS>
-Beyond BLEU: Train- In The 57th Annual Meeting of the ing neural machine translation with semantic similarity.
-<EOS>
-Association for Computational Linguistics (ACL), Florence, Italy, July 2019.
-<EOS>
-URL https: //arxiv.org/abs/1909.06694.
-<EOS>
- Ronald J Williams.
-<EOS>
-Simple statistical gradient-following algorithms for connectionist reinforcement  learning.
-<EOS>
-Machine learning, 8(3-4):229–256, 1992.
-<EOS>
- Lijun Wu, Yingce Xia, Li Zhao, Fei Tian, Tao Qin, Jianhuang Lai, and Tie-Yan Liu.
-<EOS>
-Adversarial  neural machine translation. arXiv preprint arXiv:1704.06933, 2017.
-<EOS>
- Lijun Wu, Fei Tian, Tao Qin, Jianhuang Lai, and Tie-Yan Liu.
-<EOS>
-A study of reinforcement learning  for neural machine translation.
-<EOS>
-In EMNLP, 2018.
-<EOS>
- Zhen Yang, Wei Chen, Feng Wang, and Bo Xu. Improving neural machine translation with condi- tional sequence generative adversarial nets.
-<EOS>
-In Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technolo- gies, Volume 1 (Long Papers), pp 1346–1355.
-<EOS>
-Association for Computational Linguistics, 2018. doi: 10.18653/v1/N18-1122.
-<EOS>
-URL http://aclweb.org/anthology/N18-1122.
-<EOS>
- Lantao Yu, Weinan Zhang, Jun Wang, and Yong Yu. Seqgan: Sequence generative adversarial nets  with policy gradient.
-<EOS>
-In AAAI, pp 2852–2858, 2017.
-<EOS>
- Jiac heng Zhang, Yanzhuo Ding, Shiqi Shen, Yong Cheng, Maosong Sun, Huanbo Luan, and Yang Liu.
-<EOS>
-Thumt: An open source toolkit for neural machine translation. arXiv preprint arXiv:1706.06415, 2017.
-<EOS>
- Yizhe Zhang, Zhe Gan, and Lawrence Carin.
-<EOS>
-Generating text via adversarial training.
-<EOS>
- In NIPS  workshop on Adversarial Training, volume 21, 2016.
-<EOS>
- 11  Published as a conference paper at ICLR 2020  A APPENDIX  A.1 CONTRASTIVE MRT DOES NOT MAXIMIZE THE EXPECTED REWARD  We hereby detail a simple example where following the Contrastive MRT method (see §2.2) does not converge to the parameter value that maximizes R.  Let θ be a real number in [0, 0.5], and let Pθ be a family of distributions over three values a, b, c such that:  Let r(a) = 1, r(b) = 0, r(c) = 0.5. The expected reward as a function of θ is:  Pθ (x) =       x = a θ 2θ2 x = b 1 − θ − 2θ2 x = c  R(θ) = θ + 0.5(1 − θ − 2θ2)  R(θ) is uniquely maximized by θ∗ = 0.25.
-<EOS>
- Table 1 details the possible samples of size k = 2, their probabilities, the corresponding (cid:101)R and its gradient.
-<EOS>
-Standard numerical methods show that E[∇ (cid:101)R] over possible samples S is positive for θ ∈ (0, γ) and negative for θ ∈ (γ, 0.5], where γ ≈ 0.295.
-<EOS>
-This means that for any initialization of θ ∈ (0, 0.5], Contrastive MRT will converge to γ if the learning rate is sufficiently small.
-<EOS>
-For θ = 0, (cid:101)R ≡ 0.5, and there will be no gradient updates, so the method will converge to θ = 0.
-<EOS>
-Neither of these values maximizes R(θ).
-<EOS>
-We note that by using some g (θ) the γ could be arbitrarily far from θ∗. g could also map to (−inf, inf ) more often used in neural networks parameters.
-<EOS>
- We further note that resorting to maximizing E[ (cid:101)R] instead, does not maximize R(θ) either.
-<EOS>
-Indeed, plotting E[ (cid:101)R] as a function of θ for this example, yields a maximum at θ ≈ 0.32.
-<EOS>
- Table 1: The gradients of (cid:101)R for each possible sample S. The batch size is k = 2.
-<EOS>
-Rows correspond to different sampled outcomes. ∇ (cid:101)R is the gradient of (cid:101)R given the corresponding value for S.  S  {a, b}  {a, c}  {b, c} a, a b, b c, c  P (S) 4θ3  θ2 4θ4  (1-θ-2θ2)2  2θ(1-θ-2θ2) 4θ2(1-θ-2θ2)  0.5 +  θ  2−4θ2  1−θ−2θ2  2−2θ  (cid:101)R 1  1+2θ  1 0 0.5  ∇ (cid:101)R −2  (1+2θ)2 2x2+1  2(1−2θ2)2  θ2−2θ (1−θ)2  0 0 0  A.2 DERIVING THE GRADIENT OF (cid:101)R  Given S, recall the definition of (cid:101)R:  Taking the deriviative w.r.t. θ:  (cid:101)R(θ, S) =  Qθ,S(yi)r(yi)  k  (cid:88)  i=1  12  Published as a conference paper at ICLR 2020  k  (cid:88)  i=1  r(yi)  ∇P (y) · αP (y)α−1 · Z(S) − ∇Z(S) · P (y)α  =  Z(S)2  k  (cid:88)  i=1  k  (cid:88)  i=1  k  (cid:88)  (cid:16)  α  i=1  r(yi)  (cid:16) α∇P (yi)  P (yi)  Q(yi) −  ∇Z(S) Z(S)  (cid:17)  Q(yi)  =  r(yi)Q(yi)  α∇ log P (yi) − ∇ log Z(S)  =  (cid:16)  (cid:17)  r(yi)Q(yi)∇ log P (yi)  − EQ[r]∇ log Z(S)  (cid:17)  (a)  (b)  (c)  Figure 7: The probability of different tokens following REINFORCE, in the controlled simulations in the Con- stant Reward setting.
-<EOS>
-The left/center/right figures correspond to simulations where the target token (ybest) was initially the second/third/fourth most probable token.
-<EOS>
-The green line corresponds to the target token, yellow lines to medium-reward tokens and red lines to tokens with r(y) = 0.
-<EOS>
- A.3 NMT IMPLEMENTATION DETAILS  True casing and tokenization were used (Koehn et al, 2007), including escaping html symbols and "-" that represents a compound was changed into a separate token of =.
-<EOS>
-Some preprocessing used before us converted the latter to ##AT##-##AT## but standard tokenizers in use process that into 11 different tokens, which over-represents the significance of that character when BLEU is calculated.
-<EOS>
-BPE (Sennrich et al, 2016) extracted 30,715 tokens.
-<EOS>
-For the MT experiments we used 6 layers in the encoder and the decoder.
-<EOS>
-The size of the embeddings was 512.
-<EOS>
-Gradient clipping was used with size of 5 for pre-training (see Discussion on why not to use it in training).
-<EOS>
-We did not use attention dropout, but 0.1 residual dropout rate was used.
-<EOS>
-In pretraining and training sentences of more than 50 tokens were discarded.
-<EOS>
-Pretraining and training were considered finished when BLEU did not increase in the development set for 10 consecutive evaluations, and evaluation was done every 1,000 and 5,000 for batches of size 100 and 256 for pretraining and training respectively.
-<EOS>
-Learning rate used for rmsprop (Tieleman & Hinton, 2012) was 0.01 in pretraining and for adam (Kingma & Ba, 2015) with decay was 0.005 for training.
-<EOS>
-4,000 learning rate warm up steps were used.
-<EOS>
-Pretraining took about 7 days with 4 GPUs, afterwards, training took roughly the same time.
-<EOS>
-Monte Carlo used 20 sentence rolls per word.
-<EOS>
- A.4 DETAILED RESULTS FOR CONSTANT REWARD SETTING  We present graphs for the constant reward setting in Figures 8 and 7.
-<EOS>
-Trends are similar to the ones obtained for the Simulated Reward setting.
-<EOS>
- 13  Published as a conference paper at ICLR 2020  Figure 8: Difference between the ranks of ybest in the reinforced with constant reward and the pretrained model.
-<EOS>
-Each column x corresponds to the difference in the probability that ybest is ranked in rank x in the reinforced model, and the same probability in the pretrained model.
-<EOS>
- 14  
 <EOS>

@@ -20,7 +20,7 @@ Empirically, we show that SQIL out- performs BC and achieves competitive results
 <EOS>
 This pa- per is a proof of concept that illustrates how a simple imitation method based on RL with constant rewards can be as effective as more complex methods that use learned rewards.
 <EOS>
- 1  INTRODUCTION  Many sequential decision-making problems can be tackled by imitation learning: an expert demon- strates near-optimal behavior to an agent, and the agent attempts to replicate that behavior in novel situations (Argall et al, 2009).
+ 1  INTRODUCTION  Many sequential decision-making problems can be tackled by imitation learning: an expert demon- strates near-optimal behavior to an agent, and the agent attempts to replicate that behavior in novel situations .
 <EOS>
 This paper considers the problem of training an agent to imitate an expert, given expert action demonstrations and the ability to interact with the environment.
 <EOS>
@@ -28,15 +28,15 @@ The agent does not observe a reward signal or query the expert, and does not kno
 <EOS>
  Standard approaches based on behavioral cloning (BC) use supervised learning to greedily imitate demonstrated actions, without reasoning about the consequences of actions (Pomerleau, 1991).
 <EOS>
-As a result, compounding errors cause the agent to drift away from the demonstrated states (Ross et al, 2011).
+As a result, compounding errors cause the agent to drift away from the demonstrated states .
 <EOS>
 The problem with BC is that, when the agent drifts and encounters out-of-distribution states, the agent does not know how to return to the demonstrated states.
 <EOS>
 Recent methods based on in- verse reinforcement learning (IRL) overcome this issue by training an RL agent not only to imitate demonstrated actions, but also to visit demonstrated states (Ng et al, 2000; Wulfmeier et al, 2015; Finn et al, 2016b; Fu et al, 2017).
 <EOS>
-This is also the core idea behind generative adversarial imi- tation learning (GAIL) (Ho & Ermon, 2016), which implements IRL using generative adversarial  1  Published as a conference paper at ICLR 2020  networks (Goodfellow et al, 2014; Finn et al, 2016a).
+This is also the core idea behind generative adversarial imi- tation learning (GAIL) , which implements IRL using generative adversarial  1  Published as a conference paper at ICLR 2020  networks (Goodfellow et al, 2014; Finn et al, 2016a).
 <EOS>
-Since the true reward function for the task is unknown, these methods construct a reward signal from the demonstrations through adversarial training, making them difficult to implement and use in practice (Kurach et al, 2018).
+Since the true reward function for the task is unknown, these methods construct a reward signal from the demonstrations through adversarial training, making them difficult to implement and use in practice .
 <EOS>
  The main idea in this paper is that the effectiveness of adversarial imitation methods can be achieved by a much simpler approach that does not require adversarial training, or indeed learning a reward function at all.
 <EOS>
@@ -52,7 +52,7 @@ The key idea is that, instead of using a learned reward function to provide a re
 <EOS>
 Intuitively, our method accomplishes (a) by training the agent using an ex- tremely sparse reward function – +1 for demonstrations, 0 everywhere else – and accomplishes (b) by training the agent with RL instead of supervised learning.
 <EOS>
- We instantiate our approach with soft Q-learning (Haarnoja et al, 2017) by initializing the agent’s experience replay buffer with expert demonstrations, setting the rewards to a constant r = +1 in the demonstration experiences, and setting rewards to a constant r = 0 in all of the new experiences the agent collects while interacting with the environment.
+ We instantiate our approach with soft Q-learning  by initializing the agent’s experience replay buffer with expert demonstrations, setting the rewards to a constant r = +1 in the demonstration experiences, and setting rewards to a constant r = 0 in all of the new experiences the agent collects while interacting with the environment.
 <EOS>
 Since soft Q-learning is an off-policy algorithm, the agent does not necessarily have to visit the demonstrated states in order to experience positive rewards.
 <EOS>
@@ -70,11 +70,11 @@ We find that SQIL outperforms BC and achieves com- petitive results compared to 
 <EOS>
 Our experiments illustrate two key benefits of SQIL: (1) that it can overcome the state distribution shift problem of BC without adversarial training or learning a re- ward function, which makes it easier to use, e.g., with images, and (2) that it is simple to implement using existing Q-learning or off-policy actor-critic algorithms.
 <EOS>
- 2 SOFT Q IMITATION LEARNING  SQIL performs soft Q-learning (Haarnoja et al, 2017) with three small, but important, modifications: (1) it initially fills the agent’s experience replay buffer with demonstrations, where the rewards are set to a constant r = +1; (2) as the agent interacts with the world and accumulates new experiences, it adds them to the replay buffer, and sets the rewards for these new experiences to a constant r = 0; and (3) it balances the number of demonstration experiences and new experiences (50% each) in each sample from the replay buffer.1 These three modifications are motivated theoretically in Section 3, via an equivalence to a regularized variant of BC.
+ 2 SOFT Q IMITATION LEARNING  SQIL performs soft Q-learning  with three small, but important, modifications: (1) it initially fills the agent’s experience replay buffer with demonstrations, where the rewards are set to a constant r = +1; (2) as the agent interacts with the world and accumulates new experiences, it adds them to the replay buffer, and sets the rewards for these new experiences to a constant r = 0; and (3) it balances the number of demonstration experiences and new experiences (50% each) in each sample from the replay buffer.1 These three modifications are motivated theoretically in Section 3, via an equivalence to a regularized variant of BC.
 <EOS>
 Intuitively, these modifications create a simple reward structure that gives the agent an incentive to imitate the expert in demonstrated states, and to take actions that lead it back to demonstrated states when it strays from the demonstrations.
 <EOS>
- 1 SQIL resembles the Deep Q-learning from Demonstrations (DQfD) (Hester et al, 2017) and Normalized Actor-Critic (NAC) algorithms (Gao et al, 2018), in that it initially fills the agent’s experience replay buffer with demonstrations.
+ 1 SQIL resembles the Deep Q-learning from Demonstrations (DQfD)  and Normalized Actor-Critic (NAC) algorithms , in that it initially fills the agent’s experience replay buffer with demonstrations.
 <EOS>
 The key difference is that DQfD and NAC are RL algorithms that assume access to a reward signal, while SQIL is an imitation learning algorithm that does not require an extrinsic reward signal from the environment.
 <EOS>
@@ -98,13 +98,13 @@ Balancing the number of demonstration experiences and new experiences (50% each)
 <EOS>
 In practice, we find that this reward decay does not degrade performance if SQIL is halted once the squared soft Bellman error loss converges to a minimum (e.g., see Figure 8 in the appendix).
 <EOS>
-Note that prior methods also require similar techniques: both GAIL and adversarial IRL (AIRL) (Fu et al, 2017) balance the number of positive and negative examples in the training set of the discriminator, and AIRL tends to require early stopping to avoid overfitting.
+Note that prior methods also require similar techniques: both GAIL and adversarial IRL (AIRL)  balance the number of positive and negative examples in the training set of the discriminator, and AIRL tends to require early stopping to avoid overfitting.
 <EOS>
  D  3  INTERPRETING SQIL AS REGULARIZED BEHAVIORAL CLONING  To understand why SQIL works, we sketch a surprising theoretical result: SQIL is equivalent to a variant of behavioral cloning (BC) that uses regularization to overcome state distribution shift.
 <EOS>
  BC is a simple approach that seeks to imitate the expert’s actions using supervised learning – in particular, greedily maximizing the conditional likelihood of the demonstrated actions given the demonstrated states, without reasoning about the consequences of actions.
 <EOS>
-Thus, when the agent makes small mistakes and enters states that are slightly different from those in the demonstrations, the distribution mismatch between the states in the demonstrations and those actually encountered by the agent leads to compounding errors (Ross et al, 2011).
+Thus, when the agent makes small mistakes and enters states that are slightly different from those in the demonstrations, the distribution mismatch between the states in the demonstrations and those actually encountered by the agent leads to compounding errors .
 <EOS>
 We show that SQIL is equivalent to augmenting BC with a regularization term that incorporates information about the state transition dynamics into the imitation policy, and thus enables long-horizon imitation.
 <EOS>
@@ -146,9 +146,9 @@ The issue with BC is that, when the agent encounters states that are out- demo, 
 <EOS>
 One solution from prior work of-distribution with respect to  D  3Assuming a discrete action space simplifies our analysis.
 <EOS>
-SQIL can be applied to continuous control tasks  using existing sampling methods (Haarnoja et al, 2017; 2018), as illustrated in Section 4.3.  4  Published as a conference paper at ICLR 2020  (Piot et al, 2014) is to regularize Qθ with a sparsity prior on the implied rewards – in particular, a penalty on the magnitude of the rewards (cid:80) implied by Qθ via the soft Bellman equation (Equation 3), where  Rq(s, a) |  s∈S,a∈A |  Rq(s, a) (cid:44) Qθ(s, a)  γEs(cid:48)  log  exp (Qθ(s(cid:48), a(cid:48)))  (7)  (cid:34)  (cid:32)  (cid:88)  a(cid:48)∈A  −  (cid:33)(cid:35)  Note that the reward function Rq is not explicitly modeled in this method.
+SQIL can be applied to continuous control tasks  using existing sampling methods (Haarnoja et al, 2017; 2018), as illustrated in Section 4.3.  4  Published as a conference paper at ICLR 2020   is to regularize Qθ with a sparsity prior on the implied rewards – in particular, a penalty on the magnitude of the rewards (cid:80) implied by Qθ via the soft Bellman equation (Equation 3), where  Rq(s, a) |  s∈S,a∈A |  Rq(s, a) (cid:44) Qθ(s, a)  γEs(cid:48)  log  exp (Qθ(s(cid:48), a(cid:48)))  (7)  (cid:34)  (cid:32)  (cid:88)  a(cid:48)∈A  −  (cid:33)(cid:35)  Note that the reward function Rq is not explicitly modeled in this method.
 <EOS>
-Instead, we directly minimize the magnitude of the right-hand side of Equation 7, which is equivalent to minimizing Rq(s, a) | | The purpose of the penalty on is two-fold: (1) it imposes a sparsity prior motivated by prior work (Piot et al, 2013), and (2) it incorporates information about the state transition dynamics into the imitation learning objective, since Rq(s, a) is a function of an expectation over next state s(cid:48). (2) is critical for learning long-horizon behavior that imitates the demonstrations, instead of greedy maximization of the action likelihoods in standard BC.
+Instead, we directly minimize the magnitude of the right-hand side of Equation 7, which is equivalent to minimizing Rq(s, a) | | The purpose of the penalty on is two-fold: (1) it imposes a sparsity prior motivated by prior work , and (2) it incorporates information about the state transition dynamics into the imitation learning objective, since Rq(s, a) is a function of an expectation over next state s(cid:48). (2) is critical for learning long-horizon behavior that imitates the demonstrations, instead of greedy maximization of the action likelihoods in standard BC.
 <EOS>
 For details, see Piot et al (2014).
 <EOS>
@@ -158,7 +158,7 @@ Unlike the discrete environments tested in Piot et al (2014), we assume the cont
 <EOS>
 Hence, we approximate the penalty (cid:80) by estimating it from samples: transitions (s, a, s(cid:48)) observed in the demonstrations samp periodically sampled during training using the latest imitation policy.
 <EOS>
-This approximation, which follows the standard approach to con- straint sampling (Calafiore & Dabbene, 2006), ensures that the penalty covers the state distribution actually encountered by the agent, instead of only the demonstrations.
+This approximation, which follows the standard approach to con- straint sampling , ensures that the penalty covers the state distribution actually encountered by the agent, instead of only the demonstrations.
 <EOS>
  demo, as well as additional rollouts  Rq(s, a) |  s∈S,a∈A |  D  D  S  To make the penalty continuously differentiable, we introduce an additional approximation: instead , we penalize the squared value (Rq(s, a))2.
 <EOS>
@@ -184,9 +184,9 @@ Thus, SQIL can be motivated as a practical way to implement the ideas for regula
 <EOS>
  The main benefit of using SQIL instead of RBC is that SQIL is trivial to implement, since it only requires a few small changes to any standard Q-learning implementation (see Section 2).
 <EOS>
-Extending SQIL to MDPs with a continuous action space is also easy, since we can simply replace Q-learning  5  Published as a conference paper at ICLR 2020  with an off-policy actor-critic method (Haarnoja et al, 2018) (see Section 4.3).
+Extending SQIL to MDPs with a continuous action space is also easy, since we can simply replace Q-learning  5  Published as a conference paper at ICLR 2020  with an off-policy actor-critic method  (see Section 4.3).
 <EOS>
-Given the difficulty of implementing deep RL algorithms correctly (Henderson et al, 2018), this ﬂexibility makes SQIL more practical to use, since it can be built on top of existing implementations of deep RL algorithms.
+Given the difficulty of implementing deep RL algorithms correctly , this ﬂexibility makes SQIL more practical to use, since it can be built on top of existing implementations of deep RL algorithms.
 <EOS>
 Furthermore, the ablation study in Section 4.4 suggests that SQIL actually performs better than RBC.
 <EOS>
@@ -224,7 +224,7 @@ BC tends to drive straight ahead into the grass instead of turning back onto the
 <EOS>
 Standard error on three random seeds.
 <EOS>
- −68 ± 4 698 ± 10 −66 ± 8 704 ± 6 704 ± 79  train 0 S  4 For all the image-based tasks, we implement a version of GAIL that uses deep Q-learning (GAIL-DQL) instead of TRPO as in the original GAIL paper (Ho & Ermon, 2016), since Q-learning performs better than TRPO in these environments, and because this allows for a head-to-head comparison of SQIL and GAIL: both algorithms use the same underlying RL algorithm, but provide the agent with different rewards – SQIL provides constant rewards, while GAIL provides learned rewards.
+ −68 ± 4 698 ± 10 −66 ± 8 704 ± 6 704 ± 79  train 0 S  4 For all the image-based tasks, we implement a version of GAIL that uses deep Q-learning (GAIL-DQL) instead of TRPO as in the original GAIL paper , since Q-learning performs better than TRPO in these environments, and because this allows for a head-to-head comparison of SQIL and GAIL: both algorithms use the same underlying RL algorithm, but provide the agent with different rewards – SQIL provides constant rewards, while GAIL provides learned rewards.
 <EOS>
 We use the standard GAIL-TRPO method as a baseline for all the low-dimensional tasks, since TRPO performs better than Q-learning in these environments.
 <EOS>
@@ -256,7 +256,7 @@ SQIL also outperforms GAIL on all three games, illustrating the difficulty of us
 <EOS>
 This section illustrates how SQIL can be adapted to continuous actions.
 <EOS>
-We instantiate SQIL using soft actor-critic (SAC) – an off-policy RL algorithm that can solve con- tinuous control tasks (Haarnoja et al, 2018).
+We instantiate SQIL using soft actor-critic (SAC) – an off-policy RL algorithm that can solve con- tinuous control tasks .
 <EOS>
 In particular, SAC is modified in the following ways: (1) the agent’s experience re- play buffer is initially filled with expert demonstrations, where re- wards are set to r = +1, (2) when taking gradient steps to fit the agent’s soft Q function, a balanced number of demonstration ex- periences and new experiences (50% each) are sampled from the replay buffer, and (3) the agent observes rewards of r = 0 during its interactions with the environment, instead of an extrinsic reward signal that specifies the desired task.
 <EOS>
@@ -318,7 +318,7 @@ Concurrently with SQIL, two other imitation learning algorithms that use constan
 <EOS>
 We see our paper as contributing additional evidence to support this core idea, rather than proposing a competing method.
 <EOS>
-First, SQIL is derived from sparsity-regularized BC, while the prior meth- ods are derived from an alternative formulation of the IRL objective (Sasaki et al, 2019) and from support estimation methods (Wang et al, 2019), showing that different theoretical approaches inde- pendently lead to using RL with constant rewards as an alternative to adversarial training – a sign that this idea may be a promising direction for future work.
+First, SQIL is derived from sparsity-regularized BC, while the prior meth- ods are derived from an alternative formulation of the IRL objective  and from support estimation methods , showing that different theoretical approaches inde- pendently lead to using RL with constant rewards as an alternative to adversarial training – a sign that this idea may be a promising direction for future work.
 <EOS>
 Second, SQIL is shown to outperform BC and GAIL in domains that were not evaluated in Sasaki et al (2019) or Wang et al (2019) – in particular, tasks with image observations and significant shift in the state distribution between the demonstrations and the training environment.
 <EOS>
@@ -337,294 +337,4 @@ One direction for future work would be to rigorously show whether or not SQIL ha
 Another direction would be to extend SQIL to recover not just the expert’s policy, but also their reward function; e.g., by using a parameterized reward function to model rewards in the soft Bellman error terms, instead of using constant rewards.
 <EOS>
 This could provide a simpler alternative to existing adversarial IRL algorithms.
-<EOS>
- 8  Published as a conference paper at ICLR 2020  REFERENCES  Brenna D Argall, Sonia Chernova, Manuela Veloso, and Brett Browning.
-<EOS>
-A survey of robot learning from  demonstration.
-<EOS>
-Robotics and autonomous systems, 57(5):469–483, 2009.
-<EOS>
- Marc G Bellemare, Yavar Naddaf, Joel Veness, and Michael Bowling.
-<EOS>
-The arcade learning environment: An  evaluation platform for general agents.
-<EOS>
-Journal of Artificial Intelligence Research, 47:253–279, 2013.
-<EOS>
- Greg Brockman, Vicki Cheung, Ludwig Pettersson, Jonas Schneider, John Schulman, Jie Tang, and Wojciech  Zaremba.
-<EOS>
-Openai gym, 2016.
-<EOS>
- Springer, 2006.
-<EOS>
- Giuseppe Calafiore and Fabrizio Dabbene.
-<EOS>
-Probabilistic and randomized methods for design under uncertainty.
-<EOS>
- Prafulla Dhariwal, Christopher Hesse, Oleg Klimov, Alex Nichol, Matthias Plappert, Alec Radford, John Schulman, Szymon Sidor, Yuhuai Wu, and Peter Zhokhov.
-<EOS>
-Openai baselines. https://github.com/ openai/baselines, 2017.
-<EOS>
- Chelsea Finn, Paul Christiano, Pieter Abbeel, and Sergey Levine.
-<EOS>
-A connection between generative adversar- ial networks, inverse reinforcement learning, and energy-based models. arXiv preprint arXiv:1611.03852, 2016a.
-<EOS>
- Chelsea Finn, Sergey Levine, and Pieter Abbeel.
-<EOS>
-Guided cost learning: Deep inverse optimal control via policy  optimization.
-<EOS>
-In International Conference on Machine Learning, pp 49–58, 2016b.
-<EOS>
- Justin Fu, Katie Luo, and Sergey Levine.
-<EOS>
-Learning robust rewards with adversarial inverse reinforcement  learning. arXiv preprint arXiv:1710.11248, 2017.
-<EOS>
- Yang Gao, Ji Lin, Fisher Yu, Sergey Levine, Trevor Darrell, et al Reinforcement learning from imperfect  demonstrations. arXiv preprint arXiv:1802.05313, 2018.
-<EOS>
- Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley, Sherjil Ozair, Aaron In Advances in neural information process-  Courville, and Yoshua Bengio.
-<EOS>
-Generative adversarial nets. ing systems, pp 2672–2680, 2014.
-<EOS>
- David Ha and J¨urgen Schmidhuber.
-<EOS>
-Recurrent world models facilitate policy evolution. arXiv preprint  arXiv:1809.01999, 2018.
-<EOS>
- Tuomas Haarnoja, Haoran Tang, Pieter Abbeel, and Sergey Levine.
-<EOS>
-Reinforcement learning with deep energy-  based policies. arXiv preprint arXiv:1702.08165, 2017.
-<EOS>
- Tuomas Haarnoja, Aurick Zhou, Pieter Abbeel, and Sergey Levine.
-<EOS>
-Soft actor-critic: Off-policy maximum  entropy deep reinforcement learning with a stochastic actor. arXiv preprint arXiv:1801.01290, 2018.
-<EOS>
- Peter Henderson, Riashat Islam, Philip Bachman, Joelle Pineau, Doina Precup, and David Meger.
-<EOS>
-Deep rein-  forcement learning that matters.
-<EOS>
-In Thirty-Second AAAI Conference on Artificial Intelligence, 2018.
-<EOS>
- Todd Hester, Matej Vecerik, Olivier Pietquin, Marc Lanctot, Tom Schaul, Bilal Piot, Dan Horgan, John Quan, Andrew Sendonaris, Gabriel Dulac-Arnold, et al Deep q-learning from demonstrations. arXiv preprint arXiv:1704.03732, 2017.
-<EOS>
- Jonathan Ho and Stefano Ermon.
-<EOS>
-Generative adversarial imitation learning.
-<EOS>
-In Advances in Neural Information  Processing Systems, pp 4565–4573, 2016.
-<EOS>
- Diederik P Kingma and Jimmy Ba. Adam: A method for stochastic optimization.
-<EOS>
- arXiv preprint  arXiv:1412.6980, 2014.
-<EOS>
- Ilya Kostrikov, Kumar Krishna Agrawal, Debidatta Dwibedi, Sergey Levine, and Jonathan Tompson.
-<EOS>
-Discriminator-actor-critic: Addressing sample inefficiency and reward bias in adversarial imitation learn- In International Conference on Learning Representations, 2019.
-<EOS>
-URL https://openreview. ing. net/forum?id=Hk4fpoA5Km.
-<EOS>
- Karol Kurach, Mario Lucic, Xiaohua Zhai, Marcin Michalski, and Sylvain Gelly.
-<EOS>
-The gan landscape: Losses,  architectures, regularization, and normalization. arXiv preprint arXiv:1807.04720, 2018.
-<EOS>
- Sergey Levine.
-<EOS>
-Reinforcement learning and control as probabilistic inference: Tutorial and review. arXiv  preprint arXiv:1805.00909, 2018.
-<EOS>
- 9  Published as a conference paper at ICLR 2020  Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Andrei A Rusu, Joel Veness, Marc G Bellemare, Alex Graves, Martin Riedmiller, Andreas K Fidjeland, Georg Ostrovski, et al Human-level control through deep reinforcement learning.
-<EOS>
-Nature, 518(7540):529, 2015.
-<EOS>
- Andrew Y Ng, Stuart J Russell, et al Algorithms for inverse reinforcement learning.
-<EOS>
-In Icml, pp 663–670,  2000.
-<EOS>
- Bilal Piot, Matthieu Geist, and Olivier Pietquin.
-<EOS>
-Learning from demonstrations: Is it worth estimating a reward function?
-<EOS>
-In Joint European Conference on Machine Learning and Knowledge Discovery in Databases, pp 17–32.
-<EOS>
-Springer, 2013.
-<EOS>
- Bilal Piot, Matthieu Geist, and Olivier Pietquin.
-<EOS>
-Boosted and reward-regularized classification for apprentice- ship learning.
-<EOS>
-In Proceedings of the 2014 international conference on Autonomous agents and multi-agent systems, pp 1249–1256.
-<EOS>
-International Foundation for Autonomous Agents and Multiagent Systems, 2014.
-<EOS>
- Dean A Pomerleau.
-<EOS>
-Efficient training of artificial neural networks for autonomous navigation.
-<EOS>
-Neural Compu-  tation, 3(1):88–97, 1991.
-<EOS>
- St´ephane Ross, Geoffrey Gordon, and Drew Bagnell.
-<EOS>
-A reduction of imitation learning and structured pre- diction to no-regret online learning.
-<EOS>
-In Proceedings of the fourteenth international conference on artificial intelligence and statistics, pp 627–635, 2011.
-<EOS>
- Fumihiro Sasaki, Tetsuya Yohira, and Atsuo Kawaguchi.
-<EOS>
-Sample efficient imitation learning for continuous control.
-<EOS>
-In International Conference on Learning Representations, 2019.
-<EOS>
-URL https://openreview. net/forum?id=BkN5UoAqF7.
-<EOS>
- Emanuel Todorov, Tom Erez, and Yuval Tassa.
-<EOS>
-Mujoco: A physics engine for model-based control.
-<EOS>
-In In- telligent Robots and Systems (IROS), 2012 IEEE/RSJ International Conference on, pp 5026–5033.
-<EOS>
-IEEE, 2012.
-<EOS>
- Ruohan Wang, Carlo Ciliberto, Pierluigi Amadori, and Yiannis Demiris.
-<EOS>
-Random expert distillation: Imitation  learning via expert policy support estimation. arXiv preprint arXiv:1905.06750, 2019.
-<EOS>
- Markus Wulfmeier, Peter Ondruska, and Ingmar Posner.
-<EOS>
-Maximum entropy deep inverse reinforcement learn-  ing. arXiv preprint arXiv:1507.04888, 2015.
-<EOS>
- Brian D Ziebart, J Andrew Bagnell, and Anind K Dey.
-<EOS>
-Modeling interaction via the principle of maximum causal entropy.
-<EOS>
-In Proceedings of the 27th International Conference on International Conference on Machine Learning, pp 1255–1262.
-<EOS>
-Omnipress, 2010.
-<EOS>
- 10  Published as a conference paper at ICLR 2020  A APPENDIX  A.1 DERIVATION OF RBC GRADIENT  Let τ = (s0, a0, s1, ..., sT ) denote a rollout, where sT is an absorbing state.
-<EOS>
-Let V denote the soft value function,  V (s) (cid:44) log  exp (Qθ(s, a))  (cid:33) (cid:32)  (cid:88)  a∈A  Splitting up the squared soft Bellman error terms for  demo and  samp in Equation 8,  D  D  (cid:96)RBC(θ) =  ∇  Qθ(st, at)  V (st))  − ∇  (cid:88)  τ ∈Ddemo  T −1 (cid:88) t=0 −  (  ∇  + λdemo  (cid:88)  T −1 (cid:88) t=0 ∇  (cid:88)  =  τ ∈Ddemo  + λdemo  τ ∈Ddemo  T −1 (cid:88) t=0 ∇ (cid:18)  δ2  ∇  (Qθ(st, at)  γV (st+1))2 + λsamp  δ2(  samp, 0)  −  ∇  D  V (st)  γ  V (st+1)  −  ∇  (cid:19)  1  demo,  D  2λdemo  + λsamp  δ2(  ∇  D  samp, 0).
-<EOS>
- (10)  (11)  Setting γ (cid:44) 1 turns the inner sum in the first term into a telescoping sum:  (11) =  (cid:88)  τ ∈Ddemo  V (s0)  (  ∇  − ∇  V (sT )) + λdemo  δ2  ∇  demo,  D  2λdemo  + λsamp  δ2(  ∇  D  samp, 0).
-<EOS>
- (12)  (cid:18)  (cid:19)  1  Since sT is assumed to be absorbing, V (sT ) is zero.
-<EOS>
-Thus,  (12) =  (cid:88)  ∇  s0∈Ddemo  V (s0) + λdemo  δ2  ∇  demo,  D  2λdemo  + λsamp  δ2(  ∇  D  samp, 0),  (13)  (cid:18)  (cid:19)  1  In our experiments, we have that all the demonstration rollouts start at the same initial state s0.5 Thus,  (13)  (cid:0)δ2(  ∝ ∇  D  demo, 1) + λsampδ2(  samp, 0) + V (s0)(cid:1) ,  D  (14)  where λsamp  R≥0 is a constant hyperparameter.
-<EOS>
- ∈  A.2 COMPARING THE BIASED AND UNBIASED VARIANTS OF GAIL  As discussed in Section 4, to correct the original GAIL method’s biased handling of rewards at absorbing states, we implement the suggested changes to GAIL in Section 4.2 of Kostrikov et al (2019): adding a transition to an absorbing state and a self-loop at the absorbing state to the end of each rollout sampled from the environment, and adding a binary feature to the observations indicat- ing whether or not a state is absorbing.
-<EOS>
-This enables GAIL to learn a non-zero reward for absorbing states.
-<EOS>
-We refer to the original, biased GAIL method as GAIL-DQL-B and GAIL-TRPO-B, and the unbiased version as GAIL-DQL-U and GAIL-TRPO-U.
-<EOS>
- The mechanism for learning terminal rewards proposed in Kostrikov et al (2019) does not apply to SQIL, since SQIL does not learn a reward function.
-<EOS>
-SQIL implicitly assumes a reward of zero at absorbing states in demonstrations.
-<EOS>
-This is the case in all our experiments, which include some envi- ronments where terminating the episode is always undesirable (e.g., walking without falling down) and other environments where success requires terminating the episode (e.g., landing at a target), suggesting that SQIL is not sensitive to the choice of termination reward, and neither significantly benefits nor is significantly harmed by setting the termination reward to zero.
-<EOS>
- 5Demonstration rollouts may still vary due to the stochasticity of the expert policy.
-<EOS>
- 11  Published as a conference paper at ICLR 2020  Domain Shift (S train  ) No Shift (S demo  )  0  0  −21 ± 56 −45 ± 18  Random BC GAIL-DQL-B −91 ± 4 GAIL-DQL-U −97 ± 3 SQIL (Ours) Expert  375 ± 19 480 ± 11  −68 ± 4 698 ± 10 −34 ± 21 −66 ± 8 704 ± 6 704 ± 79  Figure 5: Image-based Car Racing.
-<EOS>
-Average reward on 100 episodes after training.
-<EOS>
-Standard error on three random seeds.
-<EOS>
- Figure 6: Image-based Atari.
-<EOS>
-Smoothed with a rolling window of 100 episodes.
-<EOS>
-Standard error on three random seeds.
-<EOS>
-X-axis represents amount of interaction with the environment (not expert demonstrations).
-<EOS>
- Car Racing.
-<EOS>
-The results in Figure 5 show that both the biased (GAIL-DQL-B) and unbiased (GAIL- DQL-U) versions of GAIL perform equally poorly.
-<EOS>
-The problem of training an image-based discrim- inator for this task may be difficult enough that even with an unfair bias toward avoiding crashes that terminate the episode, GAIL-DQL-B does not perform better than GAIL-DQL-U.
-<EOS>
- Atari.
-<EOS>
-The results in Figure 6 show that SQIL outperforms both variants of GAIL on Pong and the unbiased version of GAIL (GAIL-DQL-U) on Breakout and Space Invaders, but performs compara- bly to the biased version of GAIL (GAIL-DQL-B) on Space Invaders and worse than it on Breakout.
-<EOS>
-This may be due to the fact that in Breakout and Space Invaders, the agent has multiple lives – five in Breakout, and three in Space Invaders – and receives a termination signal that the episode has ended after losing each life.
-<EOS>
-Thus, the agent experiences many more episode terminations than in Pong, exacerbating the bias in the way the original GAIL method handles rewards at absorb- ing states.
-<EOS>
-Our implementation of GAIL-DQL-B in this experiment provides a learned reward of r(s, a) = D(s, a)), where D is the discriminator (see Section A.3 in the appendix for details).
-<EOS>
-The learned reward is always positive, while the implicit reward at an absorbing state is zero.
-<EOS>
-Thus, the agent is inadvertently encouraged to avoid terminating the episode.
-<EOS>
-For Breakout and Space Invaders, this just happens to be the right incentive, since the objective is to stay alive as long as possible.
-<EOS>
-GAIL-DQL-B outperforms SQIL in Breakout and performs comparably to SQIL in Space Invaders because GAIL-DQL-B is accidentally biased in the right way.
-<EOS>
- log (1  −  −  Lunar Lander.
-<EOS>
-The results in Figure 7 show that when the initial state is varied, SQIL outperforms the unbiased variant of GAIL (GAIL-TRPO-U), but underperforms against the biased version of GAIL (GAIL-TRPO-B).
-<EOS>
-The latter result is likely due to the fact that the implementation of GAIL- TRPO-B we used in this experiment provides a learned reward of r(s, a) = log (D(s, a)), where D is the discriminator (see Section A.3 in the appendix for details).
-<EOS>
-The learned reward is always negative, while the implicit reward at an absorbing state is zero.
-<EOS>
-Thus, the agent is inadvertently encouraged to terminate the episode quickly.
-<EOS>
-For the Lunar Lander game, this just happens to be the right incentive, since the objective is to land on the ground and thereby terminate the episode.
-<EOS>
-As in the Atari experiments, GAIL-TRPO-B performs better than SQIL in this experiment because GAIL-TRPO-B is accidentally biased in the right way.
-<EOS>
- 12  02000400060008000NumberofOn-PolicyRollouts0200400RewardBreakoutSQIL(Ours)GAIL-DQL-BGAIL-DQL-UBC(P’91)Expert0500100015002000NumberofOn-PolicyRollouts−20−1001020RewardPong0200040006000NumberofOn-PolicyRollouts200400600RewardSpaceInvadersPublished as a conference paper at ICLR 2020  Random BC GAIL-TRPO-B (HE’16) GAIL-TRPO-U SQIL (Ours)  n λsamp = 0  o i t a l b A  γ = 0 π = Unif RBC Expert  Domain Shift (S train  ) No Shift (S demo  )  0  0  0.10 ± 0.30 0.07 ± 0.03 0.98 ± 0.01 0.67 ± 0.04 0.89 ± 0.02 0.12 ± 0.02 0.41 ± 0.02 0.47 ± 0.02 0.66 ± 0.02 0.93 ± 0.03  0.04 ± 0.02 0.93 ± 0.03 0.95 ± 0.02 0.93 ± 0.03 0.88 ± 0.03 0.87 ± 0.02 0.84 ± 0.02 0.82 ± 0.02 0.89 ± 0.01 0.89 ± 0.31  Figure 7: Low-dimensional Lunar Lander.
-<EOS>
-Best success rate on 100 consecutive episodes during training.
-<EOS>
-Standard error on five random seeds.
-<EOS>
-Performance bolded if at least within one standard error of expert.
-<EOS>
- Figure 8: Standard error over two random seeds.
-<EOS>
-No smoothing across training steps.
-<EOS>
- A.3  IMPLEMENTATION DETAILS  To ensure fair comparisons, the same network architectures were used to evaluate SQIL, GAIL, and BC.
-<EOS>
-For Lunar Lander, we used a network architecture with two fully-connected layers containing 128 hidden units each to represent the Q network in SQIL, the policy and discriminator networks in GAIL, and the policy network in BC.
-<EOS>
-For Car Racing, we used four convolutional layers (following (Ha & Schmidhuber, 2018)) and two fully-connected layers containing 256 hidden units each.
-<EOS>
-For Humanoid and HalfCheetah, we used two fully-connected layers containing 256 hidden units each.
-<EOS>
-For Atari, we used the convolutional neural network described in (Mnih et al, 2015) to represent the Q network in SQIL, as well as the Q network and discriminator network in GAIL.
-<EOS>
- To ensure fair comparisons, the same demonstration data were used to train SQIL, GAIL, and BC.
-<EOS>
-For Lunar Lander, we collected 100 demonstration rollouts.
-<EOS>
-For Car Racing, Pong, Breakout, and Space Invaders, we collected 20 demonstration rollouts.
-<EOS>
-Expert demonstrations were generated from scratch for Lunar Lander using DQN (Mnih et al, 2015), and collected from open-source pre- trained policies for Car Racing (Ha & Schmidhuber, 2018) as well as Humanoid and HalfCheetah (Dhariwal et al, 2017).
-<EOS>
-The Humanoid demonstrations were generated by a stochastic expert policy, while the HalfCheetah demonstrations were generated by a deterministic expert policy; both experts were trained using TRPO.6 We used two open-source implementations of GAIL: (Fu et al, 2017) for Lunar Lander, and (Dhariwal et al, 2017) for MuJoCo.
-<EOS>
-We adapted the OpenAI Baselines implementation of GAIL to use soft Q-learning for Car Racing and Atari.
-<EOS>
-Expert demonstrations were generated from scratch for Atari using DQN.
-<EOS>
-For Lunar Lander, we set λsamp = 10−6.
-<EOS>
-For Car Racing, we set λsamp = 0.01.
-<EOS>
-For all other environments, we set λsamp = 1.
-<EOS>
- 6https://drive.google.com/drive/folders/1h3H4AY_ZBx08hz-Ct0Nxxus-V1melu1U  13  050000100000150000NumberofTrainingSteps50100150SquaredBellmanError0200400600RewardHumanoid-v1Published as a conference paper at ICLR 2020  SQIL was not pre-trained in any of the experiments.
-<EOS>
-GAIL was pre-trained using BC for HalfChee- tah, but was not pre-trained in any other experiments.
-<EOS>
- In standard implementations of soft Q-learning and SAC, the agent’s experience replay buffer typ- ically has a fixed size, and once the buffer is full, old experiences are deleted to make room for new experiences.
-<EOS>
-In SQIL, we never delete demonstration experiences from the replay buffer, but otherwise follow the standard implementation.
-<EOS>
- We use Adam (Kingma & Ba, 2014) to take the gradient step in line 4 of Algorithm 1.
-<EOS>
- The BC and GAIL performance metrics in Section 4.3 are taken from (Dhariwal et al, 2017).7  The GAIL and SQIL policies in Section 4.3 are set to be deterministic during the evaluation rollouts used to measure performance.
-<EOS>
- 7https://github.com/openai/baselines/blob/master/baselines/gail/result/  gail-result.md  14  
 <EOS>

@@ -12,7 +12,7 @@ Comprehensive evaluations on four benchmark datasets (including Cora, Citeseer, 
 <EOS>
  1  INTRODUCTION  Graph, which comprises a set of vertices/nodes together with connected edges, is a formal structural representation of non-regular data.
 <EOS>
-Due to the strong representation ability, it accommodates many potential applications, e.g., social network (Orsini et al, 2017), world wide data (Page et al, 1999), knowledge graph (Xu et al, 2017), and protein-interaction network (Borgwardt et al, 2007).
+Due to the strong representation ability, it accommodates many potential applications, e.g., social network , world wide data , knowledge graph , and protein-interaction network .
 <EOS>
 Among these, semi-supervised node classification on graphs is one of the most interesting also popular topics.
 <EOS>
@@ -20,13 +20,13 @@ Given a graph in which some nodes are labeled, the aim of semi-supervised classi
 <EOS>
  While there have been numerous previous works (Brandes et al, 2008; Zhou et al, 2004; Zhu et al, 2003; Yang et al, 2016; Zhao et al, 2019) devoted to semi-supervised node classification based on explicit graph Laplacian regularizations, it is hard to efficiently boost the performance of label prediction due to the strict assumption that connected nodes are likely to share the same label information.
 <EOS>
-With the progress of deep learning on grid-shaped images/videos (He et al, 2016), a few of graph convolutional neural networks (CNN) based methods, including spectral (Kipf & Welling, 2017) and spatial methods (Niepert et al, 2016; Pan et al, 2018; Yu et al, 2018), have been proposed to learn local convolution filters on graphs in order to extract more discriminative node representations.
+With the progress of deep learning on grid-shaped images/videos , a few of graph convolutional neural networks (CNN) based methods, including spectral  and spatial methods (Niepert et al, 2016; Pan et al, 2018; Yu et al, 2018), have been proposed to learn local convolution filters on graphs in order to extract more discriminative node representations.
 <EOS>
 Although graph CNN based methods have achieved considerable capabilities of graph embedding by optimizing filters, they are limited into a conventionally semi-supervised framework and lack of an efficient inference mechanism on graphs.
 <EOS>
 Especially, in the case of few-shot learning, where a small number of training nodes are labeled, this kind of methods would drastically compromise the performance.
 <EOS>
-For example, the Pubmed graph dataset (Sen et al, 2008) consists  ∗Corresponding author: Zhen Cui.
+For example, the Pubmed graph dataset  consists  ∗Corresponding author: Zhen Cui.
 <EOS>
  1  Published as a conference paper at ICLR 2020  Figure 1: The illustration of our proposed GIL framework.
 <EOS>
@@ -52,13 +52,13 @@ The between-node relations are structured as the integration of node attributes,
 <EOS>
 It means that the similarity between two nodes is decided from three aspects: the consistency of node attributes, the consistency of local topological structures, and the between-node path reachability, as shown in Fig 1.
 <EOS>
-The local structures anchored around each node as well as the attributes of nodes therein are jointly encoded with graph convolution (Defferrard et al, 2016) for the sake of high-level feature extraction.
+The local structures anchored around each node as well as the attributes of nodes therein are jointly encoded with graph convolution  for the sake of high-level feature extraction.
 <EOS>
 For the between-node path reachability, we adopt the random walk algorithm to obtain the characteristics from a labeled reference node vi to a query unlabeled node vj in a given graph.
 <EOS>
 Based on the computed node representation and between-node reachability, the structure relations can be obtained by computing the similar scores/relationships from reference nodes to unlabeled nodes in a graph.
 <EOS>
-Inspired by the recent meta-learning strategy (Finn et al, 2017), we learn to infer the structure relations from a training set to a validation set, which can benefit the generalization capability of the learned model.
+Inspired by the recent meta-learning strategy , we learn to infer the structure relations from a training set to a validation set, which can benefit the generalization capability of the learned model.
 <EOS>
 In other words, our proposed GIL attempts to learn some transferable knowledge underlying in the structure relations from training samples to validation samples, such that the learned structure relations can be better self-adapted to the new testing stage.
 <EOS>
@@ -80,27 +80,27 @@ Specifically, spectral filtering methods (Henaff et al, 2015; Kipf & Welling, 20
 <EOS>
 Unfortunately, the spectral-based approaches often lead to a high computational complex due to the operation of eigenvalue decomposition, especially for a large number of graph nodes.
 <EOS>
-To alleviate this computation burden, local spectral filtering methods (Defferrard et al, 2016) are then proposed by parameterizing the frequency responses as a Chebyshev polynomial approximation.
+To alleviate this computation burden, local spectral filtering methods  are then proposed by parameterizing the frequency responses as a Chebyshev polynomial approximation.
 <EOS>
 Another type of graph CNNs, namely spatial methods (Li et al, 2016; Niepert et al, 2016), can perform the filtering operation by defining the spatial structures of adjacent vertices.
 <EOS>
-Various approaches can be employed to aggregate or sort neighboring vertices, such as diffusion CNNs (Atwood & Towsley, 2016), GraphSAGE (Hamilton et al, 2017), PSCN (Niepert et al, 2016), and NgramCNN (Luo et al, 2017).
+Various approaches can be employed to aggregate or sort neighboring vertices, such as diffusion CNNs , GraphSAGE , PSCN , and NgramCNN .
 <EOS>
-From the perspective of data distribution, recently, the Gaussian induced convolution model (Jiang et al, 2019) is proposed to disentangle the aggregation process through encoding adjacent regions with Gaussian mixture model.
+From the perspective of data distribution, recently, the Gaussian induced convolution model  is proposed to disentangle the aggregation process through encoding adjacent regions with Gaussian mixture model.
 <EOS>
  Semi-supervised node classification: Among various graph-related applications, semi-supervised node classification has gained increasing attention recently, and various approaches have been proposed to deal with this problem, including explicit graph Laplacian regularization and graph- embedding approaches.
 <EOS>
-Several classic algorithms with graph Laplacian regularization contain the label propagation method using Gaussian random fields (Zhu et al, 2003), the regularization framework by relying on the local/global consistency (Zhou et al, 2004), and the random walk- based sampling algorithm for acquiring the context information (Yang et al, 2016).
+Several classic algorithms with graph Laplacian regularization contain the label propagation method using Gaussian random fields , the regularization framework by relying on the local/global consistency , and the random walk- based sampling algorithm for acquiring the context information .
 <EOS>
-To further address scalable semi-supervised learning issues (Liu et al, 2012), the Anchor Graph regularization approach (Liu et al, 2010) is proposed to scale linearly with the number of graph nodes and then applied to massive-scale graph datasets.
+To further address scalable semi-supervised learning issues , the Anchor Graph regularization approach  is proposed to scale linearly with the number of graph nodes and then applied to massive-scale graph datasets.
 <EOS>
 Several graph convolution network methods (Abu-El-Haija et al, 2018; Du et al, 2017; Thekumparampil et al, 2018; Velickovic et al, 2018; Zhuang & Ma, 2018) are then developed to obtain discriminative representations of input graphs.
 <EOS>
-For example, Kipf et al (Kipf & Welling, 2017) proposed a scalable graph CNN model, which can scale linearly in the number of graph edges and learn graph representations by encoding both local graph structures and node attributes.
+For example, Kipf et al  proposed a scalable graph CNN model, which can scale linearly in the number of graph edges and learn graph representations by encoding both local graph structures and node attributes.
 <EOS>
-Graph attention networks (GAT) (Velickovic et al, 2018) are proposed to compute hidden representations of each node for attending to its neighbors with a self-attention strategy.
+Graph attention networks (GAT)  are proposed to compute hidden representations of each node for attending to its neighbors with a self-attention strategy.
 <EOS>
-By jointly considering the local- and global-consistency information, dual graph convolutional networks (Zhuang & Ma, 2018) are presented to deal with semi-supervised node classification.
+By jointly considering the local- and global-consistency information, dual graph convolutional networks  are presented to deal with semi-supervised node classification.
 <EOS>
 The critical difference between our proposed GIL and those previous semi-supervised node classification methods is to adopt a graph inference strategy by defining structure relations on graphs and then leverage a meta optimization mechanism to learn an inference model, which could be the first time to the best of our knowledge, while the existing graph CNNs take semi-supervised node classification as a general classification task.
 <EOS>
@@ -118,7 +118,7 @@ Associated with each node vi ∈ V, there is a discrete label yi ∈ {1, 2, · �
 <EOS>
 Generally, we have three node sets: a training set Vtr, a validation set Vval, and a testing set Vte.
 <EOS>
-In the standard protocol  3  Published as a conference paper at ICLR 2020  of prior literatures (Yang et al, 2016), the three node sets share the same label space.
+In the standard protocol  3  Published as a conference paper at ICLR 2020  of prior literatures , the three node sets share the same label space.
 <EOS>
 We follow but do not restrict this protocol for our proposed method.
 <EOS>
@@ -186,7 +186,7 @@ Note that, in the computation of class scores, since the reference node and quer
 <EOS>
 After several iterates of gradient descent on Vtr, we expect a better performance on the validation set Vval, i.e., min Θ  Lval(Θ(cid:48)).
 <EOS>
-Thus, we can perform the gradient update as follows  where β is the learning rate of meta optimization (Finn et al, 2017).
+Thus, we can perform the gradient update as follows  where β is the learning rate of meta optimization .
 <EOS>
  Θ = Θ − β∇ΘLval(Θ(cid:48)),  During the training process, we may perform batch sampling from training nodes and validation nodes, instead of taking all one time.
 <EOS>
@@ -204,7 +204,7 @@ The implementation details can be found in the following.
 <EOS>
 The spectral graph convo- lution can be defined as the multiplication of signal X with a filter gθ(Λ) = diag(θ) parameterized by θ in the Fourier domain: conv(X ) = gθ(L) ∗ X = Ugθ(Λ)UT X , where parameter θ ∈ Rn is a vector of Fourier coefficients.
 <EOS>
-To reduce the computational complexity and obtain the local information, we use an approximate local filter of the Chebyshev polynomial (Defferrard et al, 2016), gθ(Λ) = (cid:80)K−1 k=0 θkTk(ˆΛ), where parameter θ ∈ RK is a vector of Chebyshev coefficients and Tk(ˆΛ) ∈ Rn×n is the Chebyshev polynomial of order k evaluated at ˆΛ = 2Λ/λmax − In, a diagonal matrix of scaled eigenvalues.
+To reduce the computational complexity and obtain the local information, we use an approximate local filter of the Chebyshev polynomial , gθ(Λ) = (cid:80)K−1 k=0 θkTk(ˆΛ), where parameter θ ∈ RK is a vector of Chebyshev coefficients and Tk(ˆΛ) ∈ Rn×n is the Chebyshev polynomial of order k evaluated at ˆΛ = 2Λ/λmax − In, a diagonal matrix of scaled eigenvalues.
 <EOS>
 The graph filtering operation can then be expressed as gθ(Λ) ∗ X = (cid:80)K−1 k=0 θkTk(ˆL)X , where Tk(ˆL) ∈ Rn×n is the Chebyshev polynomial of order k evaluated at the scaled Laplacian ˆL = 2L/λmax − In. Further, we can construct multi-scale receptive fields for each vertex based on the Laplacian matrix L, where each receptive field records hopping neighborhood relationships around the reference vertex vi, and forms a local centralized subgraph.
 <EOS>
@@ -232,7 +232,7 @@ The computed value wi→j can be further used to weight the local features at no
 <EOS>
 One fully connected layer (w.r.t. φr) with C-dimensions is finally adopted to obtain the relation regression score.
 <EOS>
- (8)  (9)  5 EXPERIMENTS  5.1 EXPERIMENTAL SETTINGS  We evaluate our proposed GIL method on three citation network datasets: Cora, Citeseer, Pubmed (Sen et al, 2008), and one knowledge graph NELL dataset (Carlson et al, 2010).
+ (8)  (9)  5 EXPERIMENTS  5.1 EXPERIMENTAL SETTINGS  We evaluate our proposed GIL method on three citation network datasets: Cora, Citeseer, Pubmed , and one knowledge graph NELL dataset .
 <EOS>
 The statistical properties of graph data are summarized in Table 1.
 <EOS>
@@ -262,27 +262,27 @@ We further improve the inference learning capability of the GIL model for 1200 i
 <EOS>
 The classification accuracies for all methods are reported in Table 2.
 <EOS>
-Our proposed GIL can significantly outperform these graph Laplacian regularized methods on four graph datasets, including Deep walk (Zhou et al, 2004), modularity clustering (Brandes et al, 2008), Gaussian fields (Zhu et al, 2003), and graph embedding (Yang et al, 2016) methods.
+Our proposed GIL can significantly outperform these graph Laplacian regularized methods on four graph datasets, including Deep walk , modularity clustering , Gaussian fields , and graph embedding  methods.
 <EOS>
-For example, we can achieve much higher performance than the deepwalk method (Zhou et al, 2004), e.g., 43.2% vs 74.1% on the Citeseer dataset, 65.3% vs 83.1% on the Pubmed dataset, and 58.1% vs 78.9% on the NELL dataset.
+For example, we can achieve much higher performance than the deepwalk method , e.g., 43.2% vs 74.1% on the Citeseer dataset, 65.3% vs 83.1% on the Pubmed dataset, and 58.1% vs 78.9% on the NELL dataset.
 <EOS>
-We find that the graph embedding method (Yang et al, 2016), which has considered both label information and graph structure during sampling, can obtain lower accuracies than our proposed GIL by 9.4% on the Citeseer dataset and 10.5% on the Cora dataset, respectively.
+We find that the graph embedding method , which has considered both label information and graph structure during sampling, can obtain lower accuracies than our proposed GIL by 9.4% on the Citeseer dataset and 10.5% on the Cora dataset, respectively.
 <EOS>
 This indicates that our proposed GIL can better optimize structure relations and thus improve the network generalization.
 <EOS>
-We further compare our proposed GIL with several existing deep graph embedding methods, including graph attention network (Velickovic et al, 2018), dual graph convolutional networks (Zhuang & Ma, 2018), topology adaptive graph convolutional networks (Du et al, 2017), Multi-scale graph convolution (Abu-El-Haija et al, 2018), etc.
+We further compare our proposed GIL with several existing deep graph embedding methods, including graph attention network , dual graph convolutional networks , topology adaptive graph convolutional networks , Multi-scale graph convolution , etc.
 <EOS>
-For example, our proposed GIL achieves a very large gain, e.g., 86.2% vs 83.3% (Du et al, 2017) on the Cora dataset, and 78.9% vs 66.0% (Kipf & Welling, 2017) on the NELL dataset.
+For example, our proposed GIL achieves a very large gain, e.g., 86.2% vs 83.3%  on the Cora dataset, and 78.9% vs 66.0%  on the NELL dataset.
 <EOS>
-We evaluate our proposed GIL method on a large graph dataset with a lower label rate, which can significantly outperform existing baselines on the Pubmed dataset: 3.1% over DGCN (Zhuang & Ma, 2018), 4.1% over classic GCN (Kipf & Welling, 2017) and TAGCN (Du et al, 2017), 3.2% over AGNN (Thekumparampil et al, 2018), and 3.6% over N-GCN (Abu-El-Haija et al, 2018).
+We evaluate our proposed GIL method on a large graph dataset with a lower label rate, which can significantly outperform existing baselines on the Pubmed dataset: 3.1% over DGCN , 4.1% over classic GCN  and TAGCN , 3.2% over AGNN , and 3.6% over N-GCN .
 <EOS>
 It demonstrates that our proposed GIL performs very well on various graph datasets by building the graph inference learning process, where the limited label information and graph structures can be well employed in the predicted framework.
 <EOS>
  Table 2: Performance comparisons of semi-supervised classification methods.
 <EOS>
- Methods Clustering (Brandes et al, 2008) DeepWalk (Zhou et al, 2004) Gaussian (Zhu et al, 2003) G-embedding (Yang et al, 2016) DCNN (Atwood & Towsley, 2016) GCN (Kipf & Welling, 2017) MoNet (Monti et al, 2017) N-GCN (Abu-El-Haija et al, 2018) GAT (Velickovic et al, 2018) AGNN (Thekumparampil et al, 2018) TAGCN (Du et al, 2017) DGCN (Zhuang & Ma, 2018) Our GIL  Cora 59.5 67.2 68.0 75.7 76.8 81.5 81.7 83.0 83.0 83.1 83.3 83.5 86.2  Citeseer 60.1 43.2 45.3 64.7 - 70.3 - 72.2 72.5 71.7 72.5 72.6 74.1  Pubmed NELL 70.7 65.3 63.0 77.2 73.0 79.0 78.8 79.5 79.0 79.9 79.0 80.0 83.1  21.8 58.1 26.5 61.9 - 66.0 - - - - - 74.2 78.9  5.3 ANALYSIS  Meta-optimization: As can be seen in Table 3, we report the classification accuracies of semi-supervised classification with several variants of our proposed GIL and the classical GCN method (Kipf & Welling, 2017) when evaluating them on the Cora dataset.
+ Methods Clustering  DeepWalk  Gaussian  G-embedding  DCNN  GCN  MoNet  N-GCN  GAT  AGNN  TAGCN  DGCN  Our GIL  Cora 59.5 67.2 68.0 75.7 76.8 81.5 81.7 83.0 83.0 83.1 83.3 83.5 86.2  Citeseer 60.1 43.2 45.3 64.7 - 70.3 - 72.2 72.5 71.7 72.5 72.6 74.1  Pubmed NELL 70.7 65.3 63.0 77.2 73.0 79.0 78.8 79.5 79.0 79.9 79.0 80.0 83.1  21.8 58.1 26.5 61.9 - 66.0 - - - - - 74.2 78.9  5.3 ANALYSIS  Meta-optimization: As can be seen in Table 3, we report the classification accuracies of semi-supervised classification with several variants of our proposed GIL and the classical GCN method  when evaluating them on the Cora dataset.
 <EOS>
-For analyzing the perfor- mance improvement of our proposed GIL with the graph inference learning process, we report the classification accuracies of GCN (Kipf & Welling, 2017) and our proposed GIL on the Cora dataset under two different situations, including “only learning with the training set Vtr" and “with jointly learning on a training set Vtr and a validation set Vval".
+For analyzing the perfor- mance improvement of our proposed GIL with the graph inference learning process, we report the classification accuracies of GCN  and our proposed GIL on the Cora dataset under two different situations, including “only learning with the training set Vtr" and “with jointly learning on a training set Vtr and a validation set Vval".
 <EOS>
 “GCN /w jointly learning on Vtr & Vval" achieves a better result than “GCN /w learning on Vtr" by 3.6%, which demonstrates that the network performance can be improved by employing validation samples.
 <EOS>
@@ -298,7 +298,7 @@ In contrast, the conventional methods often employ a validation set to tune para
 <EOS>
  Table 3: Performance comparisons with several GIL variants and the classical GCN method on the Cora dataset.
 <EOS>
- GCN (Kipf & Welling, 2017)  Methods  GIL  GIL+mean pooling  GIL+2  conv layers  /w learning on Vtr /w jointly learning on Vtr & Vval /w learning on Vtr /w meta-train Vtr → Vval /w 1  conv layer /w 2  conv layers /w 3  conv layers /w max-pooling /w mean pooling  Acc. (%) 81.4 84.0 83.3 86.2 84.5 86.2 85.4 85.2 86.2  Network settings: We explore the effectiveness of our proposed GIL with the same mean pooling mechanism, but with different numbers of convolutional layers, i.e., “GIL + mean pooling" with one, two, and three convolutional layers, respectively.
+ GCN   Methods  GIL  GIL+mean pooling  GIL+2  conv layers  /w learning on Vtr /w jointly learning on Vtr & Vval /w learning on Vtr /w meta-train Vtr → Vval /w 1  conv layer /w 2  conv layers /w 3  conv layers /w max-pooling /w mean pooling  Acc. (%) 81.4 84.0 83.3 86.2 84.5 86.2 85.4 85.2 86.2  Network settings: We explore the effectiveness of our proposed GIL with the same mean pooling mechanism, but with different numbers of convolutional layers, i.e., “GIL + mean pooling" with one, two, and three convolutional layers, respectively.
 <EOS>
 As can be seen in Table 3, the proposed GIL with two convolutional layers can obtain a better performance on the Cora data than the other two network settings (i.e., GIL with one or three convolutional layers).
 <EOS>
@@ -310,7 +310,7 @@ GIL with mean pooling (i.e., “GIL /w 2 conv layers + mean pooling") can get a 
 <EOS>
 The reason may be that the graph network with two convolutional layers and the mean pooling mechanism can obtain the optimal graph embeddings, but when increasing the network layers, more parameters of a certain graph model need to be optimized, which may lead to the over-fitting issue.
 <EOS>
- Inﬂuence of different between-node steps: We compare the classification performance within different between-node steps for our proposed GIL and GCN (Kipf & Welling, 2017), as illustrated in Fig 2(a).
+ Inﬂuence of different between-node steps: We compare the classification performance within different between-node steps for our proposed GIL and GCN , as illustrated in Fig 2(a).
 <EOS>
 The length of between-node steps can be computed with the shortest path between reference nodes and query nodes.
 <EOS>
@@ -366,7 +366,7 @@ It demonstrates that three different modules of our method can improve the graph
 <EOS>
  Computational complexity: For the computational complexity of our proposed GIL, the cost is mainly spent on the computations of node representation, between-node reachability, and class-to- node relationship, which are about O((ntr + nte) ∗ e ∗ din ∗ dout), O((ntr + nte) ∗ e ∗ P ), and O(ntr ∗ nted2 out), respectively. ntr and nte refer to the numbers of training and testing nodes, din and dout denote the input and output dimensions of node representation, e is about the average degree of graph node, and P is the step length of node reachability.
 <EOS>
-Compared with those classic Graph CNNs (Kipf & Welling, 2017), our proposed GIL has a slightly higher cost due to an extra inference learning process, but can complete the testing stage with several seconds on these benchmark datasets.
+Compared with those classic Graph CNNs , our proposed GIL has a slightly higher cost due to an extra inference learning process, but can complete the testing stage with several seconds on these benchmark datasets.
 <EOS>
  6 CONCLUSION  In this work, we tackled the semi-supervised node classification task with a graph inference learning method, which can better predict the categories of these unlabeled nodes in an end-to-end framework.
 <EOS>
@@ -383,226 +383,4 @@ In the future, we would extend the graph inference method to handle more graph-r
 BK20191283 and BK20190019), and Tencent AI Lab Rhino-Bird Focused Research Program (No.
 <EOS>
 JR201922).
-<EOS>
- REFERENCES  2001, 2016.
-<EOS>
- Sami Abu-El-Haija, Amol Kapoor, Bryan Perozzi, and Joonseok Lee.
-<EOS>
-N-gcn: Multi-scale graph  convolution for semi-supervised node classification. arXiv preprint arXiv:1802.08888, 2018.
-<EOS>
- James Atwood and Don Towsley.
-<EOS>
-Diffusion-convolutional neural networks.
-<EOS>
-In NeurIPS, pp 1993–  Karsten M Borgwardt, Hans-Peter Kriegel, SVN Vishwanathan, and Nicol N Schraudolph.
-<EOS>
-Graph ker- nels for disease outcome prediction from protein-protein interaction networks.
-<EOS>
-Pacific Symposium on Biocomputing Pacific Symposium on Biocomputing, pp 4–15, 2007.
-<EOS>
- Ulrik Brandes, Daniel Delling, Marco Gaertler, Robert Gorke, Martin Hoefer, Zoran Nikoloski, and Dorothea Wagner.
-<EOS>
-On modularity clustering.
-<EOS>
-IEEE transactions on knowledge and data engineering, 20(2):172–188, 2008.
-<EOS>
- Andrew Carlson, Justin Betteridge, Bryan Kisiel, Burr Settles, Estevam R. Hruschka Jr., and Tom M.  Mitchell.
-<EOS>
-Toward an architecture for never-ending language learning.
-<EOS>
-In AAAI, 2010.
-<EOS>
- Michaël Defferrard, Xavier Bresson, and Pierre Vandergheynst.
-<EOS>
-Convolutional neural networks on  graphs with fast localized spectral filtering.
-<EOS>
-In NeurIPS, pp 3844–3852, 2016.
-<EOS>
- Jian Du, Shanghang Zhang, Guanhang Wu, José MF Moura, and Soummya Kar.
-<EOS>
-Topology adaptive  graph convolutional networks. arXiv preprint arXiv:1710.10370, 2017.
-<EOS>
- Chelsea Finn, Pieter Abbeel, and Sergey Levine.
-<EOS>
-Model-agnostic meta-learning for fast adaptation of  deep networks.
-<EOS>
-In ICML, pp 1126–1135, 2017.
-<EOS>
- Will Hamilton, Zhitao Ying, and Jure Leskovec.
-<EOS>
-Inductive representation learning on large graphs.
-<EOS>
-In  NeurIPS, pp 1025–1035, 2017.
-<EOS>
- Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun.
-<EOS>
-Deep residual learning for image  recognition.
-<EOS>
-In CVPR, pp 770–778, 2016.
-<EOS>
- Mikael Henaff, Joan Bruna, and Yann LeCun.
-<EOS>
-Deep convolutional networks on graph-structured data.
-<EOS>
- arXiv preprint arXiv:1506.05163, 2015.
-<EOS>
- Jiatao Jiang, Zhen Cui, Chunyan Xu, and Jian Yang.
-<EOS>
-Gaussian-induced convolution for graphs.
-<EOS>
-In  AAAI, volume 33, pp 4007–4014, 2019.
-<EOS>
- Hisashi Kashima, Koji Tsuda, and Akihiro Inokuchi.
-<EOS>
-Marginalized kernels between labeled graphs.
-<EOS>
- In ICML, pp 321–328, 2003.
-<EOS>
- Thomas N. Kipf and Max Welling.
-<EOS>
-Semi-supervised classification with graph convolutional networks.
-<EOS>
- In ICLR, 2017.
-<EOS>
- networks.
-<EOS>
-ICLR, 2016.
-<EOS>
- learning.
-<EOS>
-In ICML, 2010.
-<EOS>
- Yujia Li, Daniel Tarlow, Marc Brockschmidt, and Richard Zemel.
-<EOS>
-Gated graph sequence neural  Wei Liu, Junfeng He, and Shih-Fu Chang.
-<EOS>
-Large graph construction for scalable semi-supervised  Wei Liu, Jun Wang, and Shih-Fu Chang.
-<EOS>
-Robust and scalable graph-based semisupervised learning.
-<EOS>
- Proceedings of the IEEE, 100(9):2624–2638, 2012.
-<EOS>
- Zhiling Luo, Ling Liu, Jianwei Yin, Ying Li, and Zhaohui Wu. Deep learning of graphs with ngram convolutional neural networks.
-<EOS>
-IEEE Transactions on Knowledge and Data Engineering, 29(10): 2125–2139, 2017.
-<EOS>
- 10  Published as a conference paper at ICLR 2020  Federico Monti, Davide Boscaini, Jonathan Masci, Emanuele Rodola, Jan Svoboda, and Michael M Bronstein.
-<EOS>
-Geometric deep learning on graphs and manifolds using mixture model cnns.
-<EOS>
-In CVPR, pp 5115–5124, 2017.
-<EOS>
- Christopher Morris, Kristian Kersting, and Petra Mutzel.
-<EOS>
-Glocalized weisfeiler-lehman graph kernels:  Global-local feature maps of graphs.
-<EOS>
-In ICDM, pp 327–336.
-<EOS>
-IEEE, 2017.
-<EOS>
- Mathias Niepert, Mohamed Ahmed, and Konstantin Kutzkov.
-<EOS>
-Learning convolutional neural networks  for graphs.
-<EOS>
-In ICML, pp 2014–2023, 2016.
-<EOS>
- Francesco Orsini, Daniele Baracchi, and Paolo Frasconi.
-<EOS>
-Shift aggregate extract networks. arXiv  preprint arXiv:1703.05537, 2017.
-<EOS>
- Lawrence Page, Sergey Brin, Rajeev Motwani, and Terry Winograd.
-<EOS>
-The pagerank citation ranking:  Bringing order to the web.
-<EOS>
-Technical Report 1999-66, 1999.
-<EOS>
- Shirui Pan, Ruiqi Hu, Guodong Long, Jing Jiang, Lina Yao, and Chengqi Zhang.
-<EOS>
-Adversarially  regularized graph autoencoder for graph embedding.
-<EOS>
-In IJCAI, pp 2609–2615, 2018.
-<EOS>
- Sachin Ravi and Hugo Larochelle.
-<EOS>
-Optimization as a model for few-shot learning.
-<EOS>
-In ICLR, 2017.
-<EOS>
- Prithviraj Sen, Galileo Namata, Mustafa Bilgic, Lise Getoor, Brian Galligher, and Tina Eliassi-Rad.
-<EOS>
- Collective classification in network data.
-<EOS>
-AI magazine, 29(3):93–93, 2008.
-<EOS>
- Nino Shervashidze, SVN Vishwanathan, Tobias Petri, Kurt Mehlhorn, and Karsten Borgwardt.
-<EOS>
-Efficient graphlet kernels for large graph comparison.
-<EOS>
-In Artificial Intelligence and Statistics, pp 488–495, 2009.
-<EOS>
- Flood Sung, Li Zhang, Tao Xiang, Timothy Hospedales, and Yongxin Yang.
-<EOS>
-Learning to learn:  Meta-critic networks for sample efficient learning. arXiv preprint arXiv:1706.09529, 2017.
-<EOS>
- Kiran K Thekumparampil, Chong Wang, Sewoong Oh, and Li-Jia Li. Attention-based graph neural  network for semi-supervised learning. arXiv preprint arXiv:1803.03735, 2018.
-<EOS>
- Petar Velickovic, Guillem Cucurull, Arantxa Casanova, Adriana Romero, Pietro Liò, and Yoshua  Bengio.
-<EOS>
-Graph attention networks.
-<EOS>
-ICLR, 2018.
-<EOS>
- Danfei Xu, Yuke Zhu, Christopher B Choy, and Li Fei-Fei.
-<EOS>
-Scene graph generation by iterative  message passing.
-<EOS>
-In CVPR, pp 5410–5419, 2017.
-<EOS>
- Pinar Yanardag and SVN Vishwanathan.
-<EOS>
-Deep graph kernels.
-<EOS>
-In SIGKDD, pp 1365–1374, 2015.
-<EOS>
- Zhilin Yang, William W Cohen, and Ruslan Salakhutdinov.
-<EOS>
-Revisiting semi-supervised learning with  graph embeddings.
-<EOS>
-ICML, 2016.
-<EOS>
- Bing Yu, Haoteng Yin, and Zhanxing Zhu.
-<EOS>
-Spatio-temporal graph convolutional networks: A deep  learning framework for traffic forecasting.
-<EOS>
-In IJCAI, pp 3634–3640, 2018.
-<EOS>
- Tong Zhang, Zhen Cui, Chunyan Xu, Wenming Zheng, and Jian Yang.
-<EOS>
-Variational pathway reasoning  for eeg emotion recognition.
-<EOS>
-In AAAI, 2020.
-<EOS>
- Wenting Zhao, Zhen Cui, Chunyan Xu, Chengzheng Li, Tong Zhang, and Jian Yang.
-<EOS>
-Hashing graph  convolution for node classification.
-<EOS>
-In CIKM, 2019.
-<EOS>
- Dengyong Zhou, Olivier Bousquet, Thomas N Lal, Jason Weston, and Bernhard Schölkopf.
-<EOS>
-Learning  with local and global consistency.
-<EOS>
-In NeurIPS, pp 321–328, 2004.
-<EOS>
- Xiaojin Zhu, Zoubin Ghahramani, and John D Lafferty.
-<EOS>
-Semi-supervised learning using gaussian  fields and harmonic functions.
-<EOS>
-In ICML, pp 912–919, 2003.
-<EOS>
- Chenyi Zhuang and Qiang Ma. Dual graph convolutional networks for graph-based semi-supervised  classification.
-<EOS>
-In WWW, pp 499–508, 2018.
-<EOS>
- 11  
 <EOS>
