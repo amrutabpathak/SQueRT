@@ -8,10 +8,18 @@ import urllib
 from urllib import request
 import os
 import time
+import re
+from urllib import parse
 
 
-def scrape(num_pdfs):
-    url_prefix = 'https://arxiv.org/search/?searchtype=all&query=deep+learning&abstracts=show&size=200&order=-announced_date_first&start='
+def scrape(query, num_pdfs, topic = 'All'):
+    if(topic != 'All'):
+        query += ' ' + topic
+    query = re.sub(' +', ' ', query)
+    print(query)
+    urlQuery = parse.quote_plus(query)
+    print(urlQuery)
+    url_prefix = 'https://arxiv.org/search/?searchtype=all&query='+urlQuery+'&abstracts=show&size=200&order=-announced_date_first&start='
     start_file_idx = 0
     urls = []
     export_urls = []
@@ -19,6 +27,7 @@ def scrape(num_pdfs):
 
     while num_retrieved < num_pdfs:
         url_to_scrape = url_prefix + str(start_file_idx)
+        print(url_to_scrape)
         htmltext = urllib.request.urlopen(url_to_scrape).read()
         soup = BeautifulSoup(htmltext, "html.parser")
 
@@ -53,13 +62,23 @@ def scrape(num_pdfs):
 
 def main():
     '''
-     Input: python filename <num_pdfs>
+     Input: python filename <Query> <num_pdfs> <topic - optional>
      Then: sys.argv = [filename, <seed>]
      Example to invoke:
-        python arxiv_pdf_scraper.py 1000
+        python arxiv_pdf_scraper.py "What is the best accuracy achieved for mnist" 1000
+        OR
+        python arxiv_pdf_scraper.py "What is the best accuracy achieved for mnist" 1000 "Deep Learning"
+
     '''
-    num_files = int(sys.argv[1])
-    scrape(num_files)
+    query = sys.argv[1]
+    num_files = int(sys.argv[2])
+    if len(sys.argv) == 3:
+        scrape(query, num_files)
+    elif len(sys.argv) == 4:
+        topic = sys.argv[3]
+        scrape(query, num_files, topic)
+    else:
+        print("Invalid arguments")
 
 
 if __name__ == '__main__':
