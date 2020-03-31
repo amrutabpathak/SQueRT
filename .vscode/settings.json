@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": ".env\\Scripts\\python.exe",
+    "python.pythonPath": "C:\\Users\\God\\Anaconda3\\python.exe",
     "python.linting.pycodestyleEnabled": false,
     "python.linting.flake8Enabled": true,
     "python.linting.enabled": true
