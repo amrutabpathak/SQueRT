@@ -2,11 +2,11 @@ Q: Lgbatchopt: What model is best for large batch training for bert
 A: LAMB
 
 Scores:
-Order of scoring: Evan, 
-Bert: 6
-Alberta: 8
-Distilbert: 9
-USE: 7
+Order of scoring: Evan, Kate
+Bert: 6, 14
+Alberta: 8, 14
+Distilbert: 9, 13
+USE: 7, 14
 
 en_trf_bertbaseuncased_lg
 en_trf_bertbaseuncased_lg0	What model is best for large batch training for bert	There has been recent surge in interest in using large batch stochastic optimization methods to tackle this issue.The most prominent algorithm in this line of research is LARS  which by employing layerwise adaptive learning rates trains RESNET on ImageNet in a few minutes.However  LARS performs poorly for attention models like BERT  indicating that its performance gains are not consistent across tasks.	0.7528292306908712
