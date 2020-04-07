@@ -16,18 +16,19 @@ txtdir = "./DataTxt/"
 #csvdir = "C:/Users/God/git/CS7800/7180QueryTool/DataCsv/"
 csvdir = './DataCsv/'
 # Basic user interface; obtain query
-query = "Which model is best for large batch optimization of bert?"
-print("Query: %s", query)
+# query = "Which model is best for large batch optimization of bert?"
+# print("Query: %s", query)
 
 
 # Convert text files to CSV snippets
 if __name__ == "__main__":
     # Scrape papers to pdf folder
+# This no longer works without ipynb. There should probably be another way to run it.
 # %run -i arxiv_pdf_scraper "query" 1
 # Convert pdfs to text
-# for pdfPaperName in glob.glob(pdfdir + "*.pdf"):
-#     ProcessText.pdfToText(pdfPaperName, txtdir)
-    sentenceNum = 3
+    for pdfPaperName in glob.glob(pdfdir + "*.pdf"):
+        ProcessText.pdfToText(pdfPaperName, txtdir)
+        sentenceNum = 3
     for txtPaperName in glob.glob(txtdir + "*.txt"):
         ProcessText.snippetToCsv(txtPaperName, sentenceNum, csvdir)
     for csvPaperName in glob.glob(csvdir + "*.csv"):
