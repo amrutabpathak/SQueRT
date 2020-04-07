@@ -31,7 +31,8 @@ class QuerySnippet:
 def returnRelevant(researchPaper, query, numSnippets = 15):
     # Make sure these are downloaded before using
     # model_list = ['en_trf_bertbaseuncased_lg','en_trf_robertabase_lg','en_trf_distilbertbaseuncased_lg']
-    model_list = ['en_trf_bertbaseuncased_lg']
+    # model_list = ['en_trf_bertbaseuncased_lg']
+    model_list = ['en_trf_distilbertbaseuncased_lg']
     relevantSnippets = []
     
     for model in model_list:

@@ -13,12 +13,13 @@ Also download your own Albert Model here
 https://s3.amazonaws.com/models.huggingface.co/bert/ktrapeznikov/albert-xlarge-v2-squad-v2/pytorch_model.bin
 '''
 
-from transformers import (
-    AlbertConfig,
-    AlbertForQuestionAnswering,
-    AlbertTokenizer,
-    squad_convert_examples_to_features
-)
+from transformers import AlbertConfig, AlbertForQuestionAnswering, AlbertTokenizer, squad_convert_examples_to_features
+# import (
+#     AlbertConfig,
+#     AlbertForQuestionAnswering,
+#     AlbertTokenizer,
+#     squad_convert_examples_to_features
+# )
 
 from transformers.data.processors.squad import SquadResult, SquadV2Processor, SquadExample
 
@@ -33,7 +34,7 @@ if use_own_model:
 else:
     model_name_or_path = "ktrapeznikov/albert-xlarge-v2-squad-v2"
 # Edit this to your local path ***OR nothing will work***
-config_file = "C:/Users/God/git/CS7800/7180QueryTool/Albert Question Answering"
+config_file = "./Albert Question Answering"
 
 output_dir = ""
 
