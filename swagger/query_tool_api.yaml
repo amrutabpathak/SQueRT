@@ -6,10 +6,8 @@ info:
     # The Scientific Query Research Tool
     ---
     <br/>
-    **`Enter your query below`**
+    **ENTER YOUR QUERY BELOW**
     <br/>
-    <br/>
-    A [link to our GitHub repo](https://github.ccs.neu.edu/simpsone/7180QueryTool/) 
 
 paths:
   /health:
@@ -37,8 +35,32 @@ paths:
           required: true
           description: The user's query as a string
           type: string
+        - in: formData
+          name: topic
+          required: false
+          description: The (optional) topic under which to search
+          type: string
       responses:
         '200':
           description: Prediction performed successfully
         '500':
           description: Unable to perform the prediction
+
+  /feedback:
+    post:
+      summary: Accepts user feedback on result
+      operationId: query_tool_api.feedback
+      consumes:
+      - multipart/form-data
+      parameters:
+        - in: formData
+          name: ranking
+          required: false
+          description: How did we do? Please select optional feedback for our service
+          type: string
+          enum: ['Unhelpful', 'Somewhat helpful', 'Helpful']
+      responses:
+        '200':
+          description: Feedback submitted successfully
+        '500':
+          description: Unable to save feedback
