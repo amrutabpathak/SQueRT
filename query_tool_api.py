@@ -25,17 +25,22 @@ def health():
     return {"Message": "Service is OK"}
 
 # Implement our predict function
-def predict(query):
-    # Accept the query provided as part of our POST
+def predict(query, topic='All'):
+    # Accept the query and optional topic provided as part of our POST
+    # Pass query and topic to Main controller
+    res = Main(query, topic)
+
     # Use as input to model.predict()
-    res = model.predict([[query]])
+    #res = model.predict([[query]])
 
     # Return the prediction as a json
     return {"prediction" : res}
 
 # Implement our feedback function
 def feedback(ranking):
-    # code to add feedback to db here
+    # Accept the user's ranking provided as part of our POST
+    # Pass ranking to Main controller
+    Main(ranking)
 
     return {"Your feedback" : ranking}
 
