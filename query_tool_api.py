@@ -33,6 +33,12 @@ def predict(query):
     # Return the prediction as a json
     return {"prediction" : res}
 
+# Implement our feedback function
+def feedback(ranking):
+    # code to add feedback to db here
+
+    return {"Your feedback" : ranking}
+
 # Read the API definition for our service from the yaml file
 app.add_api("query_tool_api.yaml")
 
