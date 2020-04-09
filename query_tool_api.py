@@ -4,7 +4,7 @@ To run this app, in your terminal:
 """
 import connexion
 from sklearn.externals import joblib
-import Main     # local module
+#import Main     # local module
 
 # Instantiate our Flask app object
 app = connexion.FlaskApp(__name__, port=8080, specification_dir='swagger/')
@@ -35,19 +35,19 @@ def predict(query, topic='All'):
     this_topic = topic
 
     # Pass query and topic to Main controller
-    result = Main.main(this_query, this_topic)
+    paper_id, snippet = Main.main(this_query, this_topic)
 
     # Use as input to model.predict()
     #res = model.predict([[query]])
 
     # Return the prediction as a json
-    return {"prediction" : result}
+    return {"prediction" : paper_id, snippet}
 
 # Implement our feedback function
 def feedback(ranking):
     # Accept the user's ranking provided as part of our POST
     # Pass ranking to Main controller
-    Main.save_feedback(this_topic, this_query, ranking)
+    #Main.save_feedback(this_topic, this_query, ranking)
 
     return {"Your feedback" : ranking}
 
