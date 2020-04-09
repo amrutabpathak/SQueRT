@@ -43,7 +43,7 @@ def main(query, topic):
         print(predictions)
 
     # paper_identifier and snippet need to be returned from above methods
-    return paper_identifier, snippet;
+    return paper_identifier, snippet
 
 
 def save_feedback(topic, query, feedback):
