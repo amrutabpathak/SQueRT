@@ -11,23 +11,25 @@ import glob
 import os
 import db_operations
 
-print(dir(ProcessText))
-pdfdir = './Data/'
-# txtdir = 'C:/Users/Evan/Documents/7180QueryTool/DataTxt/'
-txtdir = "./DataTxt/"
-#csvdir = "C:/Users/God/git/CS7800/7180QueryTool/DataCsv/"
-csvdir = './DataCsv/'
-# Basic user interface; obtain query
-# query = "Which model is best for large batch optimization of bert?"
-# print("Query: %s", query)
+
+def main(query, topic):
+    print(dir(ProcessText))
+    pdfdir = './Data/'
+    # txtdir = 'C:/Users/Evan/Documents/7180QueryTool/DataTxt/'
+    txtdir = "./DataTxt/"
+    #csvdir = "C:/Users/God/git/CS7800/7180QueryTool/DataCsv/"
+    csvdir = './DataCsv/'
+    # Basic user interface; obtain query
+    # query = "Which model is best for large batch optimization of bert?"
+    # print("Query: %s", query)
 
 
-# Convert text files to CSV snippets
-if __name__ == "__main__":
+    # Convert text files to CSV snippets
+
     # Scrape papers to pdf folder
-# This no longer works without ipynb. There should probably be another way to run it.
-# %run -i arxiv_pdf_scraper "query" 1
-# Convert pdfs to text
+    # This no longer works without ipynb. There should probably be another way to run it.
+    # %run -i arxiv_pdf_scraper "query" 1
+    # Convert pdfs to text
     for pdfPaperName in glob.glob(pdfdir + "*.pdf"):
         ProcessText.pdfToText(pdfPaperName, txtdir)
         sentenceNum = 3
@@ -40,11 +42,13 @@ if __name__ == "__main__":
         predictions = albert_QA.question_answering_albert(query, relevantSnippets)
         print(predictions)
 
-def saveFeedback(topic, query, feedback):
+    # paper_identifier and snippet need to be returned from above methods
+    return paper_identifier, snippet;
+
+
+def save_feedback(topic, query, feedback):
     db_operations.updateRecords(topic, query, feedback)
     print('Feedback saved!')
 
-
-
-
-
+if __name__ == "__main__":
+    main(query, topic)
