@@ -9,6 +9,8 @@ import albert_QA
 import ProcessText
 import glob
 import os
+import db_operations
+
 print(dir(ProcessText))
 pdfdir = './Data/'
 # txtdir = 'C:/Users/Evan/Documents/7180QueryTool/DataTxt/'
@@ -37,6 +39,11 @@ if __name__ == "__main__":
         # From snippets for each paper, return answer
         predictions = albert_QA.question_answering_albert(query, relevantSnippets)
         print(predictions)
+
+def saveFeedback(topic, query, feedback):
+    db_operations.updateRecords(topic, query, feedback)
+    print('Feedback saved!')
+
 
 
 
