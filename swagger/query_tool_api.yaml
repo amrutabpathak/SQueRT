@@ -58,7 +58,7 @@ paths:
           required: false
           description: How did we do? Please select optional feedback for our service
           type: string
-          enum: ['Unhelpful', 'Somewhat helpful', 'Helpful']
+          enum: ['Helpful', 'Somewhat helpful', 'Unhelpful']
       responses:
         '200':
           description: Feedback submitted successfully
