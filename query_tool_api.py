@@ -35,13 +35,13 @@ def predict(query, topic='All'):
     this_topic = topic
 
     # Pass query and topic to Main controller
-    paper_id, snippet = Main.main(this_query, this_topic)
+    paper_id, snippets = Main.main(this_query, this_topic)
 
     # Use as input to model.predict()
     #res = model.predict([[query]])
 
     # Return the prediction as a json
-    return {"prediction" : paper_id, snippet}
+    return {"paper" : paper_id, "relevant snippets" : snippets}
 
 # Implement our feedback function
 def feedback(ranking):
