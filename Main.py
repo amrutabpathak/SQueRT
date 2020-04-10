@@ -22,7 +22,8 @@ def main(query, topic):
     # Basic user interface; obtain query
     # query = "Which model is best for large batch optimization of bert?"
     # print("Query: %s", query)
-
+    #Create Table
+    db_operations.createTable()
 
     # Convert text files to CSV snippets
 
