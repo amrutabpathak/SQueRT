@@ -62,6 +62,13 @@ model.to(device)
 
 processor = SquadV2Processor()
 
+class SnippetAnswer:
+
+    def __init__(self,  snippet, answer):
+        self.snippet = snippet
+        self.answer = answer
+
+
 def to_list(tensor):
     return tensor.detach().cpu().tolist()
 
@@ -146,37 +153,53 @@ def run_prediction(question_texts, context_text):
 
     return predictions
 
-def question_answering_albert(relevant_snippets, question, threshold=70):
 
+def question_answering_albert(relevant_snippets, question, threshold=70):
     answers = []
     answer_map = {}
     max_sim = 0
     final_answer = ''
+    final_snippet = ''
     # Finds answers for each snippet
     for snippet in relevant_snippets:
         predictions = run_prediction(question, snippet)
         for key in predictions.keys():
-            answers.append(predictions[key])
+            snippetAnsObj = SnippetAnswer(snippet, predictions[key])
+            answers.append(snippetAnsObj)
+
     # Returns the answer if it appears in snippets frequently. Returns the longest
     # answer in case of ties. If there is no answer it will return an empty string
+
     for answer in answers:
-        if answer not in answer_map.keys():
-            answer_map[answer] = 1
+        if answer.answer not in answer_map.keys():
+            answer_map[answer.answer] = [1, answer.snippet]
         else:
-            answer_map[answer] = answer_map[answer] + 1
+            answer_map[answer.answer] = [answer_map[answer.answer][0] + 1, answer.snippet]
         for key in answer_map:
-            if fuzz.ratio(key.lower(), answer.lower()) > threshold:
-                answer_map[key] =  answer_map[key] + 1
-                answer_map[answer] = answer_map[key] + 1
+            if fuzz.ratio(key.lower(), answer.answer.lower()) > threshold:
+                answer_map[key] = [answer_map[key][0] + 1, answer.snippet]
+                answer_map[answer.answer] = [answer_map[key][0] + 1, answer.snippet]
     for key in answer_map.keys():
-        if max_sim < answer_map[key]:
+        if max_sim < answer_map[key][0]:
+            # print("Inside if")
+            # print(key)
+            # print(answer_map[key][1])
             final_answer = key
-            max_sim = answer_map[key]
-        elif max_sim == answer_map[key]:
+            max_sim = answer_map[key][0]
+            final_snippet = answer_map[key][1]
+        elif max_sim == answer_map[key][0]:
             if len(final_answer) < len(key):
+                # print("Inside elif")
                 final_answer = key
+                final_snippet = answer_map[key][1]
+
+    if final_answer == '':
+        final_snippet = ''
+
     print(final_answer)
-    return final_answer
+    print(final_snippet)
+    return final_answer, final_snippet
+
 
 # This has to be called by this type of main because run prediction uses threading
 '''

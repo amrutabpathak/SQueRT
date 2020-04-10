@@ -40,8 +40,9 @@ def main(query, topic):
         relevantSnippets = RelevantSnippets.returnRelevant(csvPaperName, query)
         print(relevantSnippets + "\n\n")
         # From snippets for each paper, return answer
-        predictions = albert_QA.question_answering_albert(query, relevantSnippets)
+        predictions, snippet = albert_QA.question_answering_albert(query, relevantSnippets)
         print(predictions)
+        print(snippet)
 
     # paper_identifier and snippet need to be returned from above methods
     return paper_identifier, snippet
