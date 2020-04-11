@@ -36,21 +36,37 @@ def main(query, topic):
         sentenceNum = 3
     for txtPaperName in glob.glob(txtdir + "*.txt"):
         ProcessText.snippetToCsv(txtPaperName, sentenceNum, csvdir)
+    outputJson = '{ "topic": ' + '"' + topic + '" ,' + '"query": ' + '"' + query + '" ,' + '"results": ['
     for csvPaperName in glob.glob(csvdir + "*.csv"):
         relevantSnippets = RelevantSnippets.returnRelevant(csvPaperName, query)
         print(relevantSnippets + "\n\n")
         # From snippets for each paper, return answer
         predictions, snippet = albert_QA.question_answering_albert(query, relevantSnippets)
+        paper_identifier = getUrl(csvPaperName)
+        outputJson += '{' + \
+                      '"predictions": ' + '"' + predictions + '" ,' + \
+                      '"snippet": ' + '"' + snippet + '" ,' + \
+                      '"paper_identifier": ' + '"' + paper_identifier + '" },'
         print(predictions)
         print(snippet)
-
+    outputJson += '] }'
+    # removing the last comma
+    lastCommaIndex = outputJson.rfind(",")
+    resultJson = outputJson[:lastCommaIndex] + "" + outputJson[lastCommaIndex + 1:]
+    print(resultJson)
     # paper_identifier and snippet need to be returned from above methods
-    return paper_identifier, snippet
+    return resultJson
 
 
 def save_feedback(topic, query, feedback):
     db_operations.updateRecords(topic, query, feedback)
     print('Feedback saved!')
+
+def getUrl(csvPaperName):
+    url = 'http://localhost:8080/Data/'
+    fileName = csvPaperName.rsplit('_', 1)[0] +'.pdf'
+    url +=fileName
+    return url
 
 if __name__ == "__main__":
     main(query, topic)
