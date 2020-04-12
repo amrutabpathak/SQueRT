@@ -12,7 +12,7 @@ import re
 from urllib import parse
 
 
-def scrape(query, num_pdfs, topic = 'All'):
+def scrape(query, num_pdfs, topic='All'):
     if(topic != 'All'):
         query += ' ' + topic
     query = re.sub(' +', ' ', query)
@@ -40,6 +40,10 @@ def scrape(query, num_pdfs, topic = 'All'):
                 num_retrieved += 1
                 urls.append(_FULLURL)
 
+        if num_retrieved == 0:
+            print("No search results found. Please try a different search.")
+            raise Exception
+
         if num_pdfs % 200 == 0:    # if num_pdfs is a multiple of 200
             start_file_idx += 200   # increment start index in url by 200 to get next page of results
 
@@ -48,10 +52,7 @@ def scrape(query, num_pdfs, topic = 'All'):
     # Convert url list to the arxiv export form
     for addy in urls:
         addy = addy[:8] + 'export.' + addy[8:]
-        export_urls.append(addy) 
-
-    #print(export_urls)
-    #export_urls_trunc = export_urls[:3]
+        export_urls.append(addy)
 
     # Create webscraping folder if it doesn't already exist
     check_folder = os.path.isdir('webscraping')
@@ -63,7 +64,7 @@ def scrape(query, num_pdfs, topic = 'All'):
         print('Downloading %s' % doc)
         destination_file_name = os.path.join('webscraping/', doc[-10:]) + '.pdf'   # keep unique identifier for file name
         request.urlretrieve(doc, destination_file_name)
-        time.sleep(1)   # be polite      
+        time.sleep(1)   # be polite
 
 
 def main():
