@@ -53,6 +53,12 @@ def scrape(query, num_pdfs, topic = 'All'):
     #print(export_urls)
     #export_urls_trunc = export_urls[:3]
 
+    # Create webscraping folder if it doesn't already exist
+    check_folder = os.path.isdir('webscraping')
+    if not check_folder:
+        os.makedirs('webscraping')
+        print("created folder: ", 'webscraping')
+
     for doc in export_urls:
         print('Downloading %s' % doc)
         destination_file_name = os.path.join('webscraping/', doc[-10:]) + '.pdf'   # keep unique identifier for file name
