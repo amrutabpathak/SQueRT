@@ -5,7 +5,7 @@
 
 import RelevantSnippets
 import albert_QA
-# import import_ipynb
+import arxiv_pdf_scraper
 import ProcessText
 import glob
 import os
@@ -13,24 +13,19 @@ import db_operations
 
 
 def main(query, topic):
-    print(dir(ProcessText))
-    pdfdir = './Data/'
-    # txtdir = 'C:/Users/Evan/Documents/7180QueryTool/DataTxt/'
-    txtdir = "./DataTxt/"
-    #csvdir = "C:/Users/God/git/CS7800/7180QueryTool/DataCsv/"
-    csvdir = './DataCsv/'
-    # Basic user interface; obtain query
-    # query = "Which model is best for large batch optimization of bert?"
-    # print("Query: %s", query)
+    pdfdir = os.path.join(os.path.curdir, "Data")
+    txtdir = os.path.join(os.path.curdir, "DataTxt")
+    csvdir = os.path.join(os.path.curdir, "DataCsv")
+    #pdfdir = './Data/'
+    #txtdir = "./DataTxt/"
+    #csvdir = './DataCsv/'
+
     #Create Table
     db_operations.createTable()
 
-    # Convert text files to CSV snippets
-
     # Scrape papers to pdf folder
-    # This no longer works without ipynb. There should probably be another way to run it.
-    # %run -i arxiv_pdf_scraper "query" 1
-    # Convert pdfs to text
+    arxiv_pdf_scraper.scrape(query, 1)
+    # Convert pdfs to text, then to csv snippets
     for pdfPaperName in glob.glob(pdfdir + "*.pdf"):
         ProcessText.pdfToText(pdfPaperName, txtdir)
         sentenceNum = 3
@@ -68,5 +63,6 @@ def getUrl(csvPaperName):
     url +=fileName
     return url
 
-if __name__ == "__main__":
-    main(query, topic)
+main("What model is best for large batch training for bert", "Machine learning")
+#if __name__ == "__main__":
+#    main(query, topic)
