@@ -4,12 +4,14 @@ To run this app, in your terminal:
 """
 import connexion
 from flask import render_template
-from sklearn.externals import joblib
+#from sklearn.externals import joblib
 import Main     # local module
 
 # Instantiate our Flask app object
-app = connexion.FlaskApp(__name__, port=8080, specification_dir='swagger/')
-application = app.app
+#app = connexion.FlaskApp(__name__, port=8080, specification_dir='swagger/')
+#app = connexion.App(__name__, specification_dir="./")
+app = connexion.App(__name__, specification_dir="swagger/")
+#application = app.app
 
 # Load our pre-trained model
 #model = joblib.load('./model/iris_classifier.joblib')
@@ -23,7 +25,8 @@ def home():
     localhost:8080/
     :return:        the rendered template 'home.html'
     """
-    return render_template('templates/home.html')
+    #return render_template('templates/home.html')
+    return render_template('home.html')
 
 
 # Implement a simple health check function (GET)
@@ -72,4 +75,4 @@ app.add_api("query_tool_api.yaml")
 
 # Start the app
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
