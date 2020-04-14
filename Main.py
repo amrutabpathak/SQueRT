@@ -10,6 +10,8 @@ import ProcessText
 import glob
 import os
 import db_operations
+import socket
+
 
 
 def main(query, keyword):
@@ -59,10 +61,12 @@ def save_feedback(topic, query, feedback):
     print('Feedback saved!')
 
 def getUrl(csvPaperName):
-    url = 'http://localhost:8080/Data/'
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(('localhost', 0))
+    url = 'http://localhost:'+str(s.getsockname()[1])+'/Data/'
     fileName = csvPaperName.rsplit('_', 1)[0] +'.pdf'
     url +=fileName
-    return url
+    print(url)
 
 main("What model is best for large batch training for bert", "Machine learning")
 
