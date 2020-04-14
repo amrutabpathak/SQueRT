@@ -28,8 +28,10 @@ def main(query, keyword):
     for roots, dirs, files in os.walk(pdfdir):
         for pdfPaperName in files:
             ProcessText.pdfToText(os.path.join(pdfdir, pdfPaperName), txtdir)
+            os.remove(os.path.join(pdfdir, pdfPaperName))
     for txtPaperName in glob.glob(txtdir + "*.txt"):
         ProcessText.snippetToCsv(txtPaperName, snippetSize, csvdir)
+        os.remove(txtPaperName)
     for csvPaperName in glob.glob(csvdir + "*.csv"):
         relevantSnippets = RelevantSnippets.returnRelevant(csvPaperName, query)
         print(relevantSnippets + "\n\n")
@@ -42,6 +44,7 @@ def main(query, keyword):
                       '"paper_identifier": ' + '"' + paper_identifier + '" },'
         print(predictions)
         print(snippet)
+        os.remove(csvPaperName)
     outputJson += '] }'
     # removing the last comma
     lastCommaIndex = outputJson.rfind(",")
