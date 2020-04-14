@@ -12,10 +12,10 @@ import os
 import db_operations
 
 
-def main(query, topic):
-    pdfdir = os.path.join(os.path.curdir, "Data")
-    txtdir = os.path.join(os.path.curdir, "DataTxt")
-    csvdir = os.path.join(os.path.curdir, "DataCsv")
+def main(query, keyword):
+    pdfdir = os.path.join(os.getcwd(), "Data")
+    txtdir = os.path.join(os.getcwd(), "DataTxt")
+    csvdir = os.path.join(os.getcwd(), "DataCsv")
     #pdfdir = './Data/'
     #txtdir = "./DataTxt/"
     #csvdir = './DataCsv/'
@@ -24,14 +24,14 @@ def main(query, topic):
     db_operations.createTable()
 
     # Scrape papers to pdf folder
-    arxiv_pdf_scraper.scrape(query, 1)
+    arxiv_pdf_scraper.scrape(keyword, 1)
     # Convert pdfs to text, then to csv snippets
     for pdfPaperName in glob.glob(pdfdir + "*.pdf"):
         ProcessText.pdfToText(pdfPaperName, txtdir)
         sentenceNum = 3
     for txtPaperName in glob.glob(txtdir + "*.txt"):
         ProcessText.snippetToCsv(txtPaperName, sentenceNum, csvdir)
-    outputJson = '{ "topic": ' + '"' + topic + '" ,' + '"query": ' + '"' + query + '" ,' + '"results": ['
+    outputJson = '{ "keyword": ' + '"' + keyword + '" ,' + '"query": ' + '"' + query + '" ,' + '"results": ['
     for csvPaperName in glob.glob(csvdir + "*.csv"):
         relevantSnippets = RelevantSnippets.returnRelevant(csvPaperName, query)
         print(relevantSnippets + "\n\n")
@@ -64,5 +64,11 @@ def getUrl(csvPaperName):
     return url
 
 main("What model is best for large batch training for bert", "Machine learning")
+
+#pdfdir = os.path.join(os.getcwd(), "Data")
+#print(pdfdir)
+#for pdfPaperName in glob.glob(pdfdir):
+#    print("Hello there!")
+
 #if __name__ == "__main__":
 #    main(query, topic)

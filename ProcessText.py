@@ -53,6 +53,7 @@ def pdfToText(research_paper_name, txtdir):
     research_paper_txt_name = research_paper_txt_name.replace("Data","Datatxt")
     output_file = open(research_paper_txt_name, "wb")
     output_file.write(data.encode("utf8"))
+    fp.close()
 
 # In[9]:
 
@@ -96,6 +97,7 @@ def snippetToCsv(researchFile, sentenceNum, csvdir):
           file.write("\n")
           file.write("<EOS>")
           file.write("\n")
+    file.close()
     
   except Exception as e:
     print ("Unexpected error occurred : Details are ", sys.exc_info()[0], sys.exc_info()[1])

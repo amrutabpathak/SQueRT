@@ -12,12 +12,8 @@ import re
 from urllib import parse
 
 
-def scrape(query, num_pdfs, topic='All'):
-    if(topic != 'All'):
-        query += ' ' + topic
-    query = re.sub(' +', ' ', query)
-    print(query)
-    urlQuery = parse.quote_plus(query)
+def scrape(keyword, num_pdfs):
+    urlQuery = parse.quote_plus(keyword)
     print(urlQuery)
     url_prefix = 'https://arxiv.org/search/?searchtype=all&query='+urlQuery+'&abstracts=show&size=200&order=-announced_date_first&start='
     start_file_idx = 0
@@ -55,14 +51,14 @@ def scrape(query, num_pdfs, topic='All'):
         export_urls.append(addy)
 
     # Create webscraping folder if it doesn't already exist
-    check_folder = os.path.isdir('webscraping')
+    check_folder = os.path.isdir('Data')
     if not check_folder:
-        os.makedirs('webscraping')
-        print("created folder: ", 'webscraping')
+        os.makedirs('Data')
+        print("created folder: ", 'Data')
 
     for doc in export_urls:
         print('Downloading %s' % doc)
-        destination_file_name = os.path.join('webscraping/', doc[-10:]) + '.pdf'   # keep unique identifier for file name
+        destination_file_name = os.path.join('Data/', doc[-10:]) + '.pdf'   # keep unique identifier for file name
         request.urlretrieve(doc, destination_file_name)
         time.sleep(1)   # be polite
 
@@ -77,13 +73,10 @@ def main():
         python arxiv_pdf_scraper.py "What is the best accuracy achieved for mnist" 1000 "Deep Learning"
 
     '''
-    query = sys.argv[1]
+    keyword = sys.argv[1]
     num_files = int(sys.argv[2])
     if len(sys.argv) == 3:
-        scrape(query, num_files)
-    elif len(sys.argv) == 4:
-        topic = sys.argv[3]
-        scrape(query, num_files, topic)
+        scrape(keyword, num_files)
     else:
         print("Invalid arguments")
 
