@@ -13,10 +13,11 @@ import db_operations
 
 
 def main(query, keyword):
-    pdfdir = os.path.join(os.getcwd(), "Data")
-    txtdir = os.path.join(os.getcwd(), "DataTxt")
-    csvdir = os.path.join(os.getcwd(), "DataCsv")
+    pdfdir = os.path.join(os.getcwd(), "Data/")
+    txtdir = os.path.join(os.getcwd(), "DataTxt/")
+    csvdir = os.path.join(os.getcwd(), "DataCsv/")
     snippetSize = 3
+    outputJson = '{ "keyword": ' + '"' + keyword + '" ,' + '"query": ' + '"' + query + '" ,' + '"results": ['
 
     #Create Table
     db_operations.createTable()
@@ -24,16 +25,11 @@ def main(query, keyword):
     # Scrape papers to pdf folder
     arxiv_pdf_scraper.scrape(keyword, 1)
     # Convert pdfs to text, then to csv snippets
-    for pdfPaperName in glob.glob(pdfdir):
-        print(pdfPaperName)
-        if not pdfPaperName.endswith(".pdf"):
-            print("test1")
-        else:
-            print("test2")
-            ProcessText.pdfToText(pdfPaperName, txtdir)
+    for roots, dirs, files in os.walk(pdfdir):
+        for pdfPaperName in files:
+            ProcessText.pdfToText(os.path.join(pdfdir, pdfPaperName), txtdir)
     for txtPaperName in glob.glob(txtdir + "*.txt"):
         ProcessText.snippetToCsv(txtPaperName, snippetSize, csvdir)
-    outputJson = '{ "keyword": ' + '"' + keyword + '" ,' + '"query": ' + '"' + query + '" ,' + '"results": ['
     for csvPaperName in glob.glob(csvdir + "*.csv"):
         relevantSnippets = RelevantSnippets.returnRelevant(csvPaperName, query)
         print(relevantSnippets + "\n\n")

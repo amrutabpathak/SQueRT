@@ -1,0 +1,98 @@
+Pretrained Transformers Improve Out-of-Distribution Robustness  Dan Hendrycks1∗ Adam Dziedzic2  Xiaoyuan Liu1∗ Rishabh Krishnan1  1UC Berkeley 2University of Chicago  {hendrycks,ericwallace,dawnsong}@berkeley.edu  Eric Wallace1 Dawn Song1  0 2 0 2    r p A 3 1         ] L Cs c [      1 v 0 0 1 6 0  4 0 0 2 : v i X r a  Abstract  pretrained Transformers  Although such as BERT achieve high accuracy on in- distribution examples, do they generalize to new distributions?We systematically measure out-of-distribution (OOD) generalization for various NLP tasks by constructing a new robustness benchmark with realistic distribu- tion shifts.We measure the generalization of previous models including bag-of-words models, ConvNets, and LSTMs, and we show that pretrained Transformers’ performance declines are substantially smaller.
+<EOS>
+Pretrained transformers are also more effective at de- tecting anomalous or OOD examples, while many previous models are frequently worse than chance.We examine which factors affect robustness, finding that larger models are not necessarily more robust, distillation can be harmful, and more diverse pretraining data can enhance robustness.Finally, we show where future work can improve OOD robustness.
+<EOS>
+Introduction  1 The train and test distributions are often not iden- tically distributed.Such train-test mismatches occur because evaluation datasets rarely charac- terize the entire distribution , and the test distribution typically drifts over time .Chasing an evolving data distribution is costly, and even if the training data does not become stale, models will still encounter unexpected situations at test time.
+<EOS>
+Accordingly, models must generalize to OOD ex- amples whenever possible, and when OOD exam- ples do not belong to any known class, models must detect them in order to abstain or trigger a conservative fallback policy .Most evaluation in natural language processing (NLP) assumes the train and test examples are in- dependent and identically distributed (IID).In the  ∗Equal contribution.
+<EOS>
+ IID setting, large pretrained Transformer models can attain near human-level performance on nu- merous tasks .However, high IID accuracy does not necessarily translate to OOD robustness for image classifiers (Hendrycks and Di- etterich, 2019), and pretrained Transformers may embody this same fragility.Moreover, pretrained Transformers can rely heavily on spurious cues and annotation artifacts (Cai et al, 2017; Gururangan et al, 2018) which out-of-distribution examples are less likely to include, so their OOD robustness remains uncertain.
+<EOS>
+ In this work, we systematically study the OOD robustness of various NLP models, such as word embeddings averages, LSTMs, pretrained Trans- formers, and more.We decompose OOD robust- ness into a model’s ability to (1) generalize and to (2) detect OOD examples . To measure OOD generalization, we create a new evaluation benchmark that tests robustness to shifts in writing style, topic, and vocabulary, and spans the tasks of sentiment analysis, textual entail- ment, question answering, and semantic similarity.
+<EOS>
+We create OOD test sets by splitting datasets with their metadata or by pairing similar datasets to- gether (Section 2).Using our OOD generalization benchmark, we show that pretrained Transformers are considerably more robust to OOD examples than traditional NLP models (Section 3).We show that the performance of an LSTM semantic similar- ity model declines by over 35% on OOD examples, while a RoBERTa model’s performance slightly increases.
+<EOS>
+Moreover, we demonstrate that while pretraining larger models does not seem to improve OOD generalization, pretraining models on diverse data does improve OOD generalization. To measure OOD detection performance, we turn classifiers into anomaly detectors by using their prediction confidences as anomaly scores .We show that  many non-pretrained NLP models are often near or worse than random chance at OOD detection.
+<EOS>
+In contrast, pretrained Transformers are far more capable at OOD detection.Overall, our results highlight that while there is room for future robustness improvements, pretrained Transformers are already moderately robust. 2 How We Test Robustness 2.1 Train and Test Datasets We evaluate OOD generalization with seven care- fully selected datasets.
+<EOS>
+Each dataset either (1) con- tains metadata which allows us to naturally split the samples or (2) can be paired with a similar dataset from a distinct data generating process.By splitting or grouping our chosen datasets, we can induce a distribution shift and measure OOD generalization.We utilize four sentiment analysis datasets: • We use SST-2, which contains pithy expert movie reviews , and IMDb , which contains full- length lay movie reviews.
+<EOS>
+We train on one dataset and evaluate on the other dataset, and vice versa.Models predict a movie review’s binary sentiment, and we report accuracy. • The Yelp Review Dataset contains restaurant reviews with detailed metadata (e.g., user ID, restaurant name).
+<EOS>
+We carve out four groups from the dataset based on food type: American, Chi- nese, Italian, and Japanese.Models predict a restaurant review’s binary sentiment, and we re- port accuracy. • The Amazon Review Dataset contains product reviews from Amazon (McAuley et al, 2015; He and McAuley, 2016).
+<EOS>
+We split the data into five categories of clothing (Clothes, Women Cloth- ing, Men Clothing, Baby Clothing, Shoes) and two categories of entertainment products (Music, Movies).We sample 50,000 reviews for each category.Models predict a review’s 1 to 5 star rating, and we report accuracy.
+<EOS>
+ We also utilize these datasets for semantic similar- ity, reading comprehension, and textual entailment: • STS-B requires predicting the semantic simi- larity between pairs of sentences .The dataset contains text of different genres and sources; we use four sources from two genres: MSRpar (news), Headlines (news); MSRvid (captions), Images (captions).The eval- uation metric is Pearson’s correlation coefficient. • ReCoRD is a reading comprehension dataset  using paragraphs from CNN and Daily Mail news articles and automatically generated ques- tions .
+<EOS>
+We bifurcate the dataset into CNN and Daily Mail splits and eval- uate using exact match. • MNLI is a textual entailment dataset using sentence pairs drawn from different genres of text .We select examples from two genres of transcribed text (Telephone and Face-to-Face) and one genre of written text (Letters), and we report classification accuracy.
+<EOS>
+ 2.2 Embedding and Model Types We evaluate NLP models with different input rep- resentations and encoders.We investigate three model categories with a total of thirteen models. Bag-of-words (BoW) Model.
+<EOS>
+We use a bag-of- words model (Harris, 1954), which is high-bias but low-variance, so it may exhibit performance sta- bility.The BoW model is only used for sentiment analysis and STS-B due to its low performance on the other tasks.For STS-B, we use the cosine sim- ilarity of the BoW representations from the two input sentences.
+<EOS>
+ Embedding Models.We  Word use word2vec  and GloVe (Pen- nington et al, 2014) word embeddings.These embeddings are encoded with one of three models: word averages , LSTMs , and Convolutional Neural Networks (ConvNets).
+<EOS>
+For classification tasks, the representation from the encoder is fed into an MLP.For STS-B and MNLI, we use the cosine similarity of the encoded representations from the two input sentences.For reading comprehension, we use the DocQA model  with GloVe embeddings.
+<EOS>
+We implement our models in AllenNLP  and tune the hyperparameters to maximize validation performance on the IID task. Pretrained Transformers.We investigate BERT-based models  which are pretrained bidirectional Transformers  with GELU  activations.
+<EOS>
+In addition to using BERT Base and BERT Large, we also use the large version of RoBERTa (Liu et al, 2019b), which is pretrained on a larger dataset than BERT.We use ALBERT  and also a  Figure 1: Pretrained Transformers often have smaller IID/OOD generalization gaps than previous models. distilled version of BERT, DistilBERT .
+<EOS>
+We follow the standard BERT fine-tuning procedure  and lightly tune the hyperparameters for our tasks.We perform our experiments using the HuggingFace Transformers library . 3 Out-of-Distribution Generalization In this section, we evaluate OOD generalization of numerous NLP models on seven datasets and provide some upshots.
+<EOS>
+A subset of results are in Figures 1 and 2.Full results are in Appendix A. Pretrained Transformers are More Robust.In our experiments, pretrained Transformers often have smaller generalization gaps from IID data to OOD data than traditional NLP models.
+<EOS>
+For instance, Figure 1 shows that the LSTM model declined by over 35%, while RoBERTa’s general- ization performance in fact increases.For Amazon, MNLI, and Yelp, we find that pretrained Trans- formers’ accuracy only slightly ﬂuctuates on OOD examples.Partial MNLI results are in Table 1.
+<EOS>
+We present the full results for these three tasks in Ap- pendix A.2. In short, pretrained Transformers can generalize across a variety of distribution shifts. Model Telephone  BERT  (IID) 81.4%  Letters (OOD) 82.3%  Face-to-Face  (OOD) 80.8%  Table 1: Accuracy of a BERT Base MNLI model trained on Telephone data and tested on three different distributions.Accuracy only slightly ﬂuctuates.
+<EOS>
+ Bigger Models Are Not Always Better.While larger models reduce the IID/OOD generalization gap in computer vision (Hendrycks and Dietterich, 2019; Xie and Yuille, 2020; Hendrycks et al, 2019d), we find the same does not hold in NLP.Fig- ure 3 shows that larger BERT and ALBERT models do not reduce the generalization gap.
+<EOS>
+However, in  Figure 2: Generalization results for sentiment analysis and reading comprehension.While IID accuracy does not vary much for IMDb sentiment analysis, OOD ac- curacy does.Here pretrained Transformers do best.
+<EOS>
+ Figure 3: The IID/OOD generalization gap is not im- proved with larger models, unlike in computer vision. keeping with results from vision , we find that model distillation reduces robustness, as evident in our DistilBERT results in Figure 2.This highlights that testing model compression methods for BERT (Shen et al, 2020; Ganesh et al, 2020; Li et al, 2020) on only in-distribution examples gives a limited account of model generalization, and such narrow evaluation may mask downstream costs.
+<EOS>
+More Diverse Data Improves Generalization.Similar to computer vision (Orhan, 2019; Xie et al, 2020; Hendrycks et al, 2019a), pretraining on  Avg.BoWAvg.w2vConvNetw2vLSTMw2vBERTBaseBERTLargeRoBERTa020406080100Pearson Correlation (%)Semantic Textual Similarity (STS-B) GeneralizationIID Data (Images)OOD Data (MSRvid)Avg.BoWAvg.w2vConvNetw2vLSTMw2vBERTBaseBERTLargeRoBERTa60708090100Accuracy (%)IMDb Sentiment Classifier GeneralizationIID Data (IMDb)OOD Data (SST-2)DocQADistilBERTBERT BaseBERT LargeRoBERTa20304050607080Exact Match (%)ReCoRD Reading Comprehension GeneralizationIID Data (CNN)OOD Data (Daily Mail)BERTbaseBERTlargeALBERTbaseALBERTlargeALBERTxlargeALBERTxxlarge0246810SST-2 Accuracy - IMDb Accuracy (%)SST-2 Model Size vs.Accuracy DropFigure 4: We feed in OOD examples from out-of-distribution datasets (20 Newsgroups, Multi30K, etc.) to SST-2 sentiment classifiers and report the False Alarm Rate at 95% Recall.
+<EOS>
+A lower False Alarm Rate is better.Classifiers are repurposed as anomaly detectors by using their negative maximum softmax probability as the anomaly score— OOD examples should be predicted with less confidence than IID examples.Models such as BoW, word2vec averages, and LSTMs are near random chance; that is, previous NLP models are frequently more confident when classifying OOD examples than when classifying IID test examples.
+<EOS>
+ larger and more diverse datasets can improve ro- bustness.RoBERTa exhibits greater robustness than BERT Large, where one of the largest differ- ences between these two models is that RoBERTa pretrains on more data.See Figure 2’s results.
+<EOS>
+ 4 Out-of-Distribution Detection Since OOD robustness requires evaluating both OOD generalization and OOD detection, we now turn to the latter.Without access to an outlier dataset (Hendrycks et al, 2019b), the state-of- the-art OOD detection technique is to use the model’s prediction confidence to separate in- and out-of-distribution examples (Hendrycks and Gim- pel, 2017).Specifically, we assign an example x the anomaly score − maxy p(y | x), the negative prediction confidence, to perform OOD detection.
+<EOS>
+We train models on SST-2, record the model’s confidence values on SST-2 test examples, and then record the model’s confidence values on OOD examples from five other datasets.For our OOD examples, we use validation examples from 20 Newsgroups (20 NG) (Lang, 1995), the En- glish source side of English-German WMT16 and English-German Multi30K , and concatenations of the premise and hypothesis for RTE  and SNLI .These examples are purely used to evaluate OOD detection performance and are not seen during training.
+<EOS>
+ For evaluation, we follow past work (Hendrycks et al, 2019b) and report the False Alarm Rate at 95% Recall (FAR95).The FAR95 is the probability that an in-distribution example raises a false alarm,  assuming that 95% of all out-of-distribution exam- ples are detected.Hence a lower FAR95 is better.
+<EOS>
+Partial results are in Figure 4, and full results are in Appendix A.3.  Previous Models Struggle at OOD Detection.Models without pretraining (e.g., BoW, LSTM word2vec) are often unable to reliably detect OOD examples.In particular, these models’ FAR95 scores are sometimes worse than chance because the models often assign a higher probability to out-of-distribution examples than in-distribution examples.
+<EOS>
+The models particularly struggle on 20 Newsgroups (which contains text on diverse topics including computer hardware, motorcycles, space), as their false alarm rates are approximately 100%. Pretrained Transformers Are Better Detectors.In contrast, pretrained Transformer models are bet- ter OOD detectors.
+<EOS>
+Their FAR95 scores are always better than chance.Their superior detection perfor- mance is not solely because the underlying model is a language model, as prior work (Hendrycks et al, 2019b) shows that language models are not necessarily adept at OOD detection.Also note that in OOD detection for computer vision, higher accuracy does not reliably improve OOD detec- tion , so pretrained Transformers’ OOD detection performance is not anticipated.
+<EOS>
+De- spite their relatively low FAR95 scores, pretrained Transformers still do not cleanly separate in- and out-of-distribution examples (Figure 5).OOD de- tection using pretrained Transformers is still far from perfect, and future work can aim towards cre- ating better methods for OOD detection. 20 NGMulti30KRTESNLIWMT16Average020406080100False Alarm Rate (%)(Lower Is Better)Detecting OOD Examples for an SST-2 Sentiment ClassifierModel TypeRandom DetectorBag of WordsAvg. word2vecLSTM word2vecConvNet word2vecBERT LargeDomain Adaptation.
+<EOS>
+Other research on robust- ness considers the separate problem of domain adaptation (Blitzer et al, 2007; Daum´e III, 2007), where models must learn representations of a source and target distribution.We focus on testing generalization without adaptation in order to bench- mark robustness to unforeseen distribution shifts.Unlike Fisch et al (2019); Yogatama et al (2019), we measure OOD generalization by considering simple and natural distribution shifts, and we also evaluate more than question answering.
+<EOS>
+Adversarial Examples.Adversarial examples can be created for NLP models by inserting phrases (Jia and Liang, 2017; Wallace et al, 2019), paraphrasing questions , and reducing inputs .However, ad- versarial examples are often disconnected from real-world performance concerns .
+<EOS>
+Thus, we focus on an experimental setting that is more realistic.While previous works show that, for all NLP models, there exist adversarial examples, we show that all models are not equally fragile.Rather, pretrained Transformers are overall far more robust than previous models.
+<EOS>
+Counteracting Annotation Artifacts.Annota- tors can accidentally leave unintended shortcuts in datasets that allow models to achieve high ac- curacy by effectively “cheating” (Cai et al, 2017; Gururangan et al, 2018; Min et al, 2019).These annotation artifacts are one reason for OOD brit- tleness: OOD examples are unlikely to contain the same spurious patterns as in-distribution examples.
+<EOS>
+OOD robustness benchmarks like ours can stress test a model’s dependence on artifacts (Liu et al, 2019a; Feng et al, 2019; Naik et al, 2018). 6 Conclusion We created an expansive benchmark across several NLP tasks to evaluate out-of-distribution robust- ness.To accomplish this, we carefully restructured and matched previous datasets to induce numerous realistic distribution shifts.
+<EOS>
+We first showed that pretrained Transformers generalize to OOD ex- amples far better than previous models, so that the IID/OOD generalization gap is often markedly re- duced.We then showed that pretrained Transform- ers detect OOD examples surprisingly well.Over- all, our extensive evaluation shows that while pre- trained Transformers are moderately robust, there remains room for future research on robustness.
+<EOS>
+ Figure 5: The confidence distribution for a RoBERTa SST-2 classifier on examples from the SST-2 test set and the English side of WMT16 English-German.The WMT16 histogram is translucent and overlays the SST histogram.The minimum prediction confidence is 0.5. Although RoBERTa is better than previous models at OOD detection, there is clearly room for future work.
+<EOS>
+ 5 Discussion and Related Work  Why Are Pretrained Models More Robust?An interesting area for future work is to analyze why pretrained Transformers are more robust.A ﬂawed explanation is that pretrained models are simply more accurate.
+<EOS>
+However, this work and past work shows that increases in accuracy do not directly translate to reduced IID/OOD generalization gaps (Hendrycks and Dietterich, 2019; Fried et al, 2019).One partial explanation is that Transformer models are pretrained on diverse data, and in computer vision, dataset diversity can improve OOD generalization  and OOD detection (Hendrycks et al, 2019b).Similarly, Transformer models are pretrained with large amounts of data, which may also aid robustness (Orhan, 2019; Xie et al, 2020; Hendrycks et al, 2019a).
+<EOS>
+However, this is not a complete explanation as BERT is pretrained on roughly 3 billion tokens, while GloVe is trained on roughly 840 billion tokens.Another partial explanation may lie in self-supervised training itself.Hendrycks et al (2019c) show that com- puter vision models trained with self-supervised objectives exhibit better OOD generalization and far better OOD detection performance.
+<EOS>
+Future work could propose new self-supervised objectives that enhance model robustness. 0.50.60.70.80.91.0Maximum Softmax Probability (Confidence)FrequencySST Classifier Confidence DistributionSST (IID)WMT16 (OOD)Acknowledgements We thank the members of Berkeley NLP, Sona Jeswani, Suchin Gururangan, Nelson Liu, Shi Feng, the anonymous reviewers, and especially Jon Cai.This material is in part based upon work supported by the National Science Foundation Frontier Award 1804794.
+<EOS>

@@ -1,0 +1,1627 @@
+Pretrained Transformers Improve Out-of-Distribution Robustness
+
+Dan Hendrycks1∗
+Adam Dziedzic2
+
+Xiaoyuan Liu1∗
+Rishabh Krishnan1
+
+1UC Berkeley 2University of Chicago
+
+{hendrycks,ericwallace,dawnsong}@berkeley.edu
+
+Eric Wallace1
+Dawn Song1
+
+0
+2
+0
+2
+
+ 
+r
+p
+A
+3
+1
+
+ 
+
+ 
+ 
+]
+L
+C
+.
+s
+c
+[
+ 
+ 
+
+1
+v
+0
+0
+1
+6
+0
+
+.
+
+4
+0
+0
+2
+:
+v
+i
+X
+r
+a
+
+Abstract
+
+pretrained Transformers
+
+Although
+such
+as BERT achieve high accuracy on in-
+distribution examples, do they generalize to
+new distributions? We systematically measure
+out-of-distribution (OOD) generalization for
+various NLP tasks by constructing a new
+robustness benchmark with realistic distribu-
+tion shifts. We measure the generalization
+of previous models including bag-of-words
+models, ConvNets, and LSTMs, and we show
+that pretrained Transformers’ performance
+declines are substantially smaller. Pretrained
+transformers are also more effective at de-
+tecting anomalous or OOD examples, while
+many previous models are frequently worse
+than chance. We examine which factors affect
+robustness, ﬁnding that larger models are not
+necessarily more robust, distillation can be
+harmful, and more diverse pretraining data can
+enhance robustness. Finally, we show where
+future work can improve OOD robustness.
+Introduction
+
+1
+The train and test distributions are often not iden-
+tically distributed. Such train-test mismatches
+occur because evaluation datasets rarely charac-
+terize the entire distribution (Torralba and Efros,
+2011), and the test distribution typically drifts over
+time (Quionero-Candela et al., 2009). Chasing an
+evolving data distribution is costly, and even if the
+training data does not become stale, models will
+still encounter unexpected situations at test time.
+Accordingly, models must generalize to OOD ex-
+amples whenever possible, and when OOD exam-
+ples do not belong to any known class, models
+must detect them in order to abstain or trigger a
+conservative fallback policy (Emmott et al., 2015).
+Most evaluation in natural language processing
+(NLP) assumes the train and test examples are in-
+dependent and identically distributed (IID). In the
+
+∗Equal contribution.
+
+IID setting, large pretrained Transformer models
+can attain near human-level performance on nu-
+merous tasks (Wang et al., 2019). However, high
+IID accuracy does not necessarily translate to OOD
+robustness for image classiﬁers (Hendrycks and Di-
+etterich, 2019), and pretrained Transformers may
+embody this same fragility. Moreover, pretrained
+Transformers can rely heavily on spurious cues and
+annotation artifacts (Cai et al., 2017; Gururangan
+et al., 2018) which out-of-distribution examples
+are less likely to include, so their OOD robustness
+remains uncertain.
+
+In this work, we systematically study the OOD
+robustness of various NLP models, such as word
+embeddings averages, LSTMs, pretrained Trans-
+formers, and more. We decompose OOD robust-
+ness into a model’s ability to (1) generalize and to
+(2) detect OOD examples (Card et al., 2018).
+
+To measure OOD generalization, we create a
+new evaluation benchmark that tests robustness to
+shifts in writing style, topic, and vocabulary, and
+spans the tasks of sentiment analysis, textual entail-
+ment, question answering, and semantic similarity.
+We create OOD test sets by splitting datasets with
+their metadata or by pairing similar datasets to-
+gether (Section 2). Using our OOD generalization
+benchmark, we show that pretrained Transformers
+are considerably more robust to OOD examples
+than traditional NLP models (Section 3). We show
+that the performance of an LSTM semantic similar-
+ity model declines by over 35% on OOD examples,
+while a RoBERTa model’s performance slightly
+increases. Moreover, we demonstrate that while
+pretraining larger models does not seem to improve
+OOD generalization, pretraining models on diverse
+data does improve OOD generalization.
+
+To measure OOD detection performance, we
+turn classiﬁers into anomaly detectors by using
+their prediction conﬁdences as anomaly scores
+(Hendrycks and Gimpel, 2017). We show that
+
+many non-pretrained NLP models are often near
+or worse than random chance at OOD detection.
+In contrast, pretrained Transformers are far more
+capable at OOD detection. Overall, our results
+highlight
+that while there is room for future
+robustness improvements, pretrained Transformers
+are already moderately robust.
+
+2 How We Test Robustness
+2.1 Train and Test Datasets
+We evaluate OOD generalization with seven care-
+fully selected datasets. Each dataset either (1) con-
+tains metadata which allows us to naturally split the
+samples or (2) can be paired with a similar dataset
+from a distinct data generating process. By splitting
+or grouping our chosen datasets, we can induce a
+distribution shift and measure OOD generalization.
+We utilize four sentiment analysis datasets:
+• We use SST-2, which contains pithy expert
+movie reviews (Socher et al., 2013), and
+IMDb (Maas et al., 2011), which contains full-
+length lay movie reviews. We train on one
+dataset and evaluate on the other dataset, and
+vice versa. Models predict a movie review’s
+binary sentiment, and we report accuracy.
+
+• The Yelp Review Dataset contains restaurant
+reviews with detailed metadata (e.g., user ID,
+restaurant name). We carve out four groups from
+the dataset based on food type: American, Chi-
+nese, Italian, and Japanese. Models predict a
+restaurant review’s binary sentiment, and we re-
+port accuracy.
+
+• The Amazon Review Dataset contains product
+reviews from Amazon (McAuley et al., 2015; He
+and McAuley, 2016). We split the data into ﬁve
+categories of clothing (Clothes, Women Cloth-
+ing, Men Clothing, Baby Clothing, Shoes) and
+two categories of entertainment products (Music,
+Movies). We sample 50,000 reviews for each
+category. Models predict a review’s 1 to 5 star
+rating, and we report accuracy.
+
+We also utilize these datasets for semantic similar-
+ity, reading comprehension, and textual entailment:
+• STS-B requires predicting the semantic simi-
+larity between pairs of sentences (Cer et al.,
+2017). The dataset contains text of different
+genres and sources; we use four sources from
+two genres: MSRpar (news), Headlines (news);
+MSRvid (captions), Images (captions). The eval-
+uation metric is Pearson’s correlation coefﬁcient.
+• ReCoRD is a reading comprehension dataset
+
+using paragraphs from CNN and Daily Mail
+news articles and automatically generated ques-
+tions (Zhang et al., 2018). We bifurcate the
+dataset into CNN and Daily Mail splits and eval-
+uate using exact match.
+
+• MNLI is a textual entailment dataset using
+sentence pairs drawn from different genres of
+text (Williams et al., 2018). We select examples
+from two genres of transcribed text (Telephone
+and Face-to-Face) and one genre of written text
+(Letters), and we report classiﬁcation accuracy.
+
+2.2 Embedding and Model Types
+We evaluate NLP models with different input rep-
+resentations and encoders. We investigate three
+model categories with a total of thirteen models.
+
+Bag-of-words (BoW) Model. We use a bag-of-
+words model (Harris, 1954), which is high-bias but
+low-variance, so it may exhibit performance sta-
+bility. The BoW model is only used for sentiment
+analysis and STS-B due to its low performance on
+the other tasks. For STS-B, we use the cosine sim-
+ilarity of the BoW representations from the two
+input sentences.
+
+Embedding Models. We
+
+Word
+use
+word2vec (Mikolov et al., 2013) and GloVe (Pen-
+nington et al., 2014) word embeddings. These
+embeddings are encoded with one of
+three
+models: word averages (Wieting et al., 2016),
+LSTMs (Hochreiter and Schmidhuber, 1997),
+and Convolutional Neural Networks (ConvNets).
+For classiﬁcation tasks, the representation from
+the encoder is fed into an MLP. For STS-B
+and MNLI, we use the cosine similarity of the
+encoded representations from the two input
+sentences. For reading comprehension, we use
+the DocQA model (Clark and Gardner, 2018)
+with GloVe embeddings. We implement our
+models in AllenNLP (Gardner et al., 2018) and
+tune the hyperparameters to maximize validation
+performance on the IID task.
+
+Pretrained Transformers. We
+investigate
+BERT-based models (Devlin et al., 2019) which
+are pretrained bidirectional Transformers (Vaswani
+et al., 2017) with GELU (Hendrycks and Gimpel,
+2016) activations.
+In addition to using BERT
+Base and BERT Large, we also use the large
+version of RoBERTa (Liu et al., 2019b), which
+is pretrained on a larger dataset
+than BERT.
+We use ALBERT (Lan et al., 2020) and also a
+
+Figure 1: Pretrained Transformers often have smaller
+IID/OOD generalization gaps than previous models.
+
+distilled version of BERT, DistilBERT (Sanh et al.,
+2019). We follow the standard BERT ﬁne-tuning
+procedure (Devlin et al., 2019) and lightly tune the
+hyperparameters for our tasks. We perform our
+experiments using the HuggingFace Transformers
+library (Wolf et al., 2019).
+
+3 Out-of-Distribution Generalization
+In this section, we evaluate OOD generalization
+of numerous NLP models on seven datasets and
+provide some upshots. A subset of results are in
+Figures 1 and 2. Full results are in Appendix A.
+Pretrained Transformers are More Robust.
+In our experiments, pretrained Transformers often
+have smaller generalization gaps from IID data
+to OOD data than traditional NLP models. For
+instance, Figure 1 shows that the LSTM model
+declined by over 35%, while RoBERTa’s general-
+ization performance in fact increases. For Amazon,
+MNLI, and Yelp, we ﬁnd that pretrained Trans-
+formers’ accuracy only slightly ﬂuctuates on OOD
+examples. Partial MNLI results are in Table 1. We
+present the full results for these three tasks in Ap-
+pendix A.2. In short, pretrained Transformers can
+generalize across a variety of distribution shifts.
+
+Model Telephone
+
+BERT
+
+(IID)
+81.4%
+
+Letters
+(OOD)
+82.3%
+
+Face-to-Face
+
+(OOD)
+80.8%
+
+Table 1: Accuracy of a BERT Base MNLI model
+trained on Telephone data and tested on three different
+distributions. Accuracy only slightly ﬂuctuates.
+
+Bigger Models Are Not Always Better. While
+larger models reduce the IID/OOD generalization
+gap in computer vision (Hendrycks and Dietterich,
+2019; Xie and Yuille, 2020; Hendrycks et al.,
+2019d), we ﬁnd the same does not hold in NLP. Fig-
+ure 3 shows that larger BERT and ALBERT models
+do not reduce the generalization gap. However, in
+
+Figure 2: Generalization results for sentiment analysis
+and reading comprehension. While IID accuracy does
+not vary much for IMDb sentiment analysis, OOD ac-
+curacy does. Here pretrained Transformers do best.
+
+Figure 3: The IID/OOD generalization gap is not im-
+proved with larger models, unlike in computer vision.
+
+keeping with results from vision (Hendrycks and
+Dietterich, 2019), we ﬁnd that model distillation
+reduces robustness, as evident in our DistilBERT
+results in Figure 2. This highlights that testing
+model compression methods for BERT (Shen et al.,
+2020; Ganesh et al., 2020; Li et al., 2020) on only
+in-distribution examples gives a limited account of
+model generalization, and such narrow evaluation
+may mask downstream costs.
+More Diverse Data Improves Generalization.
+Similar to computer vision (Orhan, 2019; Xie et al.,
+2020; Hendrycks et al., 2019a), pretraining on
+
+Avg.BoWAvg.w2vConvNetw2vLSTMw2vBERTBaseBERTLargeRoBERTa020406080100Pearson Correlation (%)Semantic Textual Similarity (STS-B) GeneralizationIID Data (Images)OOD Data (MSRvid)Avg.BoWAvg.w2vConvNetw2vLSTMw2vBERTBaseBERTLargeRoBERTa60708090100Accuracy (%)IMDb Sentiment Classifier GeneralizationIID Data (IMDb)OOD Data (SST-2)DocQADistilBERTBERT BaseBERT LargeRoBERTa20304050607080Exact Match (%)ReCoRD Reading Comprehension GeneralizationIID Data (CNN)OOD Data (Daily Mail)BERTbaseBERTlargeALBERTbaseALBERTlargeALBERTxlargeALBERTxxlarge0246810SST-2 Accuracy - IMDb Accuracy (%)SST-2 Model Size vs. Accuracy DropFigure 4: We feed in OOD examples from out-of-distribution datasets (20 Newsgroups, Multi30K, etc.) to SST-2
+sentiment classiﬁers and report the False Alarm Rate at 95% Recall. A lower False Alarm Rate is better. Classiﬁers
+are repurposed as anomaly detectors by using their negative maximum softmax probability as the anomaly score—
+OOD examples should be predicted with less conﬁdence than IID examples. Models such as BoW, word2vec
+averages, and LSTMs are near random chance; that is, previous NLP models are frequently more conﬁdent when
+classifying OOD examples than when classifying IID test examples.
+
+larger and more diverse datasets can improve ro-
+bustness. RoBERTa exhibits greater robustness
+than BERT Large, where one of the largest differ-
+ences between these two models is that RoBERTa
+pretrains on more data. See Figure 2’s results.
+
+4 Out-of-Distribution Detection
+Since OOD robustness requires evaluating both
+OOD generalization and OOD detection, we now
+turn to the latter. Without access to an outlier
+dataset (Hendrycks et al., 2019b), the state-of-
+the-art OOD detection technique is to use the
+model’s prediction conﬁdence to separate in- and
+out-of-distribution examples (Hendrycks and Gim-
+pel, 2017). Speciﬁcally, we assign an example x
+the anomaly score − maxy p(y | x), the negative
+prediction conﬁdence, to perform OOD detection.
+We train models on SST-2, record the model’s
+conﬁdence values on SST-2 test examples, and
+then record the model’s conﬁdence values on
+OOD examples from ﬁve other datasets. For our
+OOD examples, we use validation examples from
+20 Newsgroups (20 NG) (Lang, 1995), the En-
+glish source side of English-German WMT16 and
+English-German Multi30K (Elliott et al., 2016),
+and concatenations of the premise and hypothesis
+for RTE (Dagan et al., 2005) and SNLI (Bowman
+et al., 2015). These examples are purely used to
+evaluate OOD detection performance and are not
+seen during training.
+
+For evaluation, we follow past work (Hendrycks
+et al., 2019b) and report the False Alarm Rate at
+95% Recall (FAR95). The FAR95 is the probability
+that an in-distribution example raises a false alarm,
+
+assuming that 95% of all out-of-distribution exam-
+ples are detected. Hence a lower FAR95 is better.
+Partial results are in Figure 4, and full results are
+in Appendix A.3.
+
+Previous Models Struggle at OOD Detection.
+Models without pretraining (e.g., BoW, LSTM
+word2vec) are often unable to reliably detect OOD
+examples.
+In particular, these models’ FAR95
+scores are sometimes worse than chance because
+the models often assign a higher probability to
+out-of-distribution examples than in-distribution
+examples. The models particularly struggle on 20
+Newsgroups (which contains text on diverse topics
+including computer hardware, motorcycles, space),
+as their false alarm rates are approximately 100%.
+
+Pretrained Transformers Are Better Detectors.
+In contrast, pretrained Transformer models are bet-
+ter OOD detectors. Their FAR95 scores are always
+better than chance. Their superior detection perfor-
+mance is not solely because the underlying model
+is a language model, as prior work (Hendrycks
+et al., 2019b) shows that language models are not
+necessarily adept at OOD detection. Also note
+that in OOD detection for computer vision, higher
+accuracy does not reliably improve OOD detec-
+tion (Lee et al., 2018), so pretrained Transformers’
+OOD detection performance is not anticipated. De-
+spite their relatively low FAR95 scores, pretrained
+Transformers still do not cleanly separate in- and
+out-of-distribution examples (Figure 5). OOD de-
+tection using pretrained Transformers is still far
+from perfect, and future work can aim towards cre-
+ating better methods for OOD detection.
+
+20 NGMulti30KRTESNLIWMT16Average020406080100False Alarm Rate (%)(Lower Is Better)Detecting OOD Examples for an SST-2 Sentiment ClassifierModel TypeRandom DetectorBag of WordsAvg. word2vecLSTM word2vecConvNet word2vecBERT LargeDomain Adaptation. Other research on robust-
+ness considers the separate problem of domain
+adaptation (Blitzer et al., 2007; Daum´e III, 2007),
+where models must learn representations of a
+source and target distribution. We focus on testing
+generalization without adaptation in order to bench-
+mark robustness to unforeseen distribution shifts.
+Unlike Fisch et al. (2019); Yogatama et al. (2019),
+we measure OOD generalization by considering
+simple and natural distribution shifts, and we also
+evaluate more than question answering.
+Adversarial Examples. Adversarial examples
+can be created for NLP models by inserting
+phrases (Jia and Liang, 2017; Wallace et al., 2019),
+paraphrasing questions (Ribeiro et al., 2018), and
+reducing inputs (Feng et al., 2018). However, ad-
+versarial examples are often disconnected from
+real-world performance concerns (Gilmer et al.,
+2018). Thus, we focus on an experimental setting
+that is more realistic. While previous works show
+that, for all NLP models, there exist adversarial
+examples, we show that all models are not equally
+fragile. Rather, pretrained Transformers are overall
+far more robust than previous models.
+Counteracting Annotation Artifacts. Annota-
+tors can accidentally leave unintended shortcuts
+in datasets that allow models to achieve high ac-
+curacy by effectively “cheating” (Cai et al., 2017;
+Gururangan et al., 2018; Min et al., 2019). These
+annotation artifacts are one reason for OOD brit-
+tleness: OOD examples are unlikely to contain the
+same spurious patterns as in-distribution examples.
+OOD robustness benchmarks like ours can stress
+test a model’s dependence on artifacts (Liu et al.,
+2019a; Feng et al., 2019; Naik et al., 2018).
+
+6 Conclusion
+We created an expansive benchmark across several
+NLP tasks to evaluate out-of-distribution robust-
+ness. To accomplish this, we carefully restructured
+and matched previous datasets to induce numerous
+realistic distribution shifts. We ﬁrst showed that
+pretrained Transformers generalize to OOD ex-
+amples far better than previous models, so that the
+IID/OOD generalization gap is often markedly re-
+duced. We then showed that pretrained Transform-
+ers detect OOD examples surprisingly well. Over-
+all, our extensive evaluation shows that while pre-
+trained Transformers are moderately robust, there
+remains room for future research on robustness.
+
+Figure 5: The conﬁdence distribution for a RoBERTa
+SST-2 classiﬁer on examples from the SST-2 test set
+and the English side of WMT16 English-German. The
+WMT16 histogram is translucent and overlays the SST
+histogram. The minimum prediction conﬁdence is 0.5.
+Although RoBERTa is better than previous models at
+OOD detection, there is clearly room for future work.
+
+5 Discussion and Related Work
+
+Why Are Pretrained Models More Robust?
+An interesting area for future work is to analyze
+why pretrained Transformers are more robust.
+A ﬂawed explanation is that pretrained models
+are simply more accurate. However, this work
+and past work shows that increases in accuracy
+do not directly translate to reduced IID/OOD
+generalization gaps (Hendrycks and Dietterich,
+2019; Fried et al., 2019). One partial explanation is
+that Transformer models are pretrained on diverse
+data, and in computer vision, dataset diversity
+can improve OOD generalization (Hendrycks
+et al., 2020) and OOD detection (Hendrycks
+et al., 2019b). Similarly, Transformer models are
+pretrained with large amounts of data, which may
+also aid robustness (Orhan, 2019; Xie et al., 2020;
+Hendrycks et al., 2019a). However, this is not a
+complete explanation as BERT is pretrained on
+roughly 3 billion tokens, while GloVe is trained
+on roughly 840 billion tokens. Another partial
+explanation may lie in self-supervised training
+itself. Hendrycks et al. (2019c) show that com-
+puter vision models trained with self-supervised
+objectives exhibit better OOD generalization and
+far better OOD detection performance. Future
+work could propose new self-supervised objectives
+that enhance model robustness.
+
+0.50.60.70.80.91.0Maximum Softmax Probability (Confidence)FrequencySST Classifier Confidence DistributionSST (IID)WMT16 (OOD)Acknowledgements
+We thank the members of Berkeley NLP, Sona
+Jeswani, Suchin Gururangan, Nelson Liu, Shi Feng,
+the anonymous reviewers, and especially Jon Cai.
+This material is in part based upon work supported
+by the National Science Foundation Frontier Award
+1804794. Any opinions, ﬁndings, and conclusions
+or recommendations expressed in this material are
+those of the author(s) and do not necessarily reﬂect
+the views of the National Science Foundation.
+
+References
+John Blitzer, Mark Dredze, and Fernando Pereira. 2007.
+Biographies, bollywood, boom-boxes and blenders:
+Domain adaptation for sentiment classiﬁcation.
+In
+ACL.
+
+Samuel R. Bowman, Gabor Angeli, Christopher Potts,
+and Christopher D. Manning. 2015. A large anno-
+tated corpus for learning natural language inference.
+In EMNLP.
+
+Zheng Cai, Lifu Tu, and Kevin Gimpel. 2017. Pay at-
+tention to the ending: Strong neural baselines for the
+roc story cloze task. In ACL.
+
+Dallas Card, Michael Zhang, and Noah A. Smith. 2018.
+
+Deep weighted averaging classiﬁers. In FAT.
+
+Daniel Cer, Mona Diab, Eneko Agirre, Inigo Lopez-
+Gazpio, and Lucia Specia. 2017. SemEval-2017
+Task 1: Semantic textual similarity-multilingual and
+cross-lingual focused evaluation. In SemEval.
+
+Christopher Clark and Matt Gardner. 2018. Simple
+and effective multi-paragraph reading comprehen-
+sion. In ACL.
+
+Ido Dagan, Oren Glickman, and Bernardo Magnini.
+2005. The PASCAL recognising textual entailment
+challenge. In Machine Learning Challenges Work-
+shop.
+
+Hal Daum´e III. 2007. Frustratingly easy domain adap-
+
+tation. In ACL.
+
+Jacob Devlin, Ming-Wei Chang, Kenton Lee, and
+Kristina Toutanova. 2019. BERT: pre-training of
+deep bidirectional transformers for language under-
+standing. In NAACL-HLT.
+
+Desmond Elliott, Stella Frank, Khalil Sima’an, and Lu-
+cia Specia. 2016. Multi30k: Multilingual english-
+german image descriptions. In ACL.
+
+Andrew Emmott, Shubhomoy Das, Thomas G. Diet-
+terich, Alan Fern, and Weng-Keen Wong. 2015. A
+meta-analysis of the anomaly detection problem.
+
+Shi Feng, Eric Wallace, and Jordan Boyd-Graber. 2019.
+In
+
+Misleading failures of partial-input baselines.
+ACL.
+
+Shi Feng, Eric Wallace, II Grissom, Mohit Iyyer, Pedro
+Rodriguez, and Jordan Boyd-Graber. 2018. Patholo-
+gies of neural models make interpretations difﬁcult.
+In EMNLP.
+
+Adam Fisch, Alon Talmor, Robin Jia, Minjoon Seo, Eu-
+nsol Choi, and Danqi Chen. 2019. Proceedings of
+the 2nd workshop on machine reading for question
+answering. In MRQA Workshop.
+
+Daniel Fried, Nikita Kitaev, and Dan Klein. 2019.
+Cross-domain generalization of neural constituency
+parsers. In ACL.
+
+Prakhar Ganesh, Yao Chen, Xin Lou, Mohammad Ali
+Khan, Yin Yang, Deming Chen, Marianne Winslett,
+Hassan Sajjad, and Preslav Nakov. 2020. Compress-
+ing large-scale transformer-based models: A case
+study on BERT. ArXiv, abs/2002.11985.
+
+Matt Gardner, Joel Grus, Mark Neumann, Oyvind
+Tafjord, Pradeep Dasigi, Nelson F. Liu, Matthew
+Peters, Michael Schmitz, and Luke S. Zettlemoyer.
+2018. AllenNLP: a deep semantic natural language
+In Workshop for NLP Open
+processing platform.
+Source Software.
+
+Justin Gilmer, Ryan P. Adams, Ian J. Goodfellow,
+David Andersen, and George E. Dahl. 2018. Moti-
+vating the rules of the game for adversarial example
+research. ArXiv, abs/1807.06732.
+
+Suchin Gururangan, Swabha Swayamdipta, Omer
+Levy, Roy Schwartz, Samuel R. Bowman, and Noah
+A. Smith. 2018. Annotation artifacts in natural lan-
+guage inference data. In NAACL-HLT.
+
+Zellig S Harris. 1954. Distributional structure. Word.
+
+Ruining He and Julian J. McAuley. 2016. Ups and
+downs: Modeling the visual evolution of fashion
+trends with one-class collaborative ﬁltering.
+In
+WWW.
+
+Dan Hendrycks and Thomas Dietterich. 2019. Bench-
+marking neural network robustness to common cor-
+ruptions and perturbations. In ICLR.
+
+Dan Hendrycks and Kevin Gimpel. 2016. Gaus-
+arXiv preprint
+
+sian error linear units (GELUs).
+arXiv:1606.08415.
+
+Dan Hendrycks and Kevin Gimpel. 2017. A baseline
+for detecting misclassiﬁed and out-of-distribution
+examples in neural networks. In ICLR.
+
+Dan Hendrycks, Kimin Lee, and Mantas Mazeika.
+2019a. Using pre-training can improve model ro-
+bustness and uncertainty. ICML.
+
+Dan Hendrycks, Mantas Mazeika, and Thomas G. Diet-
+terich. 2019b. Deep anomaly detection with outlier
+exposure. ICLR.
+
+Dan Hendrycks, Mantas Mazeika, Saurav Kadavath,
+and Dawn Song. 2019c. Using self-supervised learn-
+ing can improve model robustness and uncertainty.
+In NeurIPS.
+
+Dan Hendrycks, Norman Mu, Ekin D. Cubuk, Barret
+Zoph, Justin Gilmer, and Balaji Lakshminarayanan.
+2020. AugMix: A simple data processing method to
+improve robustness and uncertainty. ICLR.
+
+Dan Hendrycks, Kevin Zhao, Steven Basart, Jacob
+Steinhardt, and Dawn Song. 2019d. Natural adver-
+sarial examples. ArXiv, abs/1907.07174.
+
+Sepp Hochreiter and J¨urgen Schmidhuber. 1997. Long
+
+short-term memory. In Neural Computation.
+
+Robin Jia and Percy Liang. 2017. Adversarial exam-
+ples for evaluating reading comprehension systems.
+In EMNLP.
+
+Zhenzhong Lan, Mingda Chen, Sebastian Goodman,
+Kevin Gimpel, Piyush Sharma, and Radu Soricut.
+2020. ALBERT: a lite BERT for self-supervised
+learning of language representations. In ICLR.
+
+Ken Lang. 1995. NewsWeeder: Learning to ﬁlter Net-
+
+news. In ICML.
+
+Kimin Lee, Honglak Lee, Kibok Lee, and Jinwoo Shin.
+2018. Training conﬁdence-calibrated classiﬁers for
+detecting out-of-distribution samples. In ICLR.
+
+Zhuohan Li, Eric Wallace, Sheng Shen, Kevin Lin,
+Kurt Keutzer, Dan Klein, and Joseph E Gonzalez.
+2020. Train large, then compress: Rethinking model
+size for efﬁcient training and inference of transform-
+ers. ArXiv, abs/2002.11794.
+
+Nelson F Liu, Roy Schwartz, and Noah A Smith. 2019a.
+Inoculation by ﬁne-tuning: A method for analyzing
+challenge datasets. In NAACL.
+
+Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Man-
+dar Joshi, Danqi Chen, Omer Levy, Mike Lewis,
+Luke Zettlemoyer, and Veselin Stoyanov. 2019b.
+RoBERTa: A robustly optimized BERT pretraining
+approach. ArXiv, abs/1907.11692.
+
+Andrew L Maas, Raymond E Daly, Peter T Pham, Dan
+Huang, Andrew Y Ng, and Christopher Potts. 2011.
+Learning word vectors for sentiment analysis.
+In
+ACL.
+
+Julian J. McAuley, Christopher Targett, Qinfeng Shi,
+and Anton van den Hengel. 2015. Image-based rec-
+ommendations on styles and substitutes. In SIGIR.
+
+Tomas Mikolov, Ilya Sutskever, Kai Chen, Greg S Cor-
+rado, and Jeff Dean. 2013. Distributed representa-
+tions of words and phrases and their compositional-
+ity. In NIPS.
+
+Sewon Min, Eric Wallace, Sameer Singh, Matt Gard-
+ner, Hannaneh Hajishirzi, and Luke Zettlemoyer.
+2019. Compositional questions do not necessitate
+multi-hop reasoning. In ACL.
+
+Aakanksha Naik, Abhilasha Ravichander, Norman
+Sadeh, Carolyn Rose, and Graham Neubig. 2018.
+Stress test evaluation for natural language inference.
+In COLING.
+
+A. Emin Orhan. 2019.
+
+of facebook’s ResNeXt WSL models.
+abs/1907.07640.
+
+Robustness properties
+ArXiv,
+
+Jeffrey Pennington, Richard Socher, and Christopher D.
+Manning. 2014. GloVe: Global vectors for word rep-
+resentation. In EMNLP.
+
+Joaquin Quionero-Candela, Masashi Sugiyama, Anton
+Schwaighofer, and Neil D. Lawrence. 2009. Dataset
+shift in machine learning.
+
+Marco Tulio Ribeiro, Sameer Singh, and Carlos
+Guestrin. 2018. Semantically equivalent adversarial
+rules for debugging NLP models. In ACL.
+
+Victor Sanh, Lysandre Debut, Julien Chaumond, and
+Thomas Wolf. 2019. DistilBERT, a distilled ver-
+sion of bert: smaller, faster, cheaper and lighter. In
+NeurIPS EMC2 Workshop.
+
+Sheng Shen, Zhen Dong, Jiayu Ye, Linjian Ma, Zhewei
+Yao, Amir Gholami, Michael W Mahoney, and Kurt
+Keutzer. 2020. Q-BERT: Hessian based ultra low
+precision quantization of BERT.
+
+Richard Socher, Alex Perelygin, Jean Wu, Jason
+Chuang, Christopher D Manning, Andrew Ng, and
+Christopher Potts. 2013. Recursive deep models
+for semantic compositionality over a sentiment tree-
+bank. In EMNLP.
+
+Antonio Torralba and Alexei A. Efros. 2011. Unbiased
+
+look at dataset bias. CVPR.
+
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob
+Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz
+Kaiser, and Illia Polosukhin. 2017. Attention is all
+you need. In NIPS.
+
+Eric Wallace, Shi Feng, Nikhil Kandpal, Matthew
+Gardner, and Sameer Singh. 2019. Universal adver-
+sarial triggers for attacking and analyzing NLP. In
+EMNLP.
+
+Alex Wang, Amanpreet Singh, Julian Michael, Felix
+Hill, Omer Levy, and Samuel R. Bowman. 2019.
+GLUE: A multitask benchmark and analysis plat-
+form for natural language understanding. In ICLR.
+
+John Wieting, Mohit Bansal, Kevin Gimpel, and Karen
+Livescu. 2016. Towards universal paraphrastic sen-
+tence embeddings. In ICLR.
+
+Adina Williams, Nikita Nangia, and Samuel R Bow-
+man. 2018. A broad-coverage challenge corpus
+for sentence understanding through inference.
+In
+NAACL-HLT.
+
+Thomas Wolf, Lysandre Debut, Victor Sanh, Julien
+Chaumond, Clement Delangue, Anthony Moi, Pier-
+ric Cistac, Tim Rault, R´emi Louf, Morgan Funtow-
+icz, and Jamie Brew. 2019. HuggingFace’s Trans-
+formers: State-of-the-art natural language process-
+ing. ArXiv, abs/1910.03771.
+
+Cihang Xie and Alan L. Yuille. 2020. Intriguing prop-
+
+erties of adversarial training at scale. In ICLR.
+
+Qizhe Xie, Eduard H. Hovy, Minh-Thang Luong, and
+Quoc V. Le. 2020. Self-training with noisy student
+improves imagenet classiﬁcation. In CVPR.
+
+Dani Yogatama, Cyprien de Masson d’Autume, Jerome
+Connor, Tom´as Kocisk´y, Mike Chrzanowski, Ling-
+peng Kong, Angeliki Lazaridou, Wang Ling, Lei
+Yu, Chris Dyer, and Phil Blunsom. 2019. Learning
+and evaluating general linguistic intelligence. ArXiv,
+abs/1901.11373.
+
+Sheng Zhang, Xiaodong Liu, Jingjing Liu, Jianfeng
+Gao, Kevin Duh, and Benjamin Van Durme. 2018.
+ReCoRD: bridging the gap between human and ma-
+chine commonsense reading comprehension. arXiv,
+abs/1810.12885.
+
+A Additional Experimental Results
+
+A.1 Signiﬁcant OOD Accuracy Drops
+For STS-B, ReCoRD, and SST-2/IMDb, there is
+a noticeable drop in accuracy when testing on
+OOD examples. We show the STS-B results in
+Table 2, the ReCoRD results in Table 3, and the
+SST-2/IMDb results in Table 4.
+
+A.2 Minor OOD Accuracy Drops
+We observe more minor performance declines for
+the Amazon, MNLI, and Yelp datasets. Figure 6
+shows the Amazon results for BERT Base, Table 5
+shows the MNLI results, and Table 6 shows the
+Yelp results.
+
+Figure 6: We ﬁnetune BERT Base on one category
+of Amazon reviews and then evaluate it on other cat-
+egories. Models predict the review’s star rating with
+5-way classiﬁcation. We use ﬁve clothing categories:
+Clothes (C), Women’s Clothing (WC), Men’s Clothing
+(MC), Baby Clothing (BC), and Shoes (S); and two
+entertainment categories: Music (MS), Movies (MV).
+BERT is robust for closely related categories such as
+men’s, women’s, and baby clothing. However, BERT
+struggles when there is an extreme distribution shift
+such as Baby Clothing to Music (dark blue region).
+Note this shift is closer to a domain adaptation setting.
+
+A.3 OOD Detection
+Full FAR95 values are in Table 7. We also report
+the Area Under the Receiver Operating Charac-
+teristic (AUROC) (Hendrycks and Gimpel, 2017).
+The AUROC is the probability that an OOD ex-
+ample receives a higher anomaly score than an
+
+CWCMCBCSMSMVTest DatasetClothes (C)Women's CMen's CBaby's CShoesMusicMoviesTrain Dataset52545255525053625854534346615352514446605553534246525450524245525352544446485048494852474948504647Generalization of BERT Base onAmazon Product ReviewsAverage
+word2vec
+61.4
+11.3 (-50.1) 38.3 (-37.4) 62.0 (-19.8) 6.1 (-55.2)
+68.7
+
+39.7
+4.4 (-35.4)
+60.7
+19.3 (-41.4) 23.7 (-44.9) 45.6 (-40.2) 54.3 (-30.7) 11.1 (-55.7) 49.0 (-36.6) 51.9 (-35.4) 85.8 (-6.6)
+
+LSTM
+word2vec
+75.7
+
+ConvNet
+word2vec
+81.8
+
+ConvNet
+GloVe
+81.8
+
+LSTM
+GloVe
+79.8
+43.1 (-36.7) 57.8 (-24.1) 89.5 (-2.3)
+85.6
+
+BERT
+Base
+91.8
+
+Average
+GloVe
+61.2
+
+85.9
+
+85.0
+
+66.8
+
+87.4
+
+92.4
+
+BERT
+Large
+92.8
+90.5 (-2.3)
+93.9
+86.8 (-7.1)
+88.3
+
+RoBERTa
+
+94.2
+94.3 (0.1)
+94.9
+90.4 (-4.6)
+91.3
+
+Train
+
+Test
+
+BoW
+
+Images
+Images
+MSRvid
+MSRvid MSRvid
+Images
+Headlines Headlines 26.8
+10.1 (-16.7) 19.1 (-39.7)
+MSRpar
+47.0
+MSRpar MSRpar
+
+58.9
+
+Headlines -9.7 (-56.7)
+
+66.2
+-1.9 (-68.1)
+46.7
+
+67.4
+9.8 (-57.6)
+49.8
+
+27.0
+12.7 (-14.4) 10.3 (-36.5) 23.7 (-26.1) 7.0 (-43.9)
+
+69.9
+
+53.4
+25.9 (-27.5) 25.4 (-44.5) 10.9 (-58.7) 69.9 (-17.1) 63.6 (-24.7) 75.5 (-15.8)
+50.9
+
+69.6
+
+87.0
+
+46.7
+15.6 (-31.1) 30.6 (-15.6) 73.0 (-5.8)
+
+46.2
+
+78.8
+
+81.6
+71.7 (-9.9)
+
+86.8
+83.9 (-2.9)
+
+Table 2: We train and test models on different STS-B distributions (Images, MSR videos, Headlines, and MSR
+paraphrase). The severe drop in the Pearson correlation coefﬁcient shows the consequence of a distribution shift.
+Models such as Average GloVe lose nearly all performance when out-of-distribution. RoBERTa does especially
+well in comparison to other models.
+
+Test
+Train
+CNN
+CNN
+DailyMail
+DailyMail DailyMail
+
+CNN
+
+Document QA
+39.0
+29.7 (-9.3)
+30.8
+36.9 (6.2)
+
+DistilBERT
+45.0
+34.8 (-10.2)
+36.7
+43.9 (7.2)
+
+BERT Base
+53.2
+46.7 (-6.6)
+48.2
+51.8 (3.6)
+
+BERT Large
+67.2
+59.8 (-7.4)
+61.2
+65.5 (4.3)
+
+RoBERTa
+71.5
+72.2 (0.7)
+73.0
+73.0 (0.0)
+
+Table 3: For ReCoRD, the exact match performance is closely tethered to the test dataset, which suggests a dif-
+ference in the difﬁculty of the two test sets. This gap can be bridged by larger Transformer models pretrained on
+more data.
+
+in-distribution example, viz.,
+
+P(− max
+
+y
+
+p(y | xout) > − max
+
+y
+
+p(y | xin)).
+
+A ﬂawless AUROC is 100% while 50% is random
+chance. These results are in Figure 7 and Table 8.
+Note that the pretrained Transformers have an ap-
+proximately equal AUROC, save for DistilBERT,
+which is approximately 5% worse.
+
+Train
+
+Test
+
+BoW
+
+SST
+
+IMDb
+
+SST
+IMDb
+IMDb
+SST
+
+80.6
+73.9 (-6.8)
+85.9
+78.3 (-7.6)
+
+Average
+word2vec
+81.4
+76.4 (-5.0)
+84.8
+68.5 (-16.3) 63.7 (-26.3) 83.0 (-8.0)
+
+ConvNet
+word2vec
+85.3
+81.0 (-4.4)
+91.0
+
+LSTM
+word2vec
+87.5
+78.0 (-9.5)
+89.9
+
+Average
+GloVe
+80.3
+74.5 (-5.8)
+83.5
+77.5 (-6.1)
+
+LSTM
+GloVe
+87.4
+82.1 (-5.3)
+91.3
+79.9 (-11.4) 80.0 (-10.9) 87.6 (-4.3)
+
+ConvNet
+GloVe
+84.8
+81.0 (-3.8)
+91.0
+
+BERT
+Base
+91.9
+87.5 (-4.4)
+91.8
+
+BERT
+Large
+93.6
+88.3 (-5.3)
+92.9
+88.6 (-4.3)
+
+RoBERTa
+
+95.6
+92.8 (-2.8)
+94.3
+91.0 (-3.4)
+
+Table 4: We train and test models on SST-2 and IMDB. Notice IID accuracy is not perfectly predictive of OOD
+accuracy, so increasing IID benchmark performance does not necessarily yield superior OOD generalization.
+
+Train
+
+Telephone
+
+Test
+Telephone
+Letters
+Face-to-face
+
+DistilBERT
+77.5
+75.6 (-1.9)
+76.0 (-1.4)
+
+BERT Base
+81.4
+82.3 (0.9)
+80.8 (-0.7)
+
+BERT Large
+84.0
+85.1 (1.0)
+83.2 (-0.8)
+
+RoBERTa
+89.6
+90.0 (0.4)
+89.4 (-0.2)
+
+Table 5: We train models on the MNLI Telephone dataset and test on the Telephone, Letters, and Face-to-face
+datasets. The difference in accuracies are quite small (and sometimes even positive) for all four models. This
+demonstrates that pretrained Transformers can withstand various types of shifts in the data distribution.
+
+Train Test
+
+BoW
+
+AM
+
+CH
+
+IT
+
+JA
+
+82.4 (-4.8)
+81.8 (-5.4)
+84.2 (-3.0)
+82.2
+
+AM 87.2
+CH
+IT
+JA
+CH
+AM 82.2 (0.0)
+84.6 (2.4)
+IT
+83.8 (1.6)
+JA
+IT
+87.2
+AM 85.4 (-1.8)
+CH
+79.6 (-7.6)
+82.0 (-5.2)
+JA
+JA
+85.0
+AM 83.4 (-1.6)
+81.6 (-3.4)
+CH
+IT
+84.0 (-1.0)
+
+Average
+word2vec
+85.6
+80.4 (-5.2)
+82.6 (-3.0)
+86.0 (0.4)
+84.4
+85.4 (1.0)
+82.0 (-2.4)
+85.8 (1.4)
+86.8
+83.8 (-3.0)
+81.6 (-5.2)
+84.6 (-2.2)
+87.6
+85.0 (-2.6)
+83.6 (-4.0)
+83.6 (-4.0)
+
+LSTM
+word2vec
+88.0
+87.2 (-0.8)
+86.4 (-1.6)
+89.6 (1.6)
+87.6
+88.0 (0.4)
+88.0 (0.4)
+88.6 (1.0)
+89.6
+89.0 (-0.6)
+83.8 (-5.8)
+87.4 (-2.2)
+89.0
+87.8 (-1.2)
+89.0 (0.0)
+88.2 (-0.8)
+
+ConvNet
+word2vec
+89.6
+88.6 (-1.0)
+89.4 (-0.2)
+89.4 (-0.2)
+88.8
+89.2 (0.4)
+89.6 (0.8)
+89.0 (0.2)
+90.8
+90.2 (-0.6)
+88.4 (-2.4)
+88.6 (-2.2)
+90.4
+87.8 (-2.6)
+89.0 (-1.4)
+89.4 (-1.0)
+
+Average
+GloVe
+85.0
+75.1 (-9.9)
+82.0 (-3.0)
+79.2 (-5.8)
+84.4
+83.0 (-1.4)
+84.6 (0.2)
+86.8 (2.4)
+86.2
+85.6 (-0.6)
+78.0 (-8.2)
+85.0 (-1.2)
+88.0
+80.4 (-7.6)
+80.6 (-7.4)
+83.6 (-4.4)
+
+LSTM
+GloVe
+88.0
+88.4 (0.4)
+89.2 (1.2)
+87.8 (-0.2)
+89.2
+85.6 (-3.6)
+88.6 (-0.6)
+88.8 (-0.4)
+89.6
+89.0 (-0.6)
+83.2 (-6.4)
+86.8 (-2.8)
+89.0
+88.6 (-0.4)
+87.4 (-1.6)
+88.0 (-1.0)
+
+ConvNet
+GloVe
+91.2
+89.6 (-1.6)
+89.6 (-1.6)
+89.2 (-2.0)
+89.0
+90.2 (1.2)
+90.4 (1.4)
+89.6 (0.6)
+90.8
+90.2 (-0.6)
+85.8 (-5.0)
+89.4 (-1.4)
+89.6
+89.4 (-0.2)
+89.2 (-0.4)
+90.6 (1.0)
+
+DistilBERT BERT
+Base
+90.8
+91.0 (0.2)
+91.6 (0.8)
+92.0 (1.2)
+90.4
+88.8 (-1.6)
+89.0 (-1.4)
+89.4 (-1.0)
+91.6
+90.6 (-1.0)
+89.6 (-2.0)
+91.4 (-0.2)
+92.2
+90.4 (-1.8)
+91.4 (-0.8)
+90.2 (-2.0)
+
+90.0
+91.8 (1.8)
+92.6 (2.6)
+92.0 (2.0)
+90.2
+90.6 (0.4)
+91.4 (1.2)
+91.6 (1.4)
+92.4
+90.4 (-2.0)
+90.4 (-2.0)
+91.8 (-0.6)
+91.6
+91.2 (-0.4)
+92.8 (1.2)
+92.6 (1.0)
+
+BERT
+Large
+91.0
+90.6 (-0.4)
+91.2 (0.2)
+92.2 (1.2)
+90.8
+91.8 (1.0)
+90.2 (-0.6)
+91.6 (0.8)
+91.8
+89.4 (-2.4)
+90.0 (-1.8)
+91.2 (-0.6)
+93.4
+90.6 (-2.8)
+90.8 (-2.6)
+91.0 (-2.4)
+
+RoBERTa
+
+93.0
+90.8 (-2.2)
+91.8 (-1.2)
+93.4 (0.4)
+92.4
+92.4 (0.0)
+92.6 (0.2)
+92.2 (-0.2)
+94.2
+92.0 (-2.2)
+92.4 (-1.8)
+92.2 (-2.0)
+92.6
+91.0 (-1.6)
+92.4 (-0.2)
+92.6 (0.0)
+
+Table 6: We train and test models on American (AM), Chinese (CH), Italian (IT), and Japanese (JA) restaurant
+reviews. The accuracy drop is smaller compared to SST-2/IMDb for most models and pretrained transformers are
+typically the most robust.
+
+Din Dtest
+
+out
+
+SST
+
+20 NG
+Multi30K
+RTE
+SNLI
+WMT16
+Mean FAR95
+
+BoW
+
+100
+61
+100
+81
+100
+88.4
+
+Avg
+w2v
+100
+57
+100
+83
+91
+86.2
+
+Avg
+GloVe
+100
+52
+84
+72
+77
+76.9
+
+LSTM
+w2v
+94
+92
+93
+92
+90
+92.2
+
+LSTM
+GloVe
+90
+85
+88
+82
+82
+85.4
+
+ConvNet
+
+w2v
+61
+65
+75
+63
+70
+66.9
+
+ConvNet
+GloVe
+71
+63
+56
+63
+63
+63.1
+
+DistilBERT BERT
+Base
+35
+22
+32
+28
+48
+33.0
+
+39
+37
+43
+38
+56
+42.5
+
+BERT
+Large
+29
+23
+29
+28
+44
+30.5
+
+RoBERTa
+
+22
+61
+36
+29
+65
+43.0
+
+Table 7: Out-of-distribution detection FAR95 scores for various NLP models using the maximum softmax prob-
+ability anomaly score. Observe that while pretrained Transformers are consistently best, there remains room for
+improvement.
+
+Din Dtest
+
+out
+
+SST
+
+20 NG
+Multi30K
+RTE
+SNLI
+WMT16
+Mean AUROC
+
+BoW
+
+17
+77
+63
+56
+58
+54.2
+
+Avg
+w2v
+19
+75
+47
+58
+60
+51.8
+
+Avg
+GloVe
+30
+80
+72
+71
+69
+64.5
+
+LSTM
+w2v
+44
+55
+36
+53
+58
+49.3
+
+LSTM
+GloVe
+59
+62
+54
+64
+63
+60.4
+
+ConvNet
+
+w2v
+74
+71
+61
+72
+69
+69.5
+
+ConvNet
+GloVe
+64
+73
+77
+74
+74
+72.5
+
+DistilBERT BERT
+Base
+83
+93
+89
+92
+85
+88.1
+
+82
+86
+83
+86
+80
+83.1
+
+BERT
+Large
+87
+91
+89
+90
+85
+88.4
+
+RoBERTa
+
+90
+89
+90
+92
+83
+88.7
+
+Table 8: Out-of-distribution detection AUROC scores for various NLP models using the maximum softmax proba-
+bility anomaly score. An AUROC score of 50% is random chance, while 100% is perfect.
+
+Figure 7: We feed in OOD examples from out-of-distribution datasets (20 Newsgroups, Multi30K, etc.) to SST-2
+sentiment classiﬁers and report the AUROC detection performance. A 50% AUROC is the random chance level.
+
+20 NGMulti30KRTESNLIWMT16Average020406080100AUROC (%)(Higher Is Better)Detecting OOD Examples for an SST-2 Sentiment ClassifierModel TypeRandom DetectorBag of WordsAvg. word2vecLSTM word2vecConvNet word2vecBERT Large
