@@ -36,6 +36,7 @@ def scrape(keyword, num_pdfs):
                 num_retrieved += 1
                 urls.append(_FULLURL)
 
+        # Handle case when no search results found
         if num_retrieved == 0:
             print("No search results found. Please try a different search.")
             raise Exception
@@ -65,13 +66,10 @@ def scrape(keyword, num_pdfs):
 
 def main():
     '''
-     Input: python filename <Query> <num_pdfs> <topic - optional>
+     Input: python filename <keyword> <num_pdfs>
      Then: sys.argv = [filename, <seed>]
      Example to invoke:
-        python arxiv_pdf_scraper.py "What is the best accuracy achieved for mnist" 1000
-        OR
-        python arxiv_pdf_scraper.py "What is the best accuracy achieved for mnist" 1000 "Deep Learning"
-
+        python arxiv_pdf_scraper.py "cifar" 100
     '''
     keyword = sys.argv[1]
     num_files = int(sys.argv[2])
