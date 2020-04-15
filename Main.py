@@ -11,10 +11,12 @@ import glob
 import os
 import db_operations
 import socket
+import download_models
 
 
 
 def main(query, keyword):
+    download_models.getModels()
     pdfdir = os.path.join(os.getcwd(), "Data/")
     txtdir = os.path.join(os.getcwd(), "DataTxt/")
     csvdir = os.path.join(os.getcwd(), "DataCsv/")
