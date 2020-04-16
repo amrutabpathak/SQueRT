@@ -73,6 +73,7 @@ I tried Semlinar but no success. I tried using BERT-as-a-service but it never fi
 Process the topic and the query instead of just the query:
 Here I had tried using the multi select predefined options and tested the code using those. As one paper can belong to multiple topics , if we pass one topic not all of the relevant papers were pulled out. Also, the predefined options were too vague. The results returned due to that were not impressive.I did not even commit that code.
 
+Apps/libraries to load: See requirements.txt
 
 
 
