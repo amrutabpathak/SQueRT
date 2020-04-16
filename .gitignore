@@ -1,2 +1,5 @@
 /Albert Question Answering/pytorch_model.bin
 __pycache__
+.DS_Store
+.idea
+.vscode
