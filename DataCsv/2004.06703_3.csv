@@ -1,0 +1,270 @@
+Stacking Fault Energy Prediction for Austenitic Steels by Thermodynamic   Modeling and Machine Learning   Xin Wang, Wei Xiong *   Physical Metallurgy and Materials Design Laboratory,   Department of Mechanical Engineering and Materials Science,   University of Pittsburgh, Pittsburgh, PA 15261, USA   * Corresponding author: wxiong@yahoo.com, weixiong@pitt.edu   Abstract    Stacking fault energy (SFE) is vital in controlling the deformation mechanism and mechanical properties  of austenitic steels, while there are no accurate and straightforward computational tools for modeling it.To  address this issue, we evaluate the CALPHAD-based thermodynamic models (CALPHAD: calculations of  phase diagrams), analyze the alloying effect on SFE using data analytics, and present how machine learning  (ML) accurately predicts the SFE of austenitic steels.The results show that ML is more precise and flexible  compared to thermodynamic and empirical models.
+<EOS>
+This work demonstrates the capability of ML to predict  material properties when physical models and experiments are unfeasible.     Keywords: Machine learning, Stacking fault energy, Austenitic steels, CALPHAD      Designing  alloys  with  high  strength  and  excellent  ductility  is  one  of  the  ultimatums  to  be  achieved  in  materials  research. A  plausible  solution  to  achieve  this  goal  is  introducing  the  secondary  deformation  mechanisms, including twinning-induced plasticity (TWIP) and transformation-induced plasticity (TRIP),  which continuously improve the strength and ductility during deformation [1,2].
+<EOS>
+Stacking fault energy (SFE)  is  the  energy  related  to  dissociating  a  perfect  dislocation  into  two  partial  dislocations  along  with  the  formation of a stacking fault.SFE is an accurate indicator to predict which type of secondary deformation  mechanism  operates. Generally,  TRIP  activates  when  SFE  is  lower  than  20  mJ/m2  [3]  and  TWIP  is  achievable  if  the  SFE  lies  between  20  –  40  mJ/m2  [4].
+<EOS>
+ Therefore,  various  efforts  have  been  made  to  determine the SFE of different alloys.Experimental methods, including transmission electron microscopy  [5–7] and X-Ray/Neutron diffraction [8,9], are tedious and difficult which delay the process of exploring  new  materials. Computational  methods  such  as  empirical  equations,  ab  initio  calculations  and  thermodynamic models serve as an alternative solution.
+<EOS>
+Although, various empirical equations have been  proposed [10–16],  they predict conflicting effects for different alloying elements on SFE.This is because  they  are  localized  for  a  confined  composition  space  and  cannot  be  extrapolated  for  other  steels. A  thermodynamic model was proposed by Olson et al [17], and has been adapted in many works [18–21].
+<EOS>
+ Within this approach, an intrinsic stacking fault is defined as an hcp phase with two boundaries shared with  the  fcc  matrix. However,  the  thermodynamic  model  involves  many  parameters  and  varies  in  different  reports. Also,  and  none  of  the  thermodynamic  models  have  been  verified  for  alloys  with  a  broader  composition  range  [18,21–23].
+<EOS>
+ Lastly,  ab  initio  methods  [24,25]  are  difficult  due  to  the  chemical  and  magnetic disorder in complex alloys, and certain works underestimate the SFE and report negative values  [26,27].Thus, they are sometimes limited in predicting trends rather than the accurate value of SFE.  A promising way to leverage the wealth of data and circumvent the difficulty of SFE prediction is applying  data-driven  methods.
+<EOS>
+ Machine learning  (ML)  is  useful  in  extracting  knowledge  from  multi-dimensional  data and modeling the relationships between the targeted property and its related features [28].In recent  years, there are few studies that applied ML for SFE prediction [29,30].Das [29] predicted SFE using an  artificial neural network (ANN) with 100 compositions as an input.
+<EOS>
+However, that work did not incorporate  temperature into the model and ANN requires an extensive database for generating a reliable model, which  may limit the accuracy of this work.Chaudhary et al [30] built a classifier that categorizes compositions   into  high,  medium  and  low  SFE. However,  the  prediction  of  the  actual  SFE  value  is  desired  since  it  is  related to model the critical stress for twinning and the mechanical properties [31,32].
+<EOS>
+Thus, a systematic  study  for  understanding  the  relationship  between  composition  and  SFE,  and  building  an  accurate  SFE  predictor  are  imperative. In  this  paper,  the  following  has  been  accomplished:  1)  established  a  database  containing the composition and SFE of various steels, 2) assessed the CALPHAD-based thermodynamic  model (CALPHAD: calculations of phase diagrams), 3) discussed the influence of alloying elements on  SFE, and 4) predicted SFE using ML.The performance of the ML model developed in this work is superior  to  the  thermodynamic  and  empirical  models.
+<EOS>
+ This  model  will  serve  as  a  valuable  tool  for  designing  TWIP/TRIP steels, and it calls for a more comprehensive database to improve the model performance and  broaden the application for other alloys.   Figure 1 depicts the framework used in this work.We firstly performed an extensive literature survey and  constructed a database containing 349 entries with temperature, composition, and experimentally measured  SFE from 51 literatures [5–9,11,14,15,17,21,33–73].
+<EOS>
+Further, we randomly split them into train and test  datasets.Our dataset covered a broad range of compositions and its descriptive statistics are listed in Table  1.Secondly, all entries in this database were screened by the thermodynamic model to calculate the SFE  using Eq. 1 [17,21]:      𝛾 = 2𝜌𝛥𝐺𝑓𝑐𝑐→ℎ𝑐𝑝 + 2𝜎𝑓𝑐𝑐/ℎ𝑐𝑝,    𝜌 =  4 2  √3𝑎𝑓𝑐𝑐  1 𝑁𝐴      (1)   where γ is the SFE (mJ/m2), ΔGfcc→hcp is the Gibbs energies difference between the fcc and hcp phases [74].
+<EOS>
+ Thermo-Calc [75] software along with TCFE9 and TCHEA3 databases were used to calculate the Gibbs  energy. These  commercial  databases  may  be  the  most  comprehensive  and  reliable  databases  for  multi- component alloys compared with databases reported in literatures which were usually designed for specific  steels. ρ is the molar surface density (mol/m2) of {111} plane, NA is the Avogadro’s number, afcc = 0.36 nm  is  the  lattice  parameter  of  fcc,  σfcc/hcp  =  8  mJ/m2  is  interfacial  energy  [74]. Furthermore,  we  performed  Spearman’s correlation analysis using Python [76] and SciPy [77] to find the influence of the elements on  SFE.
+<EOS>
+Three different sets of features named as Standard, WithTCFE9, and WithTCHEA3 were built to find  out  whether  the  thermodynamic  model  can  help  ML  model  to  make  a  better  prediction. Because,  an  appropriate selection of features, which distinguish the material and describe the property of interest, can  lead  to  better  performance  of  the  ML  model. Further,  we  evaluated  the  performance  of  19  algorithms  available in Scikit-learn [78] with different hyper-parameters for the three different feature sets using the  10-fold cross-validation (CV) [79] to discover the model with highest accuracy and generalizability.
+<EOS>
+In this  process, the 75% train data is randomly split into ten subsets and the model is fitted with nine subgroups  and tested with the remaining subgroup.After training and testing for 10 times, the average value of metrics  such as the root mean square error (RMSE) and mean absolute error (MSE) were calculated using Eq. 2  and 3, respectively:          𝑅𝑀𝑆𝐸 =   √  𝑛 𝑖=1  𝐸 − 𝑆𝐹𝐸𝑖 ∑ (𝑆𝐹𝐸𝑖 𝑛  𝑃)2  𝑀𝐴𝐸 =   √  𝑛 𝑖=1  𝑃| 𝐸 − 𝑆𝐹𝐸𝑖 ∑ |𝑆𝐹𝐸𝑖   𝑛      (2)   (3)   𝑃 are the experimental and predicted  where n is the number of datapoints in the evaluation, 𝑆𝐹𝐸𝑖 SFE of the datapoint i, respectively.Finally, the model with lowest RMSE was selected and compared with  the empirical and thermodynamic models.
+<EOS>
+   𝐸 and 𝑆𝐹𝐸𝑖  Evaluation of the thermodynamic model is presented in Fig 2.Although, some points lie in the black dash  line in Figs.2(a) and 2(b), which indicates a good agreement between the thermodynamic model calculated  SFE  (SFEcalc)  and  SFE  inferred  from  experiments  (SFEexp),  but  many  other  datapoints  show  a  large  deviation.
+<EOS>
+Moreover, SFEexp varies from 3 to 80 mJ/m2, while SFEcalc with TCFE9 varies between -100 to   150 mJ/m2.Further, in the case of TCHEA3, the predicted values were as high as 800 mJ/m2.The large  discrepancy between SFEcalc and SFEexp may originate due to the following reasons.
+<EOS>
+First, the interfacial  energy used in this work and other reports is considered as a constant, while it is a composition-dependent  variable.Also, the difference in interfacial energy among previous studies differs by more than 20 mJ/m2,  which  could  introduce  a  large  uncertainty  [2,20,22,80–82]. Secondly,  most  SFE  measurements  are  performed at room temperature while the low-temperature thermodynamic databases for multicomponent  systems lack precision and the current works mainly focus on the pure element and binary reassessment  [83,84].
+<EOS>
+Additionally, the magnetic contribution to SFE is significant at low temperatures and there is need  for establishing a robust and sophisticated magnetic model to improve the accuracy of the thermodynamic  model [85,86].Though, the thermodynamic model is not applicable for all steels tested in this work, it is  useful for certain alloy systems.According to Fig 2(c), the two databases generate a good prediction for  multiple  alloy  systems.
+<EOS>
+ For  TCFE9,  the  error  in  Fe-Mn-Si-Al,  Fe-Mn-Si,  and  Fe-Mn-Al  systems  are  relatively small.For TCHEA3, the error in Fe-Cr-Ni, Fe-Cr-Mo-Ni and Fe-Mn systems is acceptable.The  Spearman’s correlation coefficient (r) for SFEcalc and SFEexp are shown in Fig 2(d).
+<EOS>
+The r lies between -1  to 1, and represents the linear relationship between two variables.A positive value corresponds to a positive  linear relation, a negative value indicates negative linear relationship, and 0 denotes that the two variables  are not linearly related.For Fe-Mn-Si-Al, Fe-Mn-Al and Fe-Cr-Mn-Ni systems, the r values between SFEexp  and SFEcalc using TCFE9 are higher than 0.5, which indicates TCFE9 can predict the trend of SFE change  with different elements in steels containing Mn. While, for the Fe-Cr-Ni system, TCHEA3 performs better  with  r  value  around  0.75  indicating  that  it  is  suitable  for  steels  with  high  Cr  and  Ni.  In  summary,  the  performance of thermodynamic model heavily depends on the quality of thermodynamic databases, and  should be carefully chosen depending on the alloy composition.
+<EOS>
+  Understanding the influence of alloying elements on SFE is crucial for alloy design and has attracted various  studies [5,27,87].However, due to the limited time and resources, previous work only focused on limited  alloys to draw a conclusion.Vitos et al [24] pointed that the alloying effect on SFE is a function of both  alloying element content and the host composition.
+<EOS>
+Thus, the general influence of elements on SFE remains  unclear.Here, we calculated the Spearman’s r for interpreting the relationship between each element and  the SFE without considering the host composition.According to Fig 3, Ni has the most pronounced effect  in increasing the SFE regardless of the host composition which agrees with the analysis  by Das [29].
+<EOS>
+It was  reported that from a total of 19 literatures, 18 reports indicated an increasing effect while only one report  gave the opposite view.C and Mn do not show a strong effect of increasing/decreasing the SFE based on  our study, since the r value is close to 0 and the p-value is larger than 0.05 which confirms that C and Mn  does not have a statistically significant linear relationship with SFE.However, as observed in Fig 3(b), C  and Mn are important for the SFE predictor generated through gradient boosting (GB) algorithm [88].
+<EOS>
+This  is because the effect of these elements on SFE is more complex than Ni and varies with different content  and host alloy, which has also been verified by the literature summarization [29].However, for some of the  elements  such  as  Si  [7,44]  which  is  generally  considered  to  decrease  the  SFE,  we  get  a  contradictory  conclusion, which may be attribute to the collective effect from the data pertaining to different alloy systems.  When building the ML model, a 10-fold CV is used to ensure that the model can accurately predict the SFE  for data untouched by the ML model.
+<EOS>
+Table 2 summarizes the mean RMSE and MAE of the 10-fold CV  for each model with optimized hyper-parameters.We found that the ensembled tree algorithms, including  random  forest  [89],  GB  and  XGBoost  [90]  algorithms,  generate  a  more  accurate  model  than  other  algorithms tested in this work.The GB model achieves a MAE less than 2.5 mJ/m2 for all of the input sets.
+<EOS>
+ The RMSE which is sensitive to large prediction errors, is nearly 8 mJ/m2.This implies that some large  deviation happens during the prediction.However, the overall performance is still reasonable.
+<EOS>
+In our study,  the ensembled methods always performs better than the multilayer perception (MLP, an ANN model)[91]  based on different metrics, indicating our hypothesis that there are better algorithms for predicting SFE than  ANN as stated in the introduction.We also found that the overall performance is similar among the three  input sets.Although the performance of adding TCFE9 calculated SFE is slightly better than the standard   inputs,  the  improvement  is  minor.
+<EOS>
+ As  a  result,  addition  of  thermodynamic  calculations  does  not  greatly  benefit the ML model.   Finally, the GB algorithm with optimized hyper-parameters was re-trained with 75% data and tested with  untouched 25% data.According to Fig 4(a), almost all the data in the train dataset align with the black  dash  line,  which  represent  the  prediction  is  the  same  as  experiments.
+<EOS>
+ This  implies  that  the  ML  model  successfully  correlates  the  composition  and  temperature  to  SFE  for  the  train  dataset. This  model  also  performs good on the untouched test dataset, except for one outlier.Based on the inset plot, it is clear that  more than 70% of the prediction error is less than 10 mJ/m2, which is close to the experimental error [16,47].
+<EOS>
+ The error in SFE inferred from experiments may come from the equipment used for characterization, the  inherent variation of SFE within a sample [35,92], and inaccurate elastic constants used  when deducing  SFE from experimental observation [6,21].The performance of ML, thermodynamic and empirical models  on the test dataset are compared, and the results are shown in Fig 4(b).Equation 4 proposed by Bellefon  [16] is so far the most accurate empirical model available [10–15].
+<EOS>
+It is clear that the MAE and RMSE of  ML models are smallest amongst the empirical and thermodynamic models confirming that ML is the most  capable model for SFE prediction.     𝛾(𝑚𝐽/𝑚2) =  2.2 + 1.9𝑁𝑖 − 2.9𝑆𝑖 + 0.7𝑀𝑜 + 0.5𝑀𝑛 + 40𝐶  − 0.016𝐶𝑟 − 3.6𝑁   (4)   The advantage of a ML model is not only higher accuracy, but also its ability to continuously evolve.Once  the SFE measurements are reported, the data can be incorporated in the current dataset to gain an improved  prediction [93,94].
+<EOS>
+ Also, if new features such as the heat treatment process, the grain size, and the accurate  prediction of interfacial energy and magnetic contribution are incorporated, the performance can be also  potentially improved.   In summary, we evaluated the thermodynamic model for SFE prediction, revealed the influence of  alloying elements on SFE with statistical analysis, and built an accurate SFE model using ML.We found  that there is a need to reassess the low-temperature multi-component thermodynamic databases, and  incorporate better magnetic and interfacial energy models to the thermodynamic model.
+<EOS>
+According to  literature and Spearman’s correlation analysis, it was found that Ni has a monotonous relationship on SFE  for most steels.While elements like C and Mn show complex effects on SFE, which are usually related to  the alloying element content and the host composition.The GB algorithm performs best among the  thermodynamic and empirical models, which proves the advantages of applying ensembled methods for  SFE prediction.
+<EOS>
+Based on these results, we envisage that the data-driven method presented in this work  will accelerate alloy design through optimization of SFE to yield preferred deformation mechanisms and  excellent mechanical properties.  Acknowledgments   W.X. acknowledges funding from the National Science Foundation under award DMR - 1808082, and from  the University of Pittsburgh, through the Central Research Development Fund (CRDF).The authors are  grateful for helpful discussions with Dr. Soumya Sridar, Mr. Rafael Tomás Rodríguez De Vecchis, and Mr.  Noah Sargent at the University of Pittsburgh.
+<EOS>
+     References   [1]   [2]   [3]   [4]   [5]   O. Grässel, L. Krüger, G. Frommeyer, L.W. Meyer, Int.J. Plast.16 (2000) 1391–1409.
+<EOS>
+  D.R.  Steinmetz,  T.  Jäpel,  B.  Wietbrock,  P.  Eisenlohr,  I.  Gutierrez-Urrutia,  A.  Saeed–Akbari,  T.  Hickel, F. Roters, D. Raabe, Acta Mater.61 (2013) 494–510.  K. Sato, M. Ichinose, Y. Hirotsu, Y. Inoue, ISIJ Int.
+<EOS>
+29 (1989) 868–877.  J. Su, D. Raabe, Z. Li, Acta Mater.163 (2019) 40–54.
+<EOS>
+  J. Lu, L. Hultman, E. Holmström, K.H. Antonsson, M. Grehk, W. Li, L. Vitos, A. Golpayegani,   Acta Mater.111 (2016) 39–46.  [6]   [7]   [8]   [9]   D.T. Pierce, J. Bentley, J.A. Jiménez, J.E. Wittig, Scr.
+<EOS>
+Mater.66 (2012) 753–756.  G.R. Lehnhoff, K.O. Findley, B.C. De Cooman, Scr.
+<EOS>
+Mater.92 (2014) 19–22.  J. Kim, B.C. De Cooman, Metall.
+<EOS>
+Mater.Trans.A 42 (2011) 932–936.
+<EOS>
+  T.H. Lee, E. Shin, C.S. Oh, H.Y. Ha, S.J. Kim, Acta Mater.58 (2010) 3173–3186.  [10]  R.E. Schramm, R.P. Reed, Metall.
+<EOS>
+Trans.A 6 (1975) 1345.  [11]  C.G. Rhodes, A.W. Thompson, Metall.
+<EOS>
+Trans.A 8 (1977) 1901–1906.  [12]  P.J. Brofman, G.S. Ansell, Metall.
+<EOS>
+Mater.Trans.A 9 (1978) 879–880.
+<EOS>
+  [13]  D. Qi-Xun, W. An-Dong, C. Xiao-Nong, L. Xin-Min, Chinese Phys.11 (2002) 596.  [14]  M. Ojima, Y. Adachi, Y. Tomota, Y. Katada, Y. Kaneko, K. Kuroda, H. Saka, Steel Res.
+<EOS>
+Int.80   (2009) 477–481.  [15]  T. Yonezawa, K. Suzuki, S. Ooki, A. Hashimoto, Metall.
+<EOS>
+Mater.Trans.A 44 (2013) 5884–5896.
+<EOS>
+  [16]  G.M. de Bellefon, J.C. van Duysen, K. Sridharan, J. Nucl.Mater.492 (2017) 227–230.
+<EOS>
+  [17]  G.B. Olson, M. Cohen, Metall.Trans.A 7 (1976) 1897–1904.
+<EOS>
+  [18]  S. Curtze, V.-T.Kuokkala, Acta Mater.58 (2010) 5129–5141.
+<EOS>
+  [19]  S.-J.Lee, Y. Sun, H. Fujii, Acta Mater.148 (2018) 235–248.
+<EOS>
+  [20]  A. Saeed-Akbari, J. Imlau, U. Prahl, W. Bleck, Metall.Mater.Trans.
+<EOS>
+A Phys.Metall.Mater.
+<EOS>
+Sci.40   (2009) 3076–3090.  [21]  D.T. Pierce, J.A. Jiménez, J. Bentley, D. Raabe, C. Oskay, J.E. Wittig, Acta Mater.
+<EOS>
+68 (2014) 238–  253.  [22]  L. Mosecker, A. Saeed-Akbari, Sci.Technol.
+<EOS>
+Adv.Mater.14 (2013).
+<EOS>
+  [23]  D. Djurovic, B. Hallstedt, J. Von Appen, R. Dronskowski, Calphad 35 (2011) 479–491.  [24]  L. Vitos, J.-O.Nilsson, B. Johansson, Acta Mater.
+<EOS>
+54 (2006) 3821–3826.  [25]  S. Huang, W. Li, S. Lu, F. Tian, J. Shen, E. Holmström, L. Vitos, Scr.Mater.
+<EOS>
+108 (2015) 44–47.  [26]  D. Wei, X. Li, J. Jiang, W. Heng, Y. Koizumi, W.-M.Choi, B.-J.
+<EOS>
+Lee, H.S. Kim, H. Kato, A. Chiba,   Scr.Mater.165 (2019) 39–43.
+<EOS>
+  [27]  S. Kibey, J.B. Liu, M.J. Curtis, D.D. Johnson, H. Sehitoglu, Acta Mater.54 (2006) 2991–3001.  [28]  Y. Liu, T. Zhao, W. Ju, S. Shi, J. Mater.
+<EOS>
+3 (2017) 159–177.  [29]  A. Das, Metall.Mater.
+<EOS>
+Trans.A Phys.Metall.
+<EOS>
+Mater.Sci.47 (2016) 748–768.
+<EOS>
+  [30]  N. Chaudhary, A. Abu-Odeh, I. Karaman, R. Arróyave, J. Mater.Sci.52 (2017) 11048–11076.
+<EOS>
+  [31]  S. Kibey, J.B. Liu, D.D. Johnson, H. Sehitoglu, Acta Mater.55 (2007) 6843–6851.  [32]  G.M. de Bellefon, M.N. Gussev, A.D. Stoica, J.C. van Duysen, K. Sridharan, G. Meric de Bellefon,   M.N. Gussev, A.D. Stoica, J.C. van Duysen, K. Sridharan, Scr.
+<EOS>
+Mater.157 (2018) 162–166.  [33]  F. Abrassart, Metall.
+<EOS>
+Trans.4 (1973) 2205–2216.  [34]  C.C. Bampton, I.P. Jones, M.H. Loretto, Acta Metall.
+<EOS>
+26 (1978) 39–51.  [35]  P. Behjati, A. Najafizadeh, Metall.Mater.
+<EOS>
+Trans.A 42 (2011) 3752.  [36]   J.T. Benzing, W.A. Poling, D.T. Pierce, J. Bentley, K.O. Findley, D. Raabe, J.E. Wittig, Mater.
+<EOS>
+Sci. Eng.A 711 (2018) 78–92.
+<EOS>
+  [37]  L. Bracke, J. Penning, N. Akdut, Metall.Mater.Trans.
+<EOS>
+A 38 (2007) 520–528.  [38]  D. Dulieu, Spec.Rep.
+<EOS>
+86 140 (1964).  [39]  R. Fawley, M.A. Quader, R.A. Dodd, Trans Met Soc AIME 242 (1968) 771–776.  [40]  V. Gavriljuk, Y. Petrov, B. Shanina, Scr.
+<EOS>
+Mater.55 (2006) 537–540.  [41]  V.G. Gavriljuk, A.L. Sozinov, J. Foct, J.N. Petrov, Y.A. Polushkin, Acta Mater.
+<EOS>
+46 (1998) 1157–  1163.  [42]  H. Idrissi, K. Renard, L. Ryelandt, D. Schryvers, P.J. Jacques, Acta Mater.58 (2010) 2464–2476.
+<EOS>
+  [43]  L.G. Martinez, K. Imakuma, A.F. Padilha, Steel Res.63 (1992) 221–223.  [44]  K. Jeong, J.E. Jin, Y.S. Jung, S. Kang, Y.K. Lee, Acta Mater.
+<EOS>
+61 (2013) 3399–3410.  [45]  Z. Jiao, G.S. Was, J. Nucl.Mater.
+<EOS>
+407 (2010) 34–43.  [46]  M. Kang, W. Woo, Y.-K.Lee, B.-S.
+<EOS>
+Seong, Mater.Lett.76 (2012) 93–95.
+<EOS>
+  [47]   J. Kim, S.-J.Lee, B.C. De Cooman, Scr.Mater.
+<EOS>
+65 (2011) 363–366.  [48]  R.M. Latanision, A.W. Ruff, Metall.Trans.
+<EOS>
+2 (1971) 505–509.  [49]  F. Lecroisey, B. Thomas, Phys.Status Solidi 2 (1970) K217–K220.
+<EOS>
+  [50]  F. Lecroisey, A. Pineau, Metall.Mater.Trans.
+<EOS>
+B 3 (1972) 391–400.  [51]  T.-H.Lee, H.-Y.
+<EOS>
+Ha, B. Hwang, S.-J.Kim, E. Shin, Metall.Mater.
+<EOS>
+Trans.A 43 (2012) 4455–4459.  [52]  S.J. Lee, Y.S. Jung, S. Il Baik, Y.W. Kim, M. Kang, W. Woo, Y.K. Lee, Scr.
+<EOS>
+Mater.92 (2014) 23–  26.  [53]   J.C. Li, W. Zheng, Q. Jiang, Mater.
+<EOS>
+Lett.38 (1999) 275–277.  [54]  X. Li, A. Almazouzi, J. Nucl.
+<EOS>
+Mater.385 (2009) 329–333.  [55]  L. Mosecker, D.T. Pierce, A. Schwedt, M. Beighmohamadi, J. Mayer, W. Bleck, J.E. Wittig, Mater.
+<EOS>
+  Sci.Eng.A 642 (2015) 71–83.
+<EOS>
+  [56]  L. Mujica, S. Weber, W. Theisen, Mater.Sci.Forum 706–709 (2012) 2193–2198.
+<EOS>
+  [57]  Y.N. Petrov, Phys.Met.6 (1985) 735–741.
+<EOS>
+  [58]  Y.N. Petrov, Scr.Metall.Mater.
+<EOS>
+States) 29 (1993).  [59]  Y.N. Petrov, Zeitschrift Für Met.94 (2003) 1012–1016.
+<EOS>
+  [60]  Y. Petrov, Int.J. Mater.Res.
+<EOS>
+103 (2012) 551–553.  [61]  D. Rafaja, C. Krbetschek, C. Ullrich, S. Martin, J. Appl.Crystallogr.
+<EOS>
+47 (2014) 936–947.  [62]  W. Reick, M. Pohl, A.F. Padilha, ISIJ Int.38 (1998) 567–571.
+<EOS>
+  [63]  L. Rémy, A. Pineau, B. Thomas, Mater.Sci.Eng.
+<EOS>
+36 (1978) 47–63.  [64]  G.S. Shin, J.Y. Yun, M.C. Park, S.J. Kim, Tribol.Lett.
+<EOS>
+57 (2015) 25.  [65]   J.M. Silcock, Corrosion 38 (1982) 144–156.  [66]  R.E. Stoltz, J.B. Vander Sande, Metall.
+<EOS>
+Trans.A 11 (1980) 1033–1037.  [67]   J.R. Strife, M.J. Carr, G.S. Ansell, Metall.
+<EOS>
+Trans.A 8 (1977) 1471–1484.  [68]  P.R. Swann, Corrosion 19 (1963) 102t-114t.
+<EOS>
+  [69]  R. Taillard and J. Foct, in: A. Hendry (Eds.), High Nitrogen Steels, HNS 88, Inst.Met.London,   1989, p. 387.
+<EOS>
+  [70]   J. Talonen, H. Hänninen, Acta Mater.55 (2007) 6108–6118.  [71]  B. THOMAS, G. HENRY, J. PLATEAU, J. HOCHMANN, COMPT REND ACAD SCI 264 (1967)   31–34.
+<EOS>
+  [72]  X. Tian, Y. Zhang, Mater.Sci.Eng.
+<EOS>
+A 516 (2009) 73–77.  [73]  S.W. Yang, J.E. Spruiell, J. Mater.Sci.
+<EOS>
+17 (1982) 677–690.  [74]  S. Curtze, V.-T.T. Kuokkala, A. Oikari, J. Talonen, H. Hänninen, Acta Mater.59 (2011) 1068–1076.
+<EOS>
+  [75]   J.-O.Andersson, T. Helander, L. Höglund, P. Shi, B. Sundman, Calphad 26 (2002) 273–312.  [76]  K.J. Millman, M. Aivazis, Comput.
+<EOS>
+Sci.Eng.13 (2011) 9–12.
+<EOS>
+  [77]  P. Virtanen, R. Gommers, T.E. Oliphant, M. Haberland, T. Reddy, D. Cournapeau, E. Burovski, P.   Peterson, W. Weckesser, J. Bright, ArXiv Prepr.ArXiv1907.10121 (2019).  [78]  F.  Pedregosa,  G.  Varoquaux,  A.  Gramfort,  V.  Michel,  B.  Thirion,  O.  Grisel,  M.  Blondel,  P.   Prettenhofer, R. Weiss, V. Dubourg, J. Mach.
+<EOS>
+Learn.Res.12 (2011) 2825–2830.
+<EOS>
+  [79]  R. Kohavi, in: Ijcai, Montreal, Canada, 1995, pp 1137–1145.  [80]  S. Allain, J.-P.Chateau, O. Bouaziz, S. Migot, N. Guelton, Mater.
+<EOS>
+Sci.Eng.A 387 (2004) 158–162.
+<EOS>
+  [81]  S.M. Cotes, A.F. Guillermet, M. Sade, Metall.Mater.Trans.
+<EOS>
+A 35 (2004) 83–91.  [82]  P.U. Volosevich, V.N. Gridnev, Y.U.N. Petrov, Phys.Met.
+<EOS>
+Met.42 (1976) 126–130.  [83]  Q. Chen, B. Sundman, J. Phase Equilibria 22 (2001) 631–644.
+<EOS>
+  [84]  W. Xiong, P. Hedström, M. Selleby, J. Odqvist, M. Thuvander, Q. Chen, Calphad 35 (2011) 355–  366.  [85]  W. Xiong, H. Zhang, L. Vitos, M. Selleby, Acta Mater.59 (2011) 521–530.
+<EOS>
+  [86]  W. Xiong, Q. Chen, P.A. Korzhavyi, M. Selleby, Calphad 39 (2012) 11–20.  [87]  K.R. Limmer, J.E. Medvedeva, D.C. Van Aken, N.I. Medvedeva, Comput.Mater.
+<EOS>
+Sci.99 (2015)   253–255.  [88]   J.H. Friedman, Ann.
+<EOS>
+Stat. (2001) 1189–1232.  [89]  L. Breiman, Mach.Learn.
+<EOS>
+45 (2001) 5–32.  [90]  T. Chen, C. Guestrin, in: Proc.22nd Acm Sigkdd Int.
+<EOS>
+Conf.Knowl.Discov.
+<EOS>
+Data Min., 2016, pp   785–794.  [91]  M.W. Gardner, S.R. Dorling, Atmos.Environ.
+<EOS>
+32 (1998) 2627–2636.  [92]  N.L. Okamoto, S. Fujimoto, Y. Kambara, M. Kawamura, Z.M.T. Chen, H. Matsunoshita, K. Tanaka,   H. Inui, E.P. George, Sci.Rep.
+<EOS>
+6 (2016) 35863.  [93]  L. Ward, S.C. O’Keeffe, J. Stevick, G.R. Jelbert, M. Aykol, C. Wolverton, Acta Mater.159 (2018)   102–111.
+<EOS>
+  [94]  D. Xue, P. V Balachandran, J. Hogden, J. Theiler, D. Xue, T. Lookman, Nat.Commun.7 (2016)   11241.
+<EOS>
+        Table and Figure Captions  Table 1.Descriptive statistics of database used in this work ........................................................................2   Table 2.
+<EOS>
+Comparison of the performance of different algorithm for different input sets .............................3   Graphical abstract .........................................................................................................................................4   Figure 1.
+<EOS>
+Schematic describing the procedure of this work ..........................................................................4   Figure 2.Comparison of SFE measured by experiments (SFEexp) and calculated using the thermodynamic  model  (SFEcalc)  with  (a)  TCFE9  and  (b)  TCHEA3  database  for  different  alloy  systems  (labeled  with  substitutional elements  exceeding 1 wt.%), where the black dash line denotes SFEcalc = SFEexp, (c) Mean  value and standard deviation for the difference between SFEcalc and SFEexp for different alloy systems, and  (d) the Spearman’s correlation coefficient between the SFEcalc and SFEexp for each alloy system ...............
+<EOS>
+5   Figure 3. (a) Spearman’s correlation coefficient and p-value for the SFE and all features used in this work,  (b) Importance of each features in gradient boosting (GB) ..........................................................................6   Figure 4. (a) comparison of the experimental and ML predicted SFE, the black dash line represents ideal  case where prediction equals to experiment measured SFE (b) comparison for performance of machine  learning, empirical model, and thermodynamic model using TCHEA3 and TCFE9 database in terms of  MAE and RMSE ...........................................................................................................................................7               Table 1.
+<EOS>
+Descriptive statistics of database used in this work      Temperature   C   Cr   Mn   Mo   N   Ni   Si   Al   P   S   Fe   SFE   (K)   (wt.%)   (wt.%)   (wt.%)   (wt.%)   (wt.%)   (wt.%)   (wt.%)   (wt.%)   (wt.%)   (wt.%)   (wt.%)   (mJ/m2)   Mean   289.94   0.09  15.36  5.09   0.41   0.07  11.23  0.34   0.10   0.00  0.00  67.31  30.60   Standard  Deviation   Min   Max         46.87   0.26   6.39   8.18   0.89   0.15   6.87   0.99   0.52   0.01  0.00  7.19   13.55   94.30   0.00   0.00   0.00   0.00   0.00   0.00   0.00   0.00   0.00  0.00  47.04   3.26   598.15   3.21  30.00  32.69  2.70   1.00  31.16  6.22   4.80   0.07  0.04  86.46  72.97      Table 2.Comparison of the performance of different algorithm for different input sets   With   TCHEA3   Standard   With  TCFE9   TCHEA3   Mean RMSE (mJ/m2) of 10-fold CV  Mean MAE (mJ/m2) of 10-fold CV  Standard  With  With  TCFE9  7.8  7.9  8.0  9.2  9.2  8.9  9.2  9.3  9.3  9.2   7.9  8.1  8.2  9.4  9.5  9.3  9.5  9.5  9.5  9.5   2.4  2.4  2.4  2.6  2.8  2.6  2.7  2.7  2.7  2.7   2.3  2.4  2.4  2.6  2.7  2.6  2.6  2.7  2.7  2.6   7.8  8.0  8.1  9.3  9.3  9.4  9.5  9.5  9.5  9.5   2.3  2.4  2.4  2.7  2.8  2.6  2.7  2.7  2.7  2.7   9.5   9.5  9.5  9.6  9.6  9.8  9.8  10.2  11.7   9.3   9.3  10.5  9.4  9.3  9.4  9.3  10.1  11.4   9.5   9.5  10.0  9.6  9.5  10.2  9.7  10.1  11.6   2.7   2.7  2.7  2.7  2.7  2.7  2.7  2.7  3.0   2.7   2.7  2.7  2.7  2.7  2.7  2.6  2.7  2.9   2.7   2.7  2.7  2.7  2.7  2.7  2.6  2.7  3.0   Machine learning   algorithm   Gradient boosting  Random forest   XGBoost  Huber   Adaptive boosting  K-nearest neighbors   Elastic net   Ridge   Kernel ridge   Lasso   Automatic relevance   determination   LassoLars  Extra-trees   Linear regression  Bayesian ridge   Multilayer perception   Supporting vector   machine   Decision tree   Stochastic gradient   descent      Graphical abstract                  Figure 1.Schematic describing the procedure of this work         Legend of alloy systems in subfigure (a) and (b)  Fe-Mn Fe-Cr-Ni-Si Fe-Cr-Ni  Fe-Mn-Si-Al Fe-Mn-Si Fe-Mn-Al     Fe-Cr-Mo-Ni Fe-Cr-Mn-Ni-Si Fe-Cr-Mn-Ni (b)  800  ) 2  /  m J m  Fe-Cr-Mn-Mo-Ni Fe-Cr-Mn Fe-Cr-Mn-Ni-Al Fe-Cr-Mo-Ni-Si     (       3 A E H C T h t i        w d e t a u c  l  l  a c   E F S  70  80  600  400  200  0  0  10  20  30  40  50  60  Experimental SFE (mJ/m2)  1.0  (d)        TCFE9    TCHEA3     70  80     (a)  150  ) 2  /  m J m  (    9 E F C T h t i        w d e t a u c  l  l     a c E F S  100  50  0  -50  -100  0  10  200  (c)   TCFE9  TCHEA3     f o n o i t a  i     v e d d r a d n a t s d n a n a e M        ) 2  /  m J m  (    c l a c E F S    -    p x e E F S  0  -200  -400  -600  -800  20  30  40  50  60  Experimental SFE (mJ/m2)           l  n e e w t e b n o i t a e r r p c s n a m r a e p S     '     p x e  E F S d n a        c  l  a c  E F S  0.5  0.0  -0.5  -1.0  Fe-Mn-Si Fe-Mn-Si-Al  Fe-Mn-Al Fe-Mn Fe-Cr-Ni Fe-Cr-Ni-Si Fe-Cr-Mn-Ni-Si Fe-Cr-Mn-Mo-Ni Fe-Cr-Mo-Ni Fe-Cr-Mn-Ni All data Fe-Cr-Mn  Fe-Mn-Si Fe-Mn-Si-Al  Fe-Mn-Al Fe-Mn Fe-Cr-Ni Fe-Cr-Ni-Si Fe-Cr-Mn-Ni-Si Fe-Cr-Mn-Mo-Ni Fe-Cr-Mo-Ni Fe-Cr-Mn-Ni All data Fe-Cr-Mn  Alloy system    Figure 2.
+<EOS>
+Comparison of SFE measured by experiments (SFEexp) and calculated using the thermodynamic  model  (SFEcalc)  with  (a)  TCFE9  and  (b)  TCHEA3  database  for  different  alloy  systems  (labeled  with  substitutional elements  exceeding 1 wt.%), where the black dash line denotes SFEcalc = SFEexp, (c) Mean  value and standard deviation for the difference between SFEcalc and SFEexp for different alloy systems, and  (d) the Spearman’s correlation coefficient between the SFEcalc and SFEexp for each alloy system   Alloy system      p-value < 0.05  p-value > 0.05  e r u  t  a r e p m e T  i  S  P  S  i  N  o M  r N C  nC M  l  A     i  N  (b) 1.0  l  e d o m B G n        o eM F  0.5  (a) 0.6  0.4  0.2  0.0  -0.2  -0.4  -0.6  r   t n e i c i f f e o c   n o i t a l e r r o c   s n a m r a e p S  '  e F  i       s e r u t a e f   f o e c n a t r o p m     I     e r u  t  a r e p m e T  n M  i  S  N  C  r  C  l  A    Figure 3. (a) Spearman’s correlation coefficient and p-value for the SFE and all features used in this work,  (b) Importance of each features in gradient boosting (GB)      0.0  PS         MAE  RMSE     132.9  76.5  68.6     57.7  5.5  8.4  10.6  7.6  (b)  t e s a t a d   t s e t   n o   ) 2  /  m J m  (       E S M R d n a E A M     140  120  100  80  60  40  20  0  0  20  10 70 GB althogrithm predicted SFE (mJ/m2)  30  40  50  60  80    Figure 4. (a) comparison of the experimental and ML predicted SFE, the black dash line represents ideal  case where prediction equals to experiment measured SFE (b) comparison for performance of machine  learning, empirical model, and thermodynamic model using TCHEA3 and TCFE9 database in terms of  MAE and RMSE   Machine  learning  Emperical  equtation  TCHEA3  TCFE9   Train dataset  Test dataset  (a)  ) 2  /  m J m     (   E F S d e r u s a e m s t n e m     i r e p x E  80  70  60  50  40  30  20  10  0     
+<EOS>
