@@ -5,8 +5,10 @@ Flask app and RESTful Swagger API for SQueRT. The API accepts user string input 
 
 I also wrote a user overview and Q&A document about our tool (the SQueRT one pager) and helped with scoring result snippets with the rest of the team. 
 
+I wrote html, js, and css scripts to render the API into a webpage. The webpage has a title banner with a description and an Inputs section with boxes for the user to enter an arXiv search query and keyword, with a submit button. Then there are three Output return boxes: one for the PDF link, one for snippets, and one for predictions.
+
 Tried but not yet included:
-I'm still troubleshooting the "fancy front end", which includes html, js, and css scripts. Troubleshooting has been very difficult given all of the obstacles I have had in attempting to run Main() as well as my utter lack of front-end experience. I very much hope to have it working soon so that I can push these scripts (hundreds of lines of code all together!!) and we can have a real webpage. 
+I still have some front end functionality to work out - namely incorporating the feedback. 
 
 Apps/libraries to load:
 scraper: sys, BeautifulSoup, urllib, os, time, re
