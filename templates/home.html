@@ -1,14 +1,72 @@
-<html>
-   <body>
-      <form action = "{{ url_for('addrec') }}" method = "POST">
-         <h2>SQueRT: The Scientific Query Research Tool</h2>
-         Query<br>
-         <input type = "text" name = "query" /></br>
-         
-         Topic (optional)<br>
-         <input type = "text" name = "topic" /><br>
+<!DOCTYPE HTML>
+<html lang="en">
 
-         <input type = "submit" value = "submit" /><br>
-      </form>
-   </body>
-</html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans:300|Open+Sans:300|Oxygen|Material+Icons"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="overlay">
+        <div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div>
+    </div>
+    <h2> SQueRT </h2>
+    <div class="row">
+        <div class="col-sm-1"></div>
+
+        <div class="col-sm-10">
+            <center>
+                <h3>The Scientific Query Research Tool</h3>
+                <p> <b>Models</b>: List of Models Used Goes Here</p>
+            </center>
+
+            <h4> Inputs </h4>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="input_question">arXiv Search Query</label>
+                    <input type="text" class="form-control" id="input_question"></textarea>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="input_keyword">Keyword (optional)</label>
+                    <input type="text" class="form-control" id="input_keyword"></textarea>
+                </div>                
+                <div class="form-group col-md-3">
+                    <label></label>
+                    <button type="button" class="btn btn-primary btn-lg btn-block" id="btn-process">Submit Query</button>
+                </div>
+            </div>  
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="pdf_link">PDF containing snippet</label>
+                    <input type="text" class="form-control" id="pdf_link" readonly></input>
+                </div>
+            </div> 
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="snippet">Snippet</label>
+                    <textarea class="form-control txt_input" id="snippet" readonly> </textarea>
+                </div>
+            </div>     
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="predictions">Predictions</label>
+                    <textarea class="form-control txt_input" id="predictions" readonly> </textarea>
+                </div>
+            </div>               
+
+        </div>
+        <div class="col-sm-1"></div>
+    </div>
+</body>
+
+</html>                                      
