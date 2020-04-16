@@ -27,14 +27,8 @@ from transformers.data.metrics.squad_metrics import compute_predictions_logits
 
 # READER NOTE: Set this flag to use own model, or use pretrained model in the Hugging Face repository
 
-use_own_model = False
-
-if use_own_model:
-    model_name_or_path = "/content/model_output"
-else:
-    model_name_or_path = "ktrapeznikov/albert-xlarge-v2-squad-v2"
+albert_model_path = os.path.join(os.getcwd(), "albert_models/")
 # Edit this to your local path ***OR nothing will work***
-config_file = "./Albert Question Answering"
 
 output_dir = ""
 
@@ -48,13 +42,13 @@ null_score_diff_threshold = 0.0
 config_class, model_class, tokenizer_class = (
     AlbertConfig, AlbertForQuestionAnswering, AlbertTokenizer)
 # config = config_class.from_pretrained(model_name_or_path)
-config = config_class.from_pretrained(config_file)
+config = config_class.from_pretrained(albert_model_path)
 # tokenizer = tokenizer_class.from_pretrained(
 #     model_name_or_path, do_lower_case=True)
 tokenizer = tokenizer_class.from_pretrained(
-    config_file, do_lower_case=True)
+    albert_model_path, do_lower_case=True)
 # model = model_class.from_pretrained(model_name_or_path, config=config)
-model = model_class.from_pretrained(config_file, config=config)
+model = model_class.from_pretrained(albert_model_path, config=config)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
