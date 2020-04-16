@@ -1,0 +1,79 @@
+Implemented:
+Research
+Before diving into the project, the first goal was to research the models/tools that could be suitable for our Question Answering system. For this, I read, tried and tested many different models on simple english sentences to check how well each model can predict the context similarity of the sentences. The base idea was to check how well the model understands the context and scores them accordingly. The models I tried were 
+Swoogle UMBC
+ParallelDots
+BERT
+TwinWord
+Google USE
+BERTBase uncased large
+RoBERTa large
+DistilBERT uncased large
+
+Path: https://github.ccs.neu.edu/simpsone/7180QueryTool/tree/master/ContextSimilarityTools
+
+Narrowing down to a few models and top n snippets:
+Based on the results from the above models and discussing each model and their results in the class, the following models were shortlisted for further
+analysis- 
+Google USE
+BERTBase uncased large
+RoBERTa large
+DistilBERT uncased large
+I tested them against simple English sentences and on sentences taken from various research papers.
+Also, I wrote a script that does the following things:
+It takes a research paper (csv format) and a question and generates top n snippets relevant to the question for each of the following models 
+Google USE
+BERTBase uncased large
+RoBERTa large
+DistilBERT uncased large
+The results from all the models are formatted and stored in an excel like tsv file for comparison.
+
+Path: https://github.ccs.neu.edu/simpsone/7180QueryTool/blob/master/Different_Models_Comparison.py
+
+Comparison:
+This phase comprised of comparing different models based on the results of top n snippet retriever script.(Different_Models_Comparison.py)
+I compared the graph_inference_learning paper over 1 and 3 snippets and 3 different questions
+and ModelComparison_RLquestiongen paper over one question.
+
+Files : 6 files starting ModelComparison_graph_inference_learning_*
+https://github.ccs.neu.edu/simpsone/7180QueryTool/tree/master/ModelComparisonForTopNSentences
+
+https://github.ccs.neu.edu/simpsone/7180QueryTool/blob/master/ModelComparisonForTopNSentences/ModelComparison_RLquestiongen.tsv
+
+
+
+Squert One pager:
+Modified one pager for different types of questions and some other modifications.
+
+
+Database Storage :
+Here, the script will store the question, answer, snippet,url,and feedback of the user to the database.
+Path: https://github.ccs.neu.edu/simpsone/7180QueryTool/blob/master/db_operations.py
+
+Snippet to csv :
+Converting cleaned up research papers to csvs and saving them in the folder
+https://github.ccs.neu.edu/simpsone/7180QueryTool/blob/master/ProcessText.py
+(snippetToCsv method)
+
+Return relevant snippet to the user:
+In order to return the snippet that contains the answer to the user, worked on modifying the methods in albert_QA and main files.
+
+Process the topic and the query instead of just the query:
+Modified the scraper to include the topic too along with the query to pull out the relevant urls. 
+
+
+Main (the controller):
+I worked on calling create insert and save database methods , creating and returning jsons for UI, creating links for pdf papers.
+Path : https://github.ccs.neu.edu/simpsone/7180QueryTool/blob/master/Main.py
+
+Things that were tried:
+Research
+I tried Semlinar but no success. I tried using BERT-as-a-service but it never finished its execution and had to give up on that.
+
+Process the topic and the query instead of just the query:
+Here I had tried using the multi select predefined options and tested the code using those. As one paper can belong to multiple topics , if we pass one topic not all of the relevant papers were pulled out. Also, the predefined options were too vague. The results returned due to that were not impressive.I did not even commit that code.
+
+
+
+
+
