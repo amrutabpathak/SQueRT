@@ -1,0 +1,244 @@
+   Iteratively Pruned Deep Learning Ensembles for  COVID-19 Detection in Chest X-rays   Sivaramakrishnan Rajaraman1, Jen Siegelman2, Philip O. Alderson3, Lucas S. Folio4, Les R.  Folio5, and Sameer K. Antani1   1Lister Hill National Center for Biomedical Communications, National Library of Medicine, Bethesda, MD 20894 USA  2Takeda Pharmaceuticals, Cambridge, MA 02139 USA   3School of Medicine, Saint Louis University, St. Louis, MO 63103 USA  4Functional and Applied Biomechanics, Clinical Center, National Institutes of Health, and Walt Whitman High School, Bethesda, MD 20817 USA   5Radiological and Imaging Sciences, Clinical Center, National Institutes of Health, Bethesda, MD 20894 USA    Corresponding author: Sivaramakrishnan Rajaraman (e-mail: sivaramakrishnan.rajaraman@nih.gov). This work was supported by the Intramural Research Program of the National Library of Medicine (NLM), National Institutes of Health (NIH) and the Lister  Hill National Center for Biomedical Communications (LHNCBC).   ABSTRACT We demonstrate use of iteratively pruned deep learning (DL) model ensembles for detecting  the “coronavirus disease 2019” (COVID-19) infection with chest X-rays (CXRs).
+<EOS>
+The disease is caused by  the novel Severe Acute Respiratory Syndrome Coronavirus 2 (SARS-CoV-2) virus, also known as the novel  Coronavirus (2019-nCoV).A custom convolutional neural network (CNN) and a selection of pretrained CNN  models  are  trained  on  publicly  available  CXR  collections  to  learn  CXR  modality-specific  feature  representations  and  the  learned  knowledge  is  transferred  and  fine-tuned  to  improve  performance  and  generalization in the related task of classifying normal, bacterial pneumonia, and CXRs exhibiting COVID- 19 abnormalities.The best performing models are iteratively pruned to identify optimal number of neurons  in the convolutional layers to reduce complexity and improve memory efficiency.
+<EOS>
+The predictions of the best- performing  pruned  models  are  combined  through  different  ensemble  strategies  to  improve  classification  performance.The custom and pretrained CNNs are evaluated at the patient-level to alleviate issues due to  information leakage and reduce generalization errors.Empirical evaluations demonstrate that the weighted  average of the best-performing pruned models significantly improves performance resulting in an accuracy  of 99.01% and area under the curve (AUC) of 0.9972 in detecting COVID-19 findings on CXRs as compared  to the individual constituent models.
+<EOS>
+The combined use of modality-specific knowledge transfer, iterative  model pruning, and ensemble learning resulted in improved predictions.We expect that this model can be  quickly adopted for COVID-19 screening using chest radiographs.  INDEX TERMS COVID-19, Convolutional neural network, Deep learning, Ensemble, Iterative pruning.
+<EOS>
+  I. INTRODUCTION  Novel  Coronavirus  disease  2019  (COVID-19)  is  caused  by  the  new  Severe  Acute  Respiratory  Syndrome  Coronavirus  2  (SARS-CoV-2)  that  originated  in  Wuhan  in  the  Hubei  province  in  China  and  has  spread  worldwide. The  World  Health  Organization (WHO) declared the outbreak a pandemic on March 11, 2020 [1].The disease is rapidly affecting worldwide  population with statistics quickly falling out of date.
+<EOS>
+As of April 12, 2020, there are over 1.8 million confirmed cases reported  globally with over 100,000 reported deaths.Lung disease that causes difficulty in breathing has been reported as an early  indicator along with hyperthermia in the COVID-19 infected population [1].The lung abnormalities caused by non-2019- nCOV viruses are observed as peripheral or hilar and visually similar to, yet often distinct from, viral pneumonia and other  bacterial pathogens [2].
+<EOS>
+   Reverse transcription polymerase chain reaction (RT-PCR) tests are performed to detect the presence of the virus and are  considered the gold standard to diagnose COVID-19 infection.However, they are reported to have variable sensitivity and in  some geographic regions may not be widely available [3].While not currently recommended as primary diagnostic tools, chest  X-rays (CXRs) and computed tomography (CT) scans have been used to screen for COVID-19 infection and evaluate disease  progression in hospital admitted cases [3] [4].
+<EOS>
+ While chest CT offers greater sensitivity to pulmonary disease there are several      1      challenges to its use.These include the non-portability, the requirement to sanitize the room and equipment between patients  followed by a delay of at least an hour, the risk of exposing the hospital staff and other patients and persons under investigation  (PUIs) to the virus.Although not as sensitive, portable CXRs are considered as an acceptable alternative since the PUIs can  be imaged in more isolated rooms, limiting personnel exposure and because sanitation is much less complex to obtain than  with CT.
+<EOS>
+   Automated computer-aided diagnostic (CADx) tools driven by automated artificial intelligence (AI) methods designed to  detect and differentiate COVID-19 related thoracic abnormalities should be highly valuable given the heavy burden of infected  patients.This is especially important in locations with insufficient radiological expertise while producing fast, high throughput  triage such as in mass casualty [5].Automated approaches, once validated, have been shown to reduce inter- and intra-observer  variability in radiological assessments [6].
+<EOS>
+Additionally, CADx tools have gained immense significance in clinical medicine  by  supplementing  medical  decision  making  and  improving  screening  and  diagnostic  accuracy  [7]. These  tools  combine  elements of radiological image processing with computer vision for identifying typical disease manifestations and localize  suspicious regions of interest (ROI).At present, recent advances in machine learning, particularly data-driven deep learning  (DL) methods using convolutional neural networks (CNNs)  have shown promising performance in identifying, classifying,  and quantifying disease patterns in medical images, particularly CT scans and CXRs [7].
+<EOS>
+These models learn the hierarchical  feature representations from medical images to analyze for typical disease manifestations and localize suspicious densities for  ROI evaluation [7].   In this study, we highlight the benefits offered through the use of an ensemble of iteratively pruned DL models toward  distinguishing CXRs showing COVID-19 pneumonia-related opacities, from bacterial pneumonia, and normals using publicly  available CXR collections.Fig 1 shows instances of CXRs being normal, showing bacterial pneumonia, and COVID-19- related pneumonia.
+<EOS>
+A custom CNN and a selection of pretrained CNN models are trained on a large-scale selection of CXRs  to learn CXR modality-specific feature representations and the learned knowledge is transferred and fine-tuned to classify the  normal and abnormal CXRs.We leverage the benefits of modality-specific knowledge transfer, iterative pruning, and ensemble  strategies to reduce model complexity, improve robustness, generalization, and inference capability of the DL model.  A. PRIOR WORK  COVID-19  detection:  A  study  of  the  literature  reveals  several  AI  efforts  for  COVID-19  screening.
+<EOS>
+ The  authors  of  [3]  distinguished COVID-19 viral pneumonia manifestations from that of other viral pneumonia on chest CT scans with high  specificity.It was observed that COVID-19 pneumonia was found to be peripherally distributed with ground glass opacities  (GGO)  and  vascular  thickening. The  authors  of  [8]  established  a  publicly  available  collection  of  275  CT  scans  showing  COVID-19 pneumonia manifestations and trained a deep CNN to achieve 0.85 F-score in classifying CTs as normal or showing  COVID-19 pneumonia-related opacities.
+<EOS>
+The authors of [9] used a customized CNN and pretrained AlexNet model to classify  CXRs as normal or showing COVID-19 pneumonia with 94.1% and 98% accuracy respectively.The authors of [10] used a  ResNet-50 [11] CNN to classify normal, pneumonia, and COVID-19 viral pneumonia manifestations in CXRs and achieved  an accuracy of 98.18 % and F-score of 98.19.CXRs are also commonly analyzed to diagnose and differentiate other types of  pneumonia including bacterial and non-COVID-19 viral pneumonia [2].
+<EOS>
+The authors of [12] proposed a custom CNN model  that was designed by combining manual design prototyping with a machine-driven designing approach to classify CXRs as  normal, or showing non-COVID-19 or COVID-19 pneumonia-related opacities with 92.4% accuracy.        Fig 1. CXRs showing (a) clear lungs, (b) bacterial pneumonia infections manifesting as consolidations in the right upper lobe and retro-cardiac left lower  lobe, and (c) COVID-19 pneumonia infection manifesting as peripheral opacities in the left lung.
+<EOS>
+    Modality-specific  knowledge  transfer:  With  limited  amounts  of  COVID-19  pneumonia  CXR  data,  traditional  transfer  learning  strategies  offer  promise  [13]  where  the  learned  feature  representations  are  fine-tuned  to  improve  performance. However, unique challenges posed in the appearance of medical images [6] including high inter-class similarity and low intra- class variance lead to model bias and overfitting resulting in reduced performance and generalization.These issues can be  alleviated through modality-specific knowledge transfer by retraining CNN models on a large CXR image collection to learn  modality-specific  feature  representations.
+<EOS>
+ Modality-specific  model  knowledge  transfer  [14]  and  ensembles  [15]  have  2         demonstrated superior disease ROI localization compared to individual constituent models.   Model pruning: To alleviate burdens from computing resources, DL models can be pruned to reduce the inference cost and  facilitate deployment in low-resource conditions with no loss or even improvement in performance.Reed [16] performed a  neural model pruning to decrease computational complexity.
+<EOS>
+Hassibi & Stork [17] deleted network parameters by leveraging  the second derivative term in the Taylor series and improved model generalization.The authors of [18] found that the earlier  layers in the neural networks have low activations that can effectively be excluded from the network without affecting the  model  performance. They  proposed  an  iterative  optimization  method  to  gradually  eliminate  the  neurons  with  the  least  activations toward reducing the memory and power requirements and promoting faster model inference.
+<EOS>
+When applied to  medical imaging, the authors of [19] proposed a genetic algorithm-based pathway evolution strategy to prune DL models that  resulted  in  a  34%  reduction  in  the  network  parameters  and  improved  the  mass  classification  performance  in  breast  mammograms.A systematic weight pruning strategy [20] to prune a YOLO-model [21] based pneumonia detector toward  classifying CXRs as normal or showing pneumonia-like manifestations using the Radiological Society of North America  (RSNA) [22] CXR collection.However, there is room for further research in this area.
+<EOS>
+   Ensemble  classification:  CNNs  are  non-linear  models  that  learn  complex  relationships  from  the  data  through  error  backpropagation and stochastic optimization, making them highly sensitive to random weight initializations and the statistical  noise  present  in  the  training  data. These  issues  can  be  alleviated  by  ensemble  learning  by  training  multiple  models  and  combining their predictions where an individual model's weaknesses are offset by the predictions of other models.Combined  predictions are shown to be superior to individual models [23].
+<EOS>
+There are several ensemble strategies reported in the literature  including max voting, simple and weighted averaging, stacking, boosting, blending and others that are shown to minimize the  variance error and improve generalization and performance of CNN models.Applied to CXRs, the authors of [7], [14], and  [24] leveraged the use of an ensemble of CNN models toward improving TB detection in CXRs.An averaging ensemble of  pretrained CNNs was used by the authors of [25] toward improving cardiomegaly detection using CXRs.
+<EOS>
+  II.MATERIALS AND METHODS   A. DATA COLLECTION AND PREPROCESSING  We used the following four publicly available CXR collections in this retrospective analysis:   A)   Pediatric  CXR  dataset  [2]:  The  authors  collected  from  Guangzhou  Women  and  Children's  Medical  Center  in  Guangzhou, China, the anterior-posterior (AP) CXRs of children from 1 to 5 years of age, showing normal lungs, bacterial  pneumonia, and non-COVID-19 viral pneumonia.Expert radiologists curated the CXR collection to remove low-quality chest  radiographs.
+<EOS>
+   RSNA CXR dataset [22]: This multi-expert curated dataset includes images from the National Institutes of Health  (NIH) CXR-14 dataset [26].The dataset was released for the Kaggle pneumonia detection challenge, organized jointly by  RSNA  and  NIH. The  collection  includes  normal  CXRs  and  abnormal  images  with  non-pneumonia  and  pneumonia-like  opacities.
+<EOS>
+The images are made available at 1,024×1,024 pixel resolution in DICOM format.  B)   C)   Twitter COVID-19 CXR dataset: A cardiothoracic radiologist from Spain made available a collection of 134 CXRs  with 2K×2K pixel resolution in JFIF format via Twitter of SARS-CoV-2 positive subjects. (https://twitter.com/ChestImaging)   D)  Montreal COVID-19 CXR dataset [27]: A publicly available periodically updated GitHub repository that includes  COVID-19 CXR cases and other pulmonary viral disease manifestations in AP, posterior-anterior (PA), and AP-Supine views. As of April 7, 2020, the repository had 179 CXRs showing COVID-19 pneumonia-related opacities.
+<EOS>
+   We performed patient-level splits of these CXR collections to allocate 90% for training and 10% for testing at different stages  of learning discussed in this study.We randomly allocated 10% of the training data to validate the DL models.Table 1 shows  the distribution of CXRs across different categories.
+<EOS>
+The ground truth (GT) for the test set, comprising of 27 CXRs showing  COVID-19 pneumonia-related opacities is set by the verification of publicly identified cases from expert radiologists who  annotated the test set.  B. LUNG ROI SEGMENTATION  While  mild  COVID-19  cases  mimic  common  upper  respiratory  viral  infections,  advanced  disease  results  in  respiratory  dysfunction and is the principal cause for triggering mortality.In developing DL solutions for detecting the disease, it is  important to guard them against irrelevant features that could severely affect reliable decision-making.
+<EOS>
+For this study, we  performed U-Net based semantic segmentation [28] to segment the lung pixels from the background.We used a dropout U- Net with a Gaussian dropout layer being placed after every convolutional layer [29] in the U-Net encoder.A dropout ratio of  0.2 was empirically determined and used in this study.
+<EOS>
+Fig 2 shows the segmentation steps performed in this study.   We used a collection of CXRs with lung masks from [30] to train the U-Net model to generate lung masks of 256×256 pixel  resolution for the aforementioned datasets.We used model checkpoints to monitor its performance and stored only the best  3         model weights to generate the final lung masks which are then superimposed on the CXR images and crop them as a bounding  box  containing  the  lung  pixels.
+<EOS>
+ The  cropped  lungs  are  resized  to  256×256  pixel  resolution. The  lung  crops  are  further  preprocessed by performing pixel rescaling, median filtering for noise removal and edge preservation, normalization for mean  and standardization for identical feature distribution.The preprocessed lung crops are used for model training and evaluation  at different stages of learning discussed in this study.
+<EOS>
+      DATASET CHARACTERISTICS.NUMERATOR AND DENOMINATOR DENOTES THE NUMBER OF TRAIN AND TEST DATA RESPECTIVELY (N = NORMAL,   UP=PNEUMONIA OF UNKNOWN TYPE, BP= BACTERIAL (PROVEN) PNEUMONIA, CP = COVID-19 PNEUMONIA)   TABLE I         Fig 2. The segmentation approach showing U-Net based mask generation and Lung ROI cropping.
+<EOS>
+        C. MODELS AND COMPUTATIONAL RESOURCES  We evaluated the performance of a customized CNN and a selection of ImageNet pretrained CNN models, viz.,  a) VGG-16  [31],  b)  VGG-19  [31],  c)  Inception-V3  [32],  d)  Xception  [33],  e)  InceptionResNet-V2  [32];  f)  MobileNet-V2  [34],  g)  DenseNet-201 [35], and h) NasNet-mobile [36].   Our customized CNN is a linear stack of strided separable convolution layers, global average pooling (GAP), and a dense  layer with Softmax activation.Fig 3 shows the architecture of the custom CNN used in this study.
+<EOS>
+We used Dropout to alleviate  issues due to model overfitting by providing restricted regularization and improving generalization by reducing the model  sensitivity to the specifics of the training input [29].We used strided convolutions that were shown to improve performance  on several visual recognition benchmarks, compared to max-pooling layers [37].Separable convolutions were used to reduce  model parameters [33] and improve performance compared to conventional convolution operations.
+<EOS>
+The number of separable  convolutional filters are initialized to 32 and increased by a factor of two in the successive convolutional layers.We used 5×5  filters and a stride length of 2 in all convolutional layers.We added a GAP layer to average the spatial feature dimensions that  are fed into the final dense layer with Softmax activation.
+<EOS>
+               Fig 3. Architecture of the customized CNN model. (I/P = Input, CONV = Convolution, GAP = Global average pooling, DO = Dropout, D = Dense with  Softmax activation, N = Normal predictions, A = Abnormal Predictions).    We used the Talos optimization package [38] to optimize the parameters and hyperparameters of the customized CNN that  include a) dropout ratio, b) optimizer and c) non-linear activation function.
+<EOS>
+The model is trained and evaluated with the optimal  parameters to classify the CXRs to their respective categories.   We instantiated the pretrained CNN with their ImageNet weights and truncated them at the fully-connected layers.The  following layers are added to the truncated model: (a) zero-padding, (b) a strided separable convolutional layer with 5×5 filters  and 1024 feature maps, (c) GAP layer, (d) Dropout layer, and (e) final dense layer with Softmax activation.
+<EOS>
+Fig 4 shows the  customized architecture of the pretrained models used in this study.   Fig 4. Architecture of the pretrained CNNs. (I/P = Input, PCNN = truncated model, ZP = Zero-padding, CONV = Convolution, GAP = Global Average  Pooling, DO = Dropout, D=Dense with Softmax activation, O/P = Output).
+<EOS>
+    We optimized the following hyperparameters of the pretrained CNNs using a randomized grid search method [39]: (a)  4      momentum, (b) L2-regularization and (c) initial learning rate of the Stochastic Gradient Descent (SGD) optimizer. The search  ranges were initialized to [0.85 0.99], [1e−10 1e−3], and [1e−9 1e−2] and for the momentum, L2-regularization, and the initial  learning rate respectively.The pretrained CNNs were retrained with smaller weight updates to improve generalization and  categorize the CXRs to their respective classes.
+<EOS>
+Class weights were used during model training to penalize the overrepresented  classes to prevent overfitting and improve performance [40].We used model checkpoints to store the best model weights for  further analysis.  D. MODALITY-SPECIFIC TRANSFER LEARNING AND FINE-TUNING  We performed modality-specific transfer learning where the customized CNN and ImageNet pretrained models are retrained  on the RSNA CXR collection to learn CXR  modality-specific features and classify the CXRs into normal and abnormal  categories.
+<EOS>
+The RSNA CXR collection includes normal CXRs and abnormal images containing pneumonia-related opacities. In this way, the weight layers are made specific to the CXR modality through learning the features of normal and abnormal  lungs and the learned knowledge is transferred and fine-tuned to a related task of classifying CXRs that are pooled from  pediatric,  Twitter  COVID-19,  and  Montreal  COVID-19  CXR  collections,  respectively,  as  normal,  or  showing  bacterial  pneumonia, or COVID-19 pneumonia-related opacities, to improve classification performance.    The top-3 performing modality-specific CNNs are instantiated and truncated at their deepest convolutional layer and added  with the following layers: (a) zero-padding, (b) a strided separable convolutional layer with 5×5 filters and 1024 feature maps,  (c) GAP layer, (d) Dropout layer and (e) final dense layer with Softmax activation.
+<EOS>
+The modified models are fine-tuned to  classify CXRs as being normal or showing bacterial pneumonia or COVID-19 viral pneumonia.Class weights were used  during model training to award higher weights to the under-represented class to alleviate issues due to class imbalance and  improve generalization and performance.Fine-tuning is performed through SGD optimization and model checkpoints were  used to store the best weights for further analysis.
+<EOS>
+  E. ITERATIVE MODEL PRUNING  We iteratively pruned the fine-tuned models to find the optimal number of neurons in the convolutional layers to reduce model  complexity with no loss in performance.We gradually eliminated the neurons with fewer activations at each time step through  iterative pruning and model retraining.We used the average percentage of zeros (APoZ) [18], the percentage of zero neuron  activations observed with the validation dataset, as the measure to rank the neurons in each convolutional layer.
+<EOS>
+We iteratively  pruned a percentage of neurons with the highest APoZ from each layer at each time step and retrained the pruned model.The  process is repeated until the maximum percentage of pruning is achieved.The best-pruned model is then selected from the  collection of iteratively pruned models based on their performance with the test set.
+<EOS>
+The retrained pruned model is expected to  achieve  similar  or  better  performance  than  the  unpruned  models  with  reduced  model  complexity  and  computational  requirements.Fig 5 shows the algorithm for iterative pruning performed in this study.     Fig 5.
+<EOS>
+ Iterative pruning algorithm.      F. LEARNING ITERATIVELY PRUNED ENSEMBLES  The  best  performing  pruned  models  are  selected  to  construct  the  ensemble  to  improve  prediction  performance  and  generalization as compared to any individual constituent model.We used several ensemble strategies including max voting,  averaging, weighted averaging, and stacking to combine the predictions of the pruned models toward classifying CXRs as  normal or showing bacterial, or COVID-19 viral pneumonia-related opacities.
+<EOS>
+For the stacking ensemble, we used a neural  network-based meta-learner that learns to optimally combine the predictions of the individual pruned models.The meta-learner  consisting of a single hidden layer with nine neurons is trained to interpret the multi-class input from the top-3 pruned models  and a final dense layer outputs the predictions to categorize the CXRs to their respective classes.     5      G. VISUALIZATION STUDIES  Visualizing the learned behavior of the DL models is a debated topic, particularly in medical visual recognition tasks.
+<EOS>
+There  are several visualization strategies reported in the literature that include (a) visualizing the overall network structure and (b)  gradient-based visualization that performs gradient manipulation during network training.Gradient-weighted class activation  mapping (Grad-CAM) is a gradient-based visualization method that computes the scores for a given image category concerning  the feature maps of the deepest convolutional layer in a trained model [41].The gradients that are flowing backward are pooled  globally to measure the importance of the weights in the decision-making process.
+<EOS>
+In this study, we verified the learned  behavior of the pruned models by comparing salient ROI with consensus GT annotations from experienced radiologists.  H. STATISTICAL ANALYSES  We analyzed the model’s performance for statistical significance at different stages of learning.We used confidence intervals  (CI) as the measure to analyze the skill of the CNN models.
+<EOS>
+A shorter CI infers a smaller margin of error or a relatively precise  estimate while a larger CI allows more margin for error and therefore results in reduced precision [42].We computed the 95%  CI values for the AUC at different learning stages to explain the models’ predictive performance.The CI values are computed  to be the Clopper–Pearson exact interval that corresponds to the separate 2-sided interval with individual coverage probabilities  of (0.95)1/2.
+<EOS>
+We used StatsModels version 0.11.0 to compute CI measures.   III.RESULTS  The optimal values for the parameters and hyperparameters obtained for the customized and pretrained CNNs with the Talos  optimization tool and randomized grid search, respectively, are shown in Table 2.
+<EOS>
+    OPTIMAL VALUES FOR THE PARAMETERS AND HYPERPARAMETERS FOR THE CUSTOM AND PRETRAINED MODELS OBTAINED THROUGH OPTIMIZATION TOOLS   (M = MOMENTUM, ILR = INITIAL LEARNING RATE, L2 = L2-WEIGHT DECAY, AND D = DROPOUT RATIO)   TABLE II   Table 3 shows the performance achieved through modality-specific knowledge transfer, by the customized and pretrained  CNNs using the RSNA CXR dataset.It can be observed that the VGG-16, VGG-19, and Inception-V3 models were more  accurate than the other models under study.The aforementioned models demonstrated promising AUC values with a shorter  CI and hence a smaller margin of error, thereby offering precise estimates compared to the other models.
+<EOS>
+This is because the  architecture depth of the VGG and Inception-V3 models are optimal to learn the hierarchical representations of features from  the CXR data to classify them into normal and pneumonia classes.Considering the F-score and MCC that give a balanced  measure of precision and recall, the aforementioned models delivered superior performance than the other models.                  PERFORMANCE METRICS ACHIEVED DURING MODALITY-SPECIFIC TRANSFER LEARNING USING THE RSNA CXR DATASET (ACC. = ACCURACY; SENS. =   SENSITIVITY, PREC. = PRECISION, F = F-SCORE, AND PARAM. = TRAINABLE PARAMETERS).
+<EOS>
+THE VALUES IN SQUARE BRACKETS SHOW THE 95% CI THAT ARE   COMPUTED TO BE THE CLOPPER–PEARSON EXACT INTERVAL CORRESPONDING TO THE SEPARATE 2-SIDED INTERVAL WITH INDIVIDUAL COVERAGE   TABLE III   PROBABILITIES OF (0.95)1/2.  The top-3 performing modality-specific knowledge transfer models (VGG-16, VGG-19, and Inception-V3) are instantiated  with their modality-specific weights and truncated at their fully connected layers and appended with the task-specific heads. Table 4 shows the performance achieved by the task-specific models toward the following classification tasks: (a) binary  classification to classify CXRs as normal or COVID-19 pneumonia and (b) multi-class classification to classify CXRs as  normal or as showing bacterial pneumonia or COVID-19 pneumonia.
+<EOS>
+      6      PERFORMANCE METRICS ACHIEVED BY THE TOP-3 MODALITY-SPECIFIC KNOWLEDGE TRANSFER MODELS ON THE TARGET TASKS   TABLE IV      *Bold values stand for the model with a statistically significant better performance than the other models.     It can be observed that for the binary classification task, all the models are 100% accurate, however, VGG-16 has the least  number of  trainable parameters.For  multi-class  classification,  it  can be  observed  that  the  Inception-V3  model  was  more  accurate with a shorter CI for the AUC metric, signifying that it has the least margin for error and hence provides a more  precise estimate.
+<EOS>
+Considering F-score and MCC, the Inception-V3 model delivered superior performance compared to VGG- 16 and VGG-19 models.   For the multi-class classification task, the predictions of the task-specific models (VGG-16, VGG-19, and Inception-V3)  are combined through several ensemble methods including max voting, simple averaging, weighted averaging and model  stacking.We didn’t perform ensemble learning for the binary classification task since the individual models are 100% accurate  in classifying CXRs as normal or showing COVID-19 pneumonia-related opacities.
+<EOS>
+Table 5 shows the performance achieved  with different ensemble strategies.It can be observed that a simple average of the models’ predictions is more accurate with a  shorter CI for the AUC metric, signifying a smaller margin of error and therefore, higher precision, compared to other ensemble  methods.Considering the F-score and MCC, the averaging ensemble outperformed other ensemble strategies in classifying  CXRs as normal, or as showing bacterial pneumonia or COVID-19 viral pneumonia.
+<EOS>
+  PERFORMANCE METRICS ACHIEVED BY THE UNPRUNED MODELS THROUGH DIFFERENT ENSEMBLE STRATEGIES FOR THE MULTICLASS CLASSIFICATION TASK   TABLE V            *Bold values stand for the method with a statistically significant better performance than the other ensemble methods.    For the multi-class classification task, we iteratively pruned the task-specific models (VGG-16, VGG-19, and Inception- V3) by removing 2% of the neurons with the highest APoZ in each convolutional layer at a given time step and retrained the  pruned model to evaluate its performance on the validation set.We used model checkpoints to store the best-pruned model  that gave a superior performance with the validation set.
+<EOS>
+The process is repeated until the maximum pruning percentage of  50% is reached.We then evaluated the performance of all the pruned models on the test set.The pruned model that achieved  superior performance with the test set is used for further analysis.
+<EOS>
+   Table 6 shows a comparison of the performance achieved by the pruned models to that of the baseline, unpruned task- specific  models  shown  in  Table  4. It  can  be  observed  that  the  pruned  models  are  more  accurate  than  their  unpruned  counterparts.Considering the F-score and MCC metrics, the pruned models are found to deliver superior performance than the  unpruned models.
+<EOS>
+It is interesting to note that the performance improvement is achieved with a significant reduction in the  number of parameters. As can be seen, the number of parameters in the pruned VGG-16 model reduced by 46.03% compared  to its unpruned counterpart.Similarly, the number of trainable parameters reduced by 16.13% and 36.1% for the pruned VGG- 19 and Inception-V3 models, respectively with the added benefit of performance improvement in terms of accuracy, F-score,  and MCC metrics, compared to their unpruned counterparts.
+<EOS>
+  Fig 6 shows the results of performing Grad-CAM visualizations to localize the salient ROIs used by the different pruned  models to classify a sample test CXR into the COVID-19 viral pneumonia category.The visualizations are compared with  consensus GT annotations provided by the expert radiologists.The predictions of the pruned models are decoded for the test  sample.
+<EOS>
+Two-dimensional heat maps are generated in which bright red corresponds to the pixels carrying higher importance  and hence weights for categorizing the test sample to the COVID-19 pneumonia infected category.Distinct color transitions  are  observed  for  varying  ranges  of  pixel  importance  toward  making  the  predictions. Salient  ROIs  are  localized  by      7      superimposing the heat maps on the input sample CXR.
+<EOS>
+It is observed that the VGG-16 pruned model precisely localizes the  salient ROI, followed by the VGG-19 and Inception-V3 pruned models.However, the Inception-V3 pruned model is found to  have false negatives, thus missing to localize some salient ROI, compared to the VGG models.The VGG-16 pruned model,  because of its architecture depth suitability to the current task, has learned the implicit rules that generalize well and conform  to the experts’ knowledge about the problem.
+<EOS>
+In this regard, VGG-16 is more accurate with salient ROI localization compared  to the other pruned models.  PERFORMANCE METRICS ACHIEVED BY THE BEST ITERATIVELY PRUNED MODELS AND COMPARED WITH THE BASELINE UNPRUNED MODELS FROM TABLE IV   TABLE VI   (U-UNPRUNED AND P-PRUNED)               Fig 6. Grad-CAM Visualizations showing salient ROI detection by different pruned models. (a) CXR showing COVID-19 viral pneumonia-related opacities  with GT annotations, (b) VGG-16 pruned model, (c) VGG-19 pruned model, and (d) Inception-V3 pruned model.
+<EOS>
+Bright red corresponds to the pixels carrying  higher importance and hence weights for categorizing the test sample to the COVID-19 viral pneumonia category.     Table 7 shows a comparison of the performance metrics achieved with the different ensemble strategies for the unpruned  and pruned models toward classifying the CXRs as normal, or showing bacterial pneumonia, or COVID-19 viral pneumonia.      COMPARING THE PERFORMANCE METRICS ACHIEVED WITH THE PRUNED AND UNPRUNED MODEL ENSEMBLES FROM TABLE IV   TABLE VII   *Bold values stand for the model with a statistically significant better performance than the other models.
+<EOS>
+        8      While  performing  weighted  averaging  ensemble  for  both  unpruned  and  pruned  models,  the  predictions  are  awarded  the  importance based on their accuracy.From Table 6, it can be observed that the pruned and unpruned Inception-V3 model  delivered superior performance, followed by the other models.In this regard, we assigned weights of 0.5, 0.3, and 0.2 to the  predictions of Inception-V3, VGG-19, and VGG-16 models, respectively.
+<EOS>
+It can be observed that the weighted averaging  ensemble of the predictions of the pruned models delivered superior performance in all aspects.The 95% CI for the AUC  metric  has  the  shortest  error  margin  with  a  more  precise  estimate  than  that  obtained  with  the  other  ensemble  methods. Considering the F-score and MCC, the weighted averaging ensemble outperformed the other ensemble strategies in classifying  CXRs as normal, bacterial pneumonia, or COVID-19 viral pneumonia.
+<EOS>
+  IV.DISCUSSION  The COVID-19 pandemic has had an enormously negative impact on population health and national economies worldwide. Early diagnosis has often been suboptimal and serological tests have not been widely available.
+<EOS>
+The opportunity to utilize  CXRs as part of the diagnostic approach could add an important and nearly universally available tool to the battle against  COVID-19 or other respiratory viruses that might emerge in the future.In the current study, we demonstrate that this can be  done by applying ensemble DL to findings seen in CXRs.  Modality-specific transfer learning performed with a large-scale CXR collection with a diversified data distribution helped  in learning CXR modality-specific features.
+<EOS>
+The learned feature representations served as a good initialization and improved  model adaptation and generalization compared to ImageNet pretrained weights, when transferred and fine-tuned for a related  CXR classification task.   Iterative pruning of the task-specific models and selection of the best performing pruned model not only improved prediction  performance on the test data but also significantly reduced the number of trainable parameters.This is because there are  redundant network parameters in a deep model that do not contribute to improving the prediction performance.
+<EOS>
+If these neurons  with  lesser  activations  can  be  identified  and  removed,  it  results  in  a  faster  and  smaller  model  with  similar  or  improved  performance than the unpruned models.This would facilitate deploying these models on browsers and mobile devices.   We further  improved  the performance  by  constructing  ensembles  of  the  pruned  models.
+<EOS>
+ By  empirically  evaluating the  performance of the pruned models and awarding weights based on their predictions, we observed that the weighted averaging  ensemble of the pruned models outperformed the other ensemble methods.   We performed visualization studies to validate the pruned models’ localization performance and found that the pruned   models precisely localized the salient ROI used in categorizing the input CXRs to their expected categories.   The combined use of CXR modality-specific knowledge transfer, iterative model pruning, and ensemble learning reduced  prediction variance, model complexity, promoted faster inference, performance, and generalization.
+<EOS>
+With recent innovations  in high-performance computing (HPC) and cloud technology, it would be feasible to deploy the pruned model ensembles into  mobile devices and browsers for real-time applications.Future studies could explore visualizing and interpreting the learned  behavior of the pruned model ensembles and their application to other screening situations like COVID-19 detection and  localization in 3D CT scans, etc.At present, we expect that the pruned model ensembles can be quickly adapted for detection  of COVID-19 pneumonia using digitized chest radiographs.
+<EOS>
+  REFERENCES   coronavirus-2019/situation-reports.  2018.  0.1148/radiol.2020200823.
+<EOS>
+  [1]. World Health Coronavirus disease (covid-2019) situation reports, 2020, [Online] Available: https://www.who.int/emergencies/diseases/novel-  [2]. S. Kermany et al, “Identifying Medical Diagnoses and Treatable Diseases by Image-Based Deep Learning”, Cell, vol.
+<EOS>
+172, no.5, pp 1122-1131,   [3]. X.  Bai  et  al,  Performance  of  radiologists  in  differentiating  COVID-19  from  viral  pneumonia  on  chest  CT,  Radiology,  pp  200823,  doi:   [4].
+<EOS>
+ G. D. Rubin et al, “The Role of Chest Imaging in Patient Management during the COVID-19 Pandemic: A Multinational Consensus Statement   from the Fleischner Society”, Radiology, pp 201365, doi: 0.1148/radiol.2020201365.  [5]. L. R. Folio, Combat Radiology: Diagnostic Imaging of Blast and Ballistic Injuries, New York, Springer, 2010.
+<EOS>
+ [6]. K. Suzuki, “Overview of deep learning in medical imaging”, Radiol Phys Technol., vol.10, no.
+<EOS>
+3, pp 257-273, 2017. [7]. P. Lakhani and B. Sundaram, “Deep Learning at Chest Radiography: Automated Classification of Pulmonary Tuberculosis by Using Convolutional   Neural Networks”, Radiology, vol.
+<EOS>
+284, no.2, pp 574-582, 2017.  [8].
+<EOS>
+ J.  Zhao,  Y.  Zhang,  X.  He  and  P.  –X. Zhao,  COVID-CT-Dataset:  A  CT  Scan  Dataset  about  COVID-19,  2020,  [Online]  Available:   https://arxiv.org/abs/2003.13865.   [9].
+<EOS>
+ H. S. Magjhdid et al, Diagnosing COVID-19 Pneumonia from X-Ray and CT Images using Deep Learning and Transfer Learning Algorithms,   2020, [Online] Available: https://arxiv.org/abs/2004.00038.  [10].S. U. K. Bukhari et al, The diagnostic evaluation of Convolutional Neural Network (CNN) for the assessment of chest X-ray of patients infected   with COVID-19, medRxiv 2020.03.26.20044610; doi: https://doi.org/10.1101/2020.03.26.20044610   [11].
+<EOS>
+He, X. Zhang, S. Ren, J. Sun, "Deep residual learning for image recognition", Proc.IEEE Conf.Comput.
+<EOS>
+Vis.Pattern Recognit., pp 770-778, Jun.  2016.
+<EOS>
+  [12].L. Wang and A. Wong, COVID-Net: A Tailored Deep Convolutional Neural Network Design for Detection of COVID-19 Cases from Chest   Radiography Images, 2020, [Online] Available: https://arxiv.org/abs/2003.09871.     9      [13].
+<EOS>
+A Krizhevsky, I. Sutskever, G. E. Hinton, "Imagenet classification with deep convolutional neural networks", Proc.Int.Conf.
+<EOS>
+Neural Inf.Process.  [14].
+<EOS>
+S. Rajaraman and S. K. Antani, "Modality-Specific Deep Learning Model Ensembles Toward Improving TB Detection in Chest Radiographs," in   Syst., pp 1-9, 2012.  IEEE Access, vol.8, pp 27318-27326, 2020.
+<EOS>
+  [15].Yadav, K. Passi and C. K. Jain, "Using Deep Learning to Classify X-ray Images of Potential Tuberculosis Patients," 2018 IEEE International   Conference on Bioinformatics and Biomedicine (BIBM), Madrid, Spain, 2018, pp 2368-2375.  [16].
+<EOS>
+R. Reed, "Pruning algorithms-a survey," in IEEE Transactions on Neural Networks, vol.4, no.5, pp 740-747, Sept.
+<EOS>
+1993. [17].B.  Hassibi,  D.  G.  Stork  and  G.  J.  Wolff,  "Optimal  Brain  Surgeon  and  general  network  pruning," IEEE  International  Conference  on  Neural   [18].
+<EOS>
+H. Hu, R. Peng, Y. –W.Tai and C. –K.Tang, Network Trimming: A Data-Driven Neuron Pruning Approach towards Efficient Deep Architectures,   [19].
+<EOS>
+R. K. Samala et al, “Evolutionary pruning of transfer learned deep convolutional neural network for breast cancer diagnosis in digital breast   Networks, San Francisco, CA, USA, 1993, pp 293-299 vol.1.   2016, [Online] Available: https://arxiv.org/abs/1607.03250.  tomosynthesis”, Phys.Med.
+<EOS>
+Biol., vol.63, pp 095005, 2016.  https://arxiv.org/abs/1911.02007.
+<EOS>
+   [20].H. Li, S. Lin, N. Liu, C. Ding and Y. W. Li, Deep Compressed Pneumonia Detection for Low-Power Embedded Devices, 2019, [Online] Available:   [21].J. Redmon, S. Divvala, R. Girshick and A. Farhadi, "You Only Look Once: Unified, Real-Time Object Detection," 2016 IEEE Conference on   Computer Vision and Pattern Recognition (CVPR), Las Vegas, NV, 2016, pp 779-788.
+<EOS>
+  [22].G, Shih et al, “Augmenting the National Institutes of Health Chest Radiograph Dataset with Expert Annotations of Possible Pneumonia”, Radiol   [23].T. G. Dietterich, “Ensemble Methods in Machine Learning.
+<EOS>
+In: Multiple Classifier Systems”, Lecture Notes in Computer Science: Springer, Berlin,   [24].S. Rajaraman et al, “Visualization and Interpretation of Convolutional Neural Network Predictions in Detecting Pneumonia in Pediatric Chest   [25].M. T. Islam et al, Abnormality Detection and Localization in Chest X-Rays using Deep Convolutional Neural Networks, 2017, [Online] Available:   Artif Intell., vol.
+<EOS>
+1, no.1, pp 1-5, 2019.  Heidelberg, vol.
+<EOS>
+1857, pp 1-15, 2000.  Radiographs”, Appl Sci., vol.8, no.
+<EOS>
+10, 1715, 2018.  https://arxiv.org/abs/1705.09850.   [26].
+<EOS>
+X. Wang et al, “ChestX-ray8: Hospital-scale Chest X-ray Database and Benchmarks on Weakly-Supervised Classification and Localization of   Common Thorax Diseases”, Proc.IEEE Conf.Comput.
+<EOS>
+Vis.Pattern Recognit., pp 3462-3471, July 2017.  [27].
+<EOS>
+J. P. Cohen, P. Morrison and L. Dao, COVID-19 image data collection, 2020, [Online] Available: https://arxiv.org/abs/2003.11597. [28].O. Ronneberger, P. Fischer and T. Brox, “U-Net: convolutional networks for biomedical image segmentation”, Medical Image Computing and   Computer Assisted Intervention, vol.
+<EOS>
+3, pp 234-241.  [29].N. Srivastava, G. Hinton, A. Krizhevsky, I. Sutskever and R. Salakhutdinov, “Dropout: a simple way to prevent neural networks from overfitting”,   Journal of Machine Learning Research, vol.
+<EOS>
+15, pp 1929-1958, 2014.  [30].S. Candemir, S. K. Antani, S. R. Jaeger and G. R. Thoma, “Lung boundary detection in pediatric chest X-rays”, Proc.
+<EOS>
+SPIE.9418, Medical imaging:   PACS and imaging informatics: next generation and innovations, 94180Q, March 17, 2015.  [31].
+<EOS>
+K.  Simonyan  and  A.  Zisserman,  Very  deep  convolutional  networks  for  large-scale  image  recognition,  2014,  [Online]  Available:   https://arxiv.org/abs/arXiv:1409.1556.  [32].C. Szegedy et al, "Going deeper with convolutions", Proc.
+<EOS>
+IEEE Conf.Comput.Vis.
+<EOS>
+Pattern Recognit., pp 1-9, Jun.2015. [33].
+<EOS>
+F. Chollet, Xception: Deep Learning with Depthwise Separable Convolutions, 2018, [Online] Available: https://arxiv.org/abs/1610.02357. [34].M. Sandler, A. Howard,  M. Zhu,  A. Zhmoginov and  L. Chen, "MobileNetV2:  Inverted  Residuals and Linear Bottlenecks," 2018  IEEE/CVF   Conference on Computer Vision and Pattern Recognition, Salt Lake City, UT, 2018, pp 4510-4520.
+<EOS>
+   [35].Huang, Z. Liu, L. van der Maaten, K. Q. Weinberger, "Densely connected convolutional networks", Proc.IEEE Conf.
+<EOS>
+Comput.Vis.Pattern   [36].
+<EOS>
+M. Y. Pham, G. B. Zoph, Q. V. Le and J. Dean, “Efficient neural architecture search via parameter sharing”, Proc.International Conference on   [37].J. T. Springenberg, A. Dosovitskiy, T. Brox and M. Riedmiller, Striving for Simplicity: The All Convolutional Net, 2014, [Online] Available:   Recognit., vol.
+<EOS>
+1, no.2, pp 4700-4708, Jul.2017.
+<EOS>
+  Machine Learning, pp 4092-4101, 2018.  https://arxiv.org/abs/1412.6806.  [38].
+<EOS>
+Autonomio   https://autonomio.github.io/docs_talos/#introduction.   Talos   [Computer   software],  Mar.  20,   2019.
+<EOS>
+ Accessed   on:  Apr.  3,   2019.  [Online].
+<EOS>
+ Available:   [39].Bergstra J, Bengio Y. 2012.Random search for hyper-parameter optimization.
+<EOS>
+Journal of Machine Learning Research 13:281-305  [40].J. M. Johnson and T. M. Khoshgoftaar, “Survey on deep learning with class imbalance”, Journal of Big Data, vol.6, pp 27.
+<EOS>
+ [41].R. R. Selvaraju et al, “Grad-CAM: Visual Explanations from Deep Networks via Gradient-Based Localization”, Int.J. Comput.
+<EOS>
+Vis., vol.128, no.  [42].
+<EOS>
+V. Gulshan et al, “Development and validation of a deep learning algorithm for detection of diabetic retinopathy in retinal fundus photographs”,   2, pp 336-359, 2020. JAMA, vol.316, no.
+<EOS>
+22, pp 2402-2410, 2016.      10   
+<EOS>
