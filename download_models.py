@@ -6,7 +6,7 @@ def getModels():
     url_Albert_bin = 'https://s3.amazonaws.com/models.huggingface.co/bert/ktrapeznikov/albert-xlarge-v2-squad-v2/pytorch_model.bin'
     albert_model_path = os.path.join(os.getcwd(), "albert_models/")
     albert_model_model_path = os.path.join(albert_model_path, "pytorch_model.bin")
-    if albert_model_model_path:
+    if os.path.exists(albert_model_model_path):
         print("File is already downloaded skipping")
     else:
         print("Albert model is downloading to " + albert_model_path)

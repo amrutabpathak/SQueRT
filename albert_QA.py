@@ -1,6 +1,7 @@
 import os
 import torch
 import time
+import download_models
 from fuzzywuzzy import fuzz
 # Needs Fuzzy Wuzzy
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
@@ -26,9 +27,10 @@ from transformers.data.processors.squad import SquadResult, SquadV2Processor, Sq
 from transformers.data.metrics.squad_metrics import compute_predictions_logits
 
 # READER NOTE: Set this flag to use own model, or use pretrained model in the Hugging Face repository
-
+download_models.getModels()
 albert_model_path = os.path.join(os.getcwd(), "albert_models/")
 # Edit this to your local path ***OR nothing will work***
+print(albert_model_path)
 
 output_dir = ""
 
