@@ -36,24 +36,30 @@ def returnRelevant(researchPaper, query, numSnippets = 15):
     model = DistilBertModel.from_pretrained('distilbert-base-cased')
     relevantSnippets = []
 
+    #from sentence_transformers import SentenceTransformer
+    #model = SentenceTransformer('bert-base-nli-mean-tokens')
+
     #researchPpr_NLP = spacy.load(model)
     with open(researchPaper, encoding='utf8') as researchPaperCSV:
         researchPaperReader = csv.reader(researchPaperCSV)
         score_max_heap = []
         input_ids = torch.tensor(tokenizer.encode(query, add_special_tokens=True, pad_to_max_length=True)).unsqueeze(0)
-        queryObj = model(input_ids)[0].squeeze()
-        #queryObj = model(query)
+        queryObj = model(input_ids)[0]
+        #queryObj = model.encode(query)
+        #queryObj = torch.tensor(queryObj)
         for snippet in researchPaperReader:
             if('<EOS>' not in snippet):
                 snippetStr = " "
                 snippetStr = ' '.join([str(elem) for elem in snippet])
                 input_ids = torch.tensor(tokenizer.encode(snippetStr, add_special_tokens=True, pad_to_max_length=True)).unsqueeze(0)
-                snippetObj = model(input_ids)[0].squeeze()
-                #snippetObj = model(snippetStr)
-                #qs = QuerySnippet(query, snippet, queryObj.similarity(snippetObj))
-                qs = QuerySnippet(query, snippet, torch.cosine_similarity(queryObj, snippetObj))
+                snippetObj = model(input_ids)[0]
+                #snippetObj = model.encode(snippetStr)
+                #snippetObj = torch.tensor(snippetObj)
+                qs = QuerySnippet(query, snippet, queryObj.similarity(snippetObj))
+                #qs = QuerySnippet(query, snippet, torch.cosine_similarity(queryObj, snippetObj))
                 if len(score_max_heap) < numSnippets or qs.similarity > score_max_heap[0].similarity:
                     if len(score_max_heap) == numSnippets: heapq.heappop(score_max_heap)
+                    print(qs.similarity)
                     heapq.heappush(score_max_heap, qs)
         for qs in score_max_heap:
             relevantSnippets.append(qs.snippet)
