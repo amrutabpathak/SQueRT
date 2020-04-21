@@ -57,7 +57,7 @@ def returnRelevant(researchPaper, query, numSnippets = 15):
         input_ids = torch.tensor([tokenizer.encode(query, add_special_tokens=True)])
         output_tuple = model(input_ids)
         last_hidden_states = output_tuple[0]
-        queryObj = last_hidden_states[0][0]
+        queryObj = last_hidden_states.mean(1)
         #queryObj = model.encode(query)
         #queryObj = torch.tensor(queryObj)
         for snippet in researchPaperReader:
@@ -70,14 +70,14 @@ def returnRelevant(researchPaper, query, numSnippets = 15):
                 input_ids = torch.tensor([tokenizer.encode(snippetStr, add_special_tokens=True)])
                 output_tuple = model(input_ids)
                 last_hidden_states = output_tuple[0]
-                snippetObj = last_hidden_states[0][0]
+                snippetObj = last_hidden_states.mean(1)
+                #print(similarity(queryObj, snippetObj))
                 #snippetObj = model.encode(snippetStr)
                 #snippetObj = torch.tensor(snippetObj)
                 #qs = QuerySnippet(query, snippet, queryObj.similarity(snippetObj))
-                qs = QuerySnippet(query, snippet, torch.cosine_similarity(queryObj, snippetObj))
+                qs = QuerySnippet(query, snippet, similarity(queryObj, snippetObj))
                 if len(score_max_heap) < numSnippets or qs.similarity > score_max_heap[0].similarity:
                     if len(score_max_heap) == numSnippets: heapq.heappop(score_max_heap)
-                    print(qs.similarity)
                     heapq.heappush(score_max_heap, qs)
         for qs in score_max_heap:
             relevantSnippets.append(qs.snippet)

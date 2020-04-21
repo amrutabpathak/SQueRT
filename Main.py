@@ -38,7 +38,8 @@ def main(query, keyword):
         os.remove(txtPaperName)
     for csvPaperName in glob.glob(csvdir + "*.csv"):
         relevantSnippets = RelevantSnippets.returnRelevant(csvPaperName, query)
-        print(relevantSnippets + "\n\n")
+        print(relevantSnippets)
+        print("\n\n")
         # From snippets for each paper, return answer
         predictions, snippet = albert_QA.question_answering_albert(query, relevantSnippets)
         paper_identifier = getUrl(csvPaperName)
