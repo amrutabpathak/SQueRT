@@ -55,8 +55,8 @@ def returnRelevant(researchPaper, query, numSnippets = 15):
                 snippetObj = model(input_ids)[0]
                 #snippetObj = model.encode(snippetStr)
                 #snippetObj = torch.tensor(snippetObj)
-                qs = QuerySnippet(query, snippet, queryObj.similarity(snippetObj))
-                #qs = QuerySnippet(query, snippet, torch.cosine_similarity(queryObj, snippetObj))
+                #qs = QuerySnippet(query, snippet, queryObj.similarity(snippetObj))
+                qs = QuerySnippet(query, snippet, torch.cosine_similarity(queryObj, snippetObj))
                 if len(score_max_heap) < numSnippets or qs.similarity > score_max_heap[0].similarity:
                     if len(score_max_heap) == numSnippets: heapq.heappop(score_max_heap)
                     print(qs.similarity)
