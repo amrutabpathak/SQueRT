@@ -23,19 +23,28 @@ def main(query, keyword):
     snippetSize = 3
     outputJson = '{ "keyword": ' + '"' + keyword + '" ,' + '"query": ' + '"' + query + '" ,' + '"results": ['
 
+    # Ensure directories are clear
+    for root, dirs, files in os.walk(pdfdir):
+        for file in files:
+            os.remove(os.path.join(root, file))
+    for root, dirs, files in os.walk(txtdir):
+        for file in files:
+            os.remove(os.path.join(root, file))
+    for root, dirs, files in os.walk(csvdir):
+        for file in files:
+            os.remove(os.path.join(root, file))
+
     # Create Table
     db_operations.createTable()
 
     # Scrape papers to pdf folder
     arxiv_pdf_scraper.scrape(keyword, 1)
     # Convert pdfs to text, then to csv snippets
-    for roots, dirs, files in os.walk(pdfdir):
+    for root, dirs, files in os.walk(pdfdir):
         for pdfPaperName in files:
             ProcessText.pdfToText(os.path.join(pdfdir, pdfPaperName), txtdir)
-            os.remove(os.path.join(pdfdir, pdfPaperName))
     for txtPaperName in glob.glob(txtdir + "*.txt"):
         ProcessText.snippetToCsv(txtPaperName, snippetSize, csvdir)
-        os.remove(txtPaperName)
     for csvPaperName in glob.glob(csvdir + "*.csv"):
         relevantSnippets = RelevantSnippets.returnRelevant(csvPaperName, query)
         print(relevantSnippets)
@@ -57,7 +66,6 @@ def main(query, keyword):
                       '"paper_identifier": ' + '"' + paper_identifier + '" },'
         print(predictions)
         print(snippet)
-        os.remove(csvPaperName)
     outputJson += '] }'
     # removing the last comma
     lastCommaIndex = outputJson.rfind(",")
@@ -82,12 +90,6 @@ def getUrl(csvPaperName):
     url +=pathList[-1]
     print(url)
     return url
-
-
-# pdfdir = os.path.join(os.getcwd(), "Data")
-# print(pdfdir)
-# for pdfPaperName in glob.glob(pdfdir):
-#    print("Hello there!")
 
 # Run from here so as to properly employ multithreading
 if __name__ == "__main__":
