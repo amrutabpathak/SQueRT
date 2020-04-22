@@ -42,42 +42,27 @@ def similarity(x1, x2=None, eps=1e-8):
 def returnRelevant(researchPaper, query, numSnippets = 15):
     # Make sure these are downloaded before using
     config = DistilBertConfig.from_pretrained("distilbert-base-uncased")
-    tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-cased')
-    model = DistilBertModel.from_pretrained('distilbert-base-cased', config=config)
+    tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
+    model = DistilBertModel.from_pretrained('distilbert-base-uncased', config=config)
     relevantSnippets = []
 
-    #from sentence_transformers import SentenceTransformer
-    #model = SentenceTransformer('bert-base-nli-mean-tokens')
-    #researchPpr_NLP = spacy.load(model)
     with open(researchPaper, encoding='utf8') as researchPaperCSV, torch.no_grad():
         researchPaperReader = csv.reader(researchPaperCSV)
         score_max_heap = []
-        #queryArr = tokenizer.encode(query, add_special_tokens=True)
-        #input_ids = torch.tensor(queryArr)
-        #queryObj = model(input_ids)[0][0]
-        input_ids = torch.tensor([tokenizer.encode(query, add_special_tokens=True)])
-        print(input_ids)
+        input_ids = torch.tensor([tokenizer.encode(query, add_special_tokens=True, max_length=512)])
+        print(input_ids.size())
         output_tuple = model(input_ids)
         last_hidden_states = output_tuple[0]
         queryObj = last_hidden_states.mean(1)
-        #queryObj = model.encode(query)
-        #queryObj = torch.tensor(queryObj)
         for snippet in researchPaperReader:
             if('<EOS>' not in snippet):
                 snippetStr = " "
                 snippetStr = ' '.join([str(elem) for elem in snippet])
-                #snippetArr = tokenizer.encode(snippetStr, add_special_tokens=True)
-                #input_ids = torch.tensor(snippetArr)
-                #snippetObj = model(input_ids)[0][0]
-                # Currently the snippet is just cut at 511 because if the snippet is too long distillbert breaks
-                input_ids = torch.tensor([tokenizer.encode(snippetStr, add_special_tokens=True, max_length=2048)])
+                # This implementation will reject snippets of longer than 512 tokens
+                input_ids = torch.tensor([tokenizer.encode(snippetStr, add_special_tokens=True, max_length=512)])
                 output_tuple = model(input_ids)
                 last_hidden_states = output_tuple[0]
                 snippetObj = last_hidden_states.mean(1)
-                #print(similarity(queryObj, snippetObj))
-                #snippetObj = model.encode(snippetStr)
-                #snippetObj = torch.tensor(snippetObj)
-                #qs = QuerySnippet(query, snippet, queryObj.similarity(snippetObj))
                 qs = QuerySnippet(query, snippet, similarity(queryObj, snippetObj))
                 if len(score_max_heap) < numSnippets or qs.similarity > score_max_heap[0].similarity:
                     if len(score_max_heap) == numSnippets: heapq.heappop(score_max_heap)
