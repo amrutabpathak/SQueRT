@@ -40,8 +40,14 @@ def main(query, keyword):
         relevantSnippets = RelevantSnippets.returnRelevant(csvPaperName, query)
         print(relevantSnippets)
         print("\n\n")
+        relevantSnippetsFormated = []
+        for snippet in relevantSnippets:
+            relevantSnippetsFormated.append(snippet[0])
+        print(relevantSnippetsFormated)
+        
         # From snippets for each paper, return answer
-        predictions, snippet = albert_QA.question_answering_albert(query, relevantSnippets)
+        # relevantSnippetsFormated must be list of strings and query must be passed in a list for whatever reason
+        predictions, snippet = albert_QA.question_answering_albert(relevantSnippetsFormated, [query])
         paper_identifier = getUrl(csvPaperName)
         outputJson += '{' + \
                       '"predictions": ' + '"' + predictions + '" ,' + \

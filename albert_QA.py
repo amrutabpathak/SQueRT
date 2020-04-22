@@ -158,6 +158,7 @@ def question_answering_albert(relevant_snippets, question, threshold=70):
     final_snippet = ''
     # Finds answers for each snippet
     for snippet in relevant_snippets:
+        print(snippet)
         predictions = run_prediction(question, snippet)
         for key in predictions.keys():
             snippetAnsObj = SnippetAnswer(snippet, predictions[key])
