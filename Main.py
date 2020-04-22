@@ -86,5 +86,6 @@ def getUrl(csvPaperName):
 #for pdfPaperName in glob.glob(pdfdir):
 #    print("Hello there!")
 
+# Run from here so as to properly employ multithreading
 if __name__ == "__main__":
     main("What model is best for large batch training for bert", "Machine learning")

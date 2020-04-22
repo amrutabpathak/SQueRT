@@ -41,7 +41,7 @@ def similarity(x1, x2=None, eps=1e-8):
 
 def returnRelevant(researchPaper, query, numSnippets = 15):
     # Make sure these are downloaded before using
-    config = DistilBertConfig(max_position_embeddings=2048)
+    config = DistilBertConfig.from_pretrained("distilbert-base-uncased")
     tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-cased')
     model = DistilBertModel.from_pretrained('distilbert-base-cased', config=config)
     relevantSnippets = []
