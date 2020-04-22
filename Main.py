@@ -71,12 +71,12 @@ def getUrl(csvPaperName):
     url +=fileName
     print(url)
 
-main("What model is best for large batch training for bert", "Machine learning")
+
 
 #pdfdir = os.path.join(os.getcwd(), "Data")
 #print(pdfdir)
 #for pdfPaperName in glob.glob(pdfdir):
 #    print("Hello there!")
 
-#if __name__ == "__main__":
-#    main(query, topic)
+if __name__ == "__main__":
+    main("What model is best for large batch training for bert", "Machine learning")
