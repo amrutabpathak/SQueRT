@@ -127,6 +127,7 @@ def snippetProducerSplit(file, lengthSnippets):
         if re.search(remove_references, snippet) is not None:
             return snippets
         snippet = re.sub(r'\n', ' ', snippet)
+        print(snippet)
         snippets.append(snippet)
     return snippets
 

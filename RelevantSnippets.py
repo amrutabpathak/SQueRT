@@ -55,6 +55,7 @@ def returnRelevant(researchPaper, query, numSnippets = 15):
         #input_ids = torch.tensor(queryArr)
         #queryObj = model(input_ids)[0][0]
         input_ids = torch.tensor([tokenizer.encode(query, add_special_tokens=True)])
+        print(input_ids)
         output_tuple = model(input_ids)
         last_hidden_states = output_tuple[0]
         queryObj = last_hidden_states.mean(1)
@@ -67,6 +68,7 @@ def returnRelevant(researchPaper, query, numSnippets = 15):
                 #snippetArr = tokenizer.encode(snippetStr, add_special_tokens=True)
                 #input_ids = torch.tensor(snippetArr)
                 #snippetObj = model(input_ids)[0][0]
+                # Currently the snippet is just cut at 511 because if the snippet is too long distillbert breaks
                 input_ids = torch.tensor([tokenizer.encode(snippetStr, add_special_tokens=True)])
                 output_tuple = model(input_ids)
                 last_hidden_states = output_tuple[0]

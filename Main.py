@@ -46,7 +46,7 @@ def main(query, keyword):
         print(relevantSnippetsFormated)
         
         # From snippets for each paper, return answer
-        # relevantSnippetsFormated must be list of strings and query must be passed in a list for whatever reason
+        # relevantSnippetsFormated must be list of strings and query must be passed as a list for whatever reason
         predictions, snippet = albert_QA.question_answering_albert(relevantSnippetsFormated, [query])
         paper_identifier = getUrl(csvPaperName)
         outputJson += '{' + \
@@ -70,12 +70,14 @@ def save_feedback(topic, query, feedback):
     print('Feedback saved!')
 
 def getUrl(csvPaperName):
+    # This needs to actually return a url currently it returns a path to the local host
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('localhost', 0))
     url = 'http://localhost:'+str(s.getsockname()[1])+'/Data/'
     fileName = csvPaperName.rsplit('_', 1)[0] +'.pdf'
     url +=fileName
     print(url)
+    return url
 
 
 
