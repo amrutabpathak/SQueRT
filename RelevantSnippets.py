@@ -9,7 +9,7 @@ import csv
 import heapq
 
 # In[ ]:
-from transformers import DistilBertTokenizer, DistilBertModel
+from transformers import DistilBertTokenizer, DistilBertModel, DistilBertConfig
 import torch
 
 
@@ -41,8 +41,9 @@ def similarity(x1, x2=None, eps=1e-8):
 
 def returnRelevant(researchPaper, query, numSnippets = 15):
     # Make sure these are downloaded before using
+    config = DistilBertConfig(max_position_embeddings=2048)
     tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-cased')
-    model = DistilBertModel.from_pretrained('distilbert-base-cased')
+    model = DistilBertModel.from_pretrained('distilbert-base-cased', config=config)
     relevantSnippets = []
 
     #from sentence_transformers import SentenceTransformer
@@ -69,7 +70,7 @@ def returnRelevant(researchPaper, query, numSnippets = 15):
                 #input_ids = torch.tensor(snippetArr)
                 #snippetObj = model(input_ids)[0][0]
                 # Currently the snippet is just cut at 511 because if the snippet is too long distillbert breaks
-                input_ids = torch.tensor([tokenizer.encode(snippetStr, add_special_tokens=True)])
+                input_ids = torch.tensor([tokenizer.encode(snippetStr, add_special_tokens=True, max_length=2048)])
                 output_tuple = model(input_ids)
                 last_hidden_states = output_tuple[0]
                 snippetObj = last_hidden_states.mean(1)
