@@ -12,7 +12,7 @@ import os
 import db_operations
 import socket
 import download_models
-
+import re
 
 
 def main(query, keyword):
@@ -23,7 +23,7 @@ def main(query, keyword):
     snippetSize = 3
     outputJson = '{ "keyword": ' + '"' + keyword + '" ,' + '"query": ' + '"' + query + '" ,' + '"results": ['
 
-    #Create Table
+    # Create Table
     db_operations.createTable()
 
     # Scrape papers to pdf folder
@@ -44,11 +44,13 @@ def main(query, keyword):
         for snippet in relevantSnippets:
             relevantSnippetsFormated.append(snippet[0])
         print(relevantSnippetsFormated)
-        
+
         # From snippets for each paper, return answer
         # relevantSnippetsFormated must be list of strings and query must be passed as a list for whatever reason
         predictions, snippet = albert_QA.question_answering_albert(relevantSnippetsFormated, [query])
         paper_identifier = getUrl(csvPaperName)
+        if paper_identifier is None:
+            paper_identifier = ''
         outputJson += '{' + \
                       '"predictions": ' + '"' + predictions + '" ,' + \
                       '"snippet": ' + '"' + snippet + '" ,' + \
@@ -69,21 +71,22 @@ def save_feedback(topic, query, feedback):
     db_operations.updateRecords(topic, query, feedback)
     print('Feedback saved!')
 
+
 def getUrl(csvPaperName):
     # This needs to actually return a url currently it returns a path to the local host
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('localhost', 0))
-    url = 'http://localhost:'+str(s.getsockname()[1])+'/Data/'
+    url = 'http://localhost:' + str(s.getsockname()[1]) + '/Data/'
     fileName = csvPaperName.rsplit('_', 1)[0] +'.pdf'
-    url +=fileName
+    pathList = re.split(r'[\\/]', fileName)
+    url +=pathList[-1]
     print(url)
     return url
 
 
-
-#pdfdir = os.path.join(os.getcwd(), "Data")
-#print(pdfdir)
-#for pdfPaperName in glob.glob(pdfdir):
+# pdfdir = os.path.join(os.getcwd(), "Data")
+# print(pdfdir)
+# for pdfPaperName in glob.glob(pdfdir):
 #    print("Hello there!")
 
 # Run from here so as to properly employ multithreading
