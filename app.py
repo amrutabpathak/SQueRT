@@ -1,7 +1,7 @@
 import flask
 from flask import Flask, request, render_template
 import json
-#import Main
+import Main
 
 app = Flask(__name__)
 
@@ -14,9 +14,13 @@ def index():
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
+        global this_query
+        global this_keyword
         query = request.json['input_question']
         keyword = request.json['input_keyword']
-        #json_info = Main.main(query, keyword)
+        this_query = query
+        this_keyword = keyword
+        json_info = Main.main(query, keyword)
 
         predictions = []
         snippet = []
@@ -35,6 +39,16 @@ def predict():
     except Exception as error:
         bad_res = str(error)
         return app.response_class(response=json.dumps(bad_res), status=500, mimetype='application/json')
+
+
+@app.route('/feedback', methods=['POST'])
+def collect_feedback():
+    try:
+        feedback = request.json['feedback']
+        Main.save_feedback(this_keyword, this_query, feedback)
+    except Exception as error:
+        bad_res = str(error)
+        return app.response_class(response=json.dumps(bad_res), status=500, mimetype='application/json')        
 
 
 if __name__ == '__main__':
