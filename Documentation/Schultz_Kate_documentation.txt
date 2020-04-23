@@ -12,7 +12,7 @@ I wrote collective documentation based on each team member's individual document
 Note that the project repo hasn't tracked the vast majority of my contributions; I noticed this recently and figured out that it is because I have been committing code while logged in to a different GitHub account than the one associated with this project. Oy vey.
 
 Tried but not included:
-I still have some front end functionality to work out regarding incorporating the feedback. I can get a feedback button to render, but so far haven't been able to get it to display the defined options or to only appear after the intial submit query button has been clicked.
+I still have some front end functionality to work out regarding incorporating the feedback. I can get a feedback button to render, but so far haven't been able to get it to display the defined options or to only appear after the intial submit query button has been clicked. I plan to continue working on this for my own edification if nothing else - I have been banging my head against a wall over this for hours and hours and I really want to figure this out!
 
 The Swagger API definitions were implemented for ultimately abandoned for a different approach to the front end.
 
