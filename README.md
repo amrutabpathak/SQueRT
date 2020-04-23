@@ -70,7 +70,7 @@ Good ROUGE and/or BLEU scores. Note: define 'good'! How does our baseline do? Ho
 SQueRT is a Flask application with SQLite database support that runs in two primary stages. In the first stage, a web scraper is employed to scrape PDFs from arXiv.org based on the user's input. The text from the PDFs is processed and DistilBERT used to locate relevant text snippets. In the second stage, ALBERT is employed to rank candidate snippets according to their relevance to the user's query. Results are displayed on the web page, including a link to the PDF that contains the answer returned by SQueRT. The script Main.py acts as the Controller for the program. For a comprehensive list of packages used, see requirements.txt.
 
 ## User Manual
-_Before attempting to run SQueRt, ensure that you have all the required packages installed. These are enumerated in requirements.txt._
+_Before attempting to run SQueRT, ensure that you have all the required packages installed. These are enumerated in requirements.txt._
 
 The entry point to SQueRT is the script app.py.
 
