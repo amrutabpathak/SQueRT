@@ -65,7 +65,6 @@ def main(query, keyword):
         time_stage2_albert = time.time() - time_to_stage1
         paper_identifier = getUrl(csvPaperName)
         total_time = time.time() - start_time
-        print(total_time)
         print('''
 Scraping PDFs: %1.3f seconds
 PDFs to text: %1.3f seconds
