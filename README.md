@@ -2,6 +2,8 @@
 
 SQueRT is a web application that assists researchers by leveraging artificial intelligence to query the latest academic literature. It utilizes the state-of-the-art natural language processing deep learning models ALBERT and DistilBERT to search the academic literature database arXiv for articles  relevant to the user's query. SQueRT can greatly reduce the time and effort necessary find reported answers to research questions.
 
+![SQueRT_UI](https://github.ccs.neu.edu/simpsone/7180QueryTool/tree/master/img)
+
 **Who is our user?**\
 Our user is most likely to be a(n):
 * academic
