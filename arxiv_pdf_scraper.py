@@ -13,9 +13,10 @@ from urllib import parse
 
 
 def scrape(keyword, num_pdfs):
+    num_results_displayed = 25
     urlQuery = parse.quote_plus(keyword)
     print(urlQuery)
-    url_prefix = 'https://arxiv.org/search/?searchtype=all&query='+urlQuery+'&abstracts=show&size=25&order=-announced_date_first&start='
+    url_prefix = 'https://arxiv.org/search/?searchtype=all&query='+urlQuery+'&abstracts=show&size='+num_results_displayed+'&order=-announced_date_first&start='
     start_file_idx = 0
     urls = []
     export_urls = []
@@ -41,8 +42,8 @@ def scrape(keyword, num_pdfs):
             print("No search results found. Please try a different search.")
             raise Exception
 
-        if num_pdfs % 200 == 0:    # if num_pdfs is a multiple of 200
-            start_file_idx += 200   # increment start index in url by 200 to get next page of results
+        if num_pdfs % num_results_displayed == 0:    # if num_pdfs is a multiple of num displayed results
+            start_file_idx += num_results_displayed   # increment start index in url to get next page of results
 
     print("num_retrieved: ", num_retrieved)
 
