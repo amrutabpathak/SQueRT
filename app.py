@@ -20,15 +20,17 @@ def predict():
         keyword = request.json['input_keyword']
         this_query = query
         this_keyword = keyword
-        json_info = Main.main(query, keyword)
-
+        json_info_str = Main.main(query, keyword)
+        json_info = json.loads(json_info_str)
+        print(type(json_info))
         predictions = []
         snippet = []
         paper_id = []
-        for i in json_info["results"].keys():
-            predictions.append(json_info["results"][i]['predictions'])
-            snippet.append(json_info["results"][i]['snippet'])
-            paper_id.append(json_info["results"][i]['paper_identifier'])
+        for i in json_info["results"]:
+            print(type(i))
+            predictions.append(i['predictions'])
+            snippet.append(i['snippet'])
+            paper_id.append(i['paper_identifier'])
 
         res = {'snippet': snippet,
                 'pdf_link': paper_id,
@@ -48,7 +50,7 @@ def collect_feedback():
         Main.save_feedback(this_keyword, this_query, feedback)
     except Exception as error:
         bad_res = str(error)
-        return app.response_class(response=json.dumps(bad_res), status=500, mimetype='application/json')        
+        return app.response_class(response=json.dumps(bad_res), status=500, mimetype='application/json')
 
 
 if __name__ == '__main__':
