@@ -128,7 +128,7 @@ def snippetProducerSplit(file, lengthSnippets):
             return snippets
         snippet = re.sub(r'\n', ' ', snippet)
         snippet = re.sub(r',', ' ', snippet)
-        print("\n\n" + snippet)
+        # print("\n\n" + snippet)
         snippets.append(snippet)
     return snippets
 
