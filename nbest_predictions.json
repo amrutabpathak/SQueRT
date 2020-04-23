@@ -1,16 +1,16 @@
 {
     "0": [
         {
-            "text": "Russia",
-            "probability": 0.998676467127275,
-            "start_logit": 3.866926670074463,
-            "end_logit": 3.168015718460083
+            "text": "empty",
+            "probability": 0.33208753899086096,
+            "start_logit": 0.0,
+            "end_logit": 0.0
         },
         {
             "text": "",
-            "probability": 0.0013235328727249872,
-            "start_logit": 0.3039605915546417,
-            "end_logit": 0.1048555076122284
+            "probability": 0.667912461009139,
+            "start_logit": 0.4750811755657196,
+            "end_logit": 0.22367733716964722
         }
     ]
 }

@@ -111,7 +111,7 @@ def snippetProducerSplit(file, lengthSnippets):
     file_content = f.read()
     # Replaces certain words that likely end with a period with words without aperiod
     for i in range(len(replace_words)):
-      file_content = re.sub(replace_words[i], replace_to_word[i], file_content)
+        file_content = re.sub(replace_words[i], replace_to_word[i], file_content)
     # Split at sentences which means its in regex \w\.\s[A-Z0-9]|\s
     # So its splits at word character a period or ! or ? followed by a space then A-Z capital or 0-9 or a space
     sentences = re.split(split_sentences, file_content)
@@ -127,9 +127,13 @@ def snippetProducerSplit(file, lengthSnippets):
         if re.search(remove_references, snippet) is not None:
             return snippets
         snippet = re.sub(r'\n', ' ', snippet)
+        snippet = re.sub(r',', ' ', snippet)
+        print("\n\n" + snippet)
         snippets.append(snippet)
     return snippets
 
+
+# snippetProducerSplit("DataTxt/file.txt", 3)
 # In[ ]:
 
 
