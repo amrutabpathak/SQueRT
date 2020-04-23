@@ -66,6 +66,16 @@ Main (the controller):
 I worked on calling create insert and save database methods , creating and returning jsons for UI, creating links for pdf papers.
 Path : https://github.ccs.neu.edu/simpsone/7180QueryTool/blob/master/Main.py
 
+
+Created a script to dump the feedback and other details to the file.
+Path: https://github.ccs.neu.edu/simpsone/7180QueryTool/blob/master/DBDumpToFileScript.py
+
+ReadMe
+Worked on readme to include one pager information, deployment instructions and program entry point.
+
+Worked on fixing any issues that were hindering us from running the app end to end. 
+
+
 Things that were tried:
 Research
 I tried Semlinar but no success. I tried using BERT-as-a-service but it never finished its execution and had to give up on that.
