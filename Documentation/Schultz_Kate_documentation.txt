@@ -1,15 +1,21 @@
 Implemented:
-Script that scrapes arXiv for relevant pdfs given a specified query/keyword and number of results desired. It downloads the pdfs for use by other scripts. The script incorporates politeness policies and has exception handling for when no search results are returned. I also edited Main() several times to cooperate with the scraper and the Flask app.
+Script that scrapes arXiv for relevant pdfs given a specified query/keyword and number of results desired: arxiv_pdf_scraper.py. It downloads the pdfs for use by other scripts. The script incorporates politeness policies and has exception handling for when no search results are returned. I also edited Main() several times to cooperate with the scraper and the Flask app.
 
-Flask app and RESTful Swagger API for SQueRT. The API accepts user string input for a search query and keyword under the /predict endpoint. The Flask script then invokes Main() with the user input. The API has another endpoint, /feedback, that accepts user feedback about how helpful the results are. This input is given as a selection of one of three options: helpful, somewhat helpful, or unhelpful. Finally, there is a third endpoint to check the health of the system without running it end-to-end. The /predict and /feedback endpoints have POST operations, while the /health endpoint makes a GET request. There is a corresponding yaml file where the endpoints, parameters, and functions are defined and described. The functions all return JSON response objects that include informative messages and data where relevant. The API can be viewed in any browser on any OS when the script is invoked and the user goes to their local host and adds a /ui to the URL.
+Flask app for SQueRT - the script app.py. The API accepts user string input for a search query and keyword under the /predict endpoint. The Flask script then invokes Main() with the user input. The API has another endpoint, /feedback, that accepts user feedback about how helpful the results are. This input is given as a selection of one of three options: helpful, somewhat helpful, or unhelpful. The /predict and /feedback endpoints have POST operations.  The functions all return JSON response objects that include informative messages and data where relevant.
 
 I also wrote a user overview and Q&A document about our tool (the SQueRT one pager) and helped with scoring result snippets with the rest of the team. 
 
-I wrote html, js, and css scripts to render the API into a webpage. The webpage has a title banner with a description and an Inputs section with boxes for the user to enter an arXiv search query and keyword, with a submit button. Then there are three Output return boxes: one for the PDF link, one for snippets, and one for predictions.
+I wrote html, js, and css scripts to render the API into a webpage. The JavaScript part utilizes jquery. The html file is located in the "templates" directory while the js and css scripts are in the "static" directory. The webpage has a title banner with a description and an Inputs section with boxes for the user to enter an arXiv search query and keyword, with a submit button. Then there are three Output return boxes: one for the PDF link, one for snippets, and one for predictions.
 
-Tried but not yet included:
-I still have some front end functionality to work out - namely incorporating the feedback. 
+I wrote collective documentation based on each team member's individual documentation files and incorporated it into the README. This includes an overview of the app's goals and uses, architecture, and user manual. I also added an image to the README of our UI in action.
+
+Note that the project repo hasn't tracked the vast majority of my contributions; I noticed this recently and figured out that it is because I have been committing code while logged in to a different GitHub account than the one associated with this project. Oy vey.
+
+Tried but not included:
+I still have some front end functionality to work out regarding incorporating the feedback. I can get a feedback button to render, but so far haven't been able to get it to display the defined options or to only appear after the intial submit query button has been clicked. I plan to continue working on this for my own edification if nothing else - I have been banging my head against a wall over this for hours and hours and I really want to figure this out!
+
+The Swagger API definitions were implemented for ultimately abandoned for a different approach to the front end.
 
 Apps/libraries to load:
 scraper: sys, BeautifulSoup, urllib, os, time, re
-Flask and API: connexion, flask
+Flask and API: flask, json
