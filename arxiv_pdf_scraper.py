@@ -15,8 +15,7 @@ from urllib import parse
 def scrape(keyword, num_pdfs):
     num_results_displayed = 25
     urlQuery = parse.quote_plus(keyword)
-    print(urlQuery)
-    url_prefix = 'https://arxiv.org/search/?searchtype=all&query='+urlQuery+'&abstracts=show&size='+num_results_displayed+'&order=-announced_date_first&start='
+    url_prefix = 'https://arxiv.org/search/?searchtype=all&query='+urlQuery+'&abstracts=show&size='+str(num_results_displayed)+'&order=-announced_date_first&start='
     start_file_idx = 0
     urls = []
     export_urls = []
@@ -24,7 +23,6 @@ def scrape(keyword, num_pdfs):
 
     while num_retrieved < num_pdfs:
         url_to_scrape = url_prefix + str(start_file_idx)
-        print(url_to_scrape)
         htmltext = urllib.request.urlopen(url_to_scrape).read()
         soup = BeautifulSoup(htmltext, "html.parser")
 
@@ -44,8 +42,6 @@ def scrape(keyword, num_pdfs):
 
         if num_pdfs % num_results_displayed == 0:    # if num_pdfs is a multiple of num displayed results
             start_file_idx += num_results_displayed   # increment start index in url to get next page of results
-
-    print("num_retrieved: ", num_retrieved)
 
     # Convert url list to the arxiv export form
     for addy in urls:
