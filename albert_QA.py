@@ -26,11 +26,14 @@ from transformers.data.processors.squad import SquadResult, SquadV2Processor, Sq
 
 from transformers.data.metrics.squad_metrics import compute_predictions_logits
 
-# READER NOTE: Set this flag to use own model, or use pretrained model in the Hugging Face repository
+# A large section of this code was taken from
+# Title: Reading Comprehension with ALBERT (and similar)
+# Author: @techno246
+# https://colab.research.google.com/github/spark-ming/albert-qa-demo/blob/master/Question_Answering_with_ALBERT.ipynb
 download_models.getModels()
 albert_model_path = os.path.join(os.getcwd(), "albert_models/")
 # Edit this to your local path ***OR nothing will work***
-print(albert_model_path)
+# print(albert_model_path)
 
 output_dir = ""
 
@@ -202,5 +205,5 @@ def question_answering_albert(relevant_snippets, question, threshold=70):
 # This has to be called by this type of main because run prediction uses threading
 '''
 if __name__ == '__main__':
-    question_answering_albert(["The capital of Washington is Olympia"], ["What is the capital of Washington"])
+    question_answering_albert(["The capital of Washington is Olympia", "Washington's capital is Russia", 'Washington has a capital Russia'], ["What is the capital of Washington"])
 '''

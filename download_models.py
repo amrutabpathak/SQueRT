@@ -7,7 +7,7 @@ def getModels():
     albert_model_path = os.path.join(os.getcwd(), "albert_models/")
     albert_model_model_path = os.path.join(albert_model_path, "pytorch_model.bin")
     if os.path.exists(albert_model_model_path):
-        print("File is already downloaded skipping")
+        pass
     else:
         print("Albert model is downloading to " + albert_model_path)
         r = requests.get(url_Albert_bin, allow_redirects=True)
