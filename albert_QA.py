@@ -177,18 +177,19 @@ def question_answering_albert(relevant_snippets, question, threshold=70):
                 answer_map[key] = [answer_map[key][0] + 1, answer.snippet]
                 answer_map[answer.answer] = [answer_map[key][0] + 1, answer.snippet]
     for key in answer_map.keys():
-        if max_sim < answer_map[key][0]:
-            # print("Inside if")
-            # print(key)
-            # print(answer_map[key][1])
-            final_answer = key
-            max_sim = answer_map[key][0]
-            final_snippet = answer_map[key][1]
-        elif max_sim == answer_map[key][0]:
-            if len(final_answer) < len(key):
-                # print("Inside elif")
+        if key != '':
+            if max_sim < answer_map[key][0]:
+                # print("Inside if")
+                # print(key)
+                # print(answer_map[key][1])
                 final_answer = key
+                max_sim = answer_map[key][0]
                 final_snippet = answer_map[key][1]
+            elif max_sim == answer_map[key][0]:
+                if len(final_answer) < len(key):
+                    # print("Inside elif")
+                    final_answer = key
+                    final_snippet = answer_map[key][1]
 
     if final_answer == '':
         final_snippet = ''
