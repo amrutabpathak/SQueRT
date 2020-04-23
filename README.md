@@ -52,9 +52,10 @@ URL: https://arxiv.org/pdf/1905.11108.pdf \
 [SQIL outperforms GAIL in both conditions.Since SQIL and GAIL both use deep Q-learning for RL in this experiment  the gap between them may be attributed to the difference in the reward functions they use to train the agent.SQIL benefits from providing a constant reward that does not require fitting a discriminator  while GAIL struggles to train a discriminator to provide learned rewards directly from images.
 ]
 
-_Which model is the best to use for this task?_ [snippet to return]\
-_What is the name of the model to use?_ [snippet to return]\
-_What type of model should I use to do this?_ [snippet to return]
+Some examples of queries could be - 
+_Which model is the best to use for this task?_\
+_What is the name of the model to use?_ \
+_What type of model should I use to do this?
 
 **How do we know that our user is getting what they want?**\
 We have included a feedback mechanism that asks the user to rank the relevancy of the result we provide. We would then have to track these relevancy reports and adjust our methods such that they provide more relevant results.
