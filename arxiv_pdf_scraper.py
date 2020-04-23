@@ -15,7 +15,7 @@ from urllib import parse
 def scrape(keyword, num_pdfs):
     urlQuery = parse.quote_plus(keyword)
     print(urlQuery)
-    url_prefix = 'https://arxiv.org/search/?searchtype=all&query='+urlQuery+'&abstracts=show&size=200&order=-announced_date_first&start='
+    url_prefix = 'https://arxiv.org/search/?searchtype=all&query='+urlQuery+'&abstracts=show&size=25&order=-announced_date_first&start='
     start_file_idx = 0
     urls = []
     export_urls = []
