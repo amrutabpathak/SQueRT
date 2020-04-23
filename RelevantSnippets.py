@@ -50,7 +50,6 @@ def returnRelevant(researchPaper, query, numSnippets = 15):
         researchPaperReader = csv.reader(researchPaperCSV)
         score_max_heap = []
         input_ids = torch.tensor([tokenizer.encode(query, add_special_tokens=True, max_length=512)])
-        print(input_ids.size())
         output_tuple = model(input_ids)
         last_hidden_states = output_tuple[0]
         queryObj = last_hidden_states.mean(1)

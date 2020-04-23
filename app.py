@@ -22,12 +22,12 @@ def predict():
         this_keyword = keyword
         json_info_str = Main.main(query, keyword)
         json_info = json.loads(json_info_str)
-        print(type(json_info))
+        # print(type(json_info))
         predictions = []
         snippet = []
         paper_id = []
         for i in json_info["results"]:
-            print(type(i))
+            # print(type(i))
             predictions.append(i['predictions'])
             snippet.append(i['snippet'])
             paper_id.append(i['paper_identifier'])
