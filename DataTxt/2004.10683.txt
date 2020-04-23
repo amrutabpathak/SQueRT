@@ -1,0 +1,3381 @@
+Probing Flavor Structure of Cosmic Ray e∓ Spectrum
+and Implications for Indirect Dark Matter Searches
+
+Shao-Feng Ge,a,∗ Hong-Jian He,a,b,c,† Yu-Chen Wang,b,d,‡ Qiang Yuan e,f,c,§
+
+a Tsung-Dao Lee Institute & School of Physics and Astronomy,
+
+Shanghai Jiao Tong University, Shanghai 200240, China
+b Institute of Modern Physics and Department of Physics,
+
+Tsinghua University, Beijing 100084, China
+
+c Center for High Energy Physics, Peking University, Beijing 100871, China
+d Department of Physics, Harvard University, Cambridge, MA 02138, USA
+
+e Key Laboratory of Dark Matter and Space Astronomy, Purple Mountain Observatory,
+
+Chinese Academy of Sciences, Nanjing 210033, China
+
+f School of Astronomy and Space Science,
+
+University of Science and Technology of China, Hefei 230026, China
+
+Abstract
+
+Measuring high energy cosmic ray electrons/positrons (CRE) provides important means
+
+for probing the nearby galactic sources and for the dark matter (DM) indirect detection.
+
+In this work, we perform a systematical analysis of the ﬂavor structure of DM annihila-
+
+tions into charged leptons based on the cosmic ray CRE spectra measured by DAMPE,
+
+Fermi-LAT, AMS-02, and CALET experiments. We study the annihilations of possible
+
+TeV scale DM particles in a nearby subhalo, which is proposed to explain the possible
+
+peak-like structure of the DAMPE CRE data. We pay special attention to the possi-
+
+ble non-resonant excess (besides the possible peak-like structure) and demonstrate that
+
+such non-resonant excess can mainly arise from the decay of muons produced by the DM
+
+annihilations in the subhalo. With these we study the ﬂavor composition of the lepton
+ﬁnal states of χχ→ e+e−, µ+µ−, τ +τ− by ﬁtting the CRE data. We further analyze the
+constraints on the lepton ﬂavor composition using the Fermi-LAT γ-ray measurements.
+
+We ﬁnd that the ﬂavor composition (favored by the CRE data) is consistent with the
+
+Fermi-LAT data at relatively low Galactic latitudes, while the fraction of the ﬁnal state
+τ± is severely bounded.
+
+∗Email: gesf@sjtu.edu.cn
+†Email: hjhe@sjtu.edu.cn, hjhe@tsinghua.edu.cn
+‡Email: wang-yc15@mails.tsinghua.edu.cn
+§Email: yuanq@pmo.ac.cn
+
+0
+2
+0
+2
+
+ 
+r
+p
+A
+2
+2
+
+ 
+
+.
+
+ 
+ 
+]
+E
+H
+h
+p
+-
+o
+r
+t
+s
+a
+[
+ 
+ 
+
+1
+v
+3
+8
+6
+0
+1
+
+.
+
+4
+0
+0
+2
+:
+v
+i
+X
+r
+a
+
+Contents
+
+1. Introduction . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+
+2. Improved Fit to the DAMPE CRE Spectrum . . . . . . . . . . . . . . . . . . . 4
+
+2.1. Fit with Broken Power-Law Background . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+2.2. Physical Spectra for the CRE Backgrounds . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+2.3. CRE Spectra from DM Annihilations . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+2.4. Fitting Event Excesses in CRE Spectrum . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+4
+
+6
+
+7
+
+9
+
+2.5. Origin of Flavor Composition of CRE Spectrum. . . . . . . . . . . . . . . . . . . . . . . . . . . . 12
+
+2.6. Impacts of DAMPE Future Running . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13
+
+3. Comparison with Other CRE Detections. . . . . . . . . . . . . . . . . . . . . . . . . 15
+
+3.1. Combined Fit with Fermi-LAT . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 15
+
+3.2. Comparison with AMS-02 and CALET . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17
+
+4. Gamma Ray Constraints from Fermi-LAT . . . . . . . . . . . . . . . . . . . . . . . 19
+
+4.1. Prompt Gamma Rays . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+
+4.2. The J factor . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+
+4.3. Gamma Ray Searches with Fermi-LAT . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 21
+4.4. Constraints on τ± Fraction. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23
+
+5. Conclusions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 24
+
+A.Likelihood and Upper Limits for the γ-Ray Analysis . . . . . . . . . . . 27
+
+B.Summary of γ-ray Fitting Results for All ROIs . . . . . . . . . . . . . . . . . 27
+
+References . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32
+
+2
+
+1. Introduction
+
+High energy cosmic ray electrons and positrons (CRE) can provide important information
+about the nearby galactic sources [1] and the possible signals of dark matter (DM) annihilations
+or decays [2]. There have been very active experimental activities to measure the cosmic ray
+electron/positron spectrum up to TeV energy scale, including the ground-based and space-
+borne experiments such as HESS [3], VERITAS [4], Fermi-LAT [6], AMS-02 [5], and CALET [7].
+Measuring the high energy CRE spectrum opens up an important window for the indirect
+detection of DM particles.
+
+Among these experimental activities, the ﬁrst announcement of the CRE energy spectrum
+measurement from 25 GeV up to 4.6 TeV [8] by the Dark Matter Particle Explorer (DAMPE)
+detector [9] provided some intriguing results. The DAMPE satellite was launched in December,
+2015 and is optimized for detecting cosmic e± events and γ rays up to about 10 TeV energy.
+The ﬁrst CRE result of DAMPE collaboration was based on 530 days of data-taking [8]. The
+ﬁtted CRE spectrum shows a spectral break around 0.9 TeV and is consistent with the HESS
+result [3]. The DAMPE CRE data also show a tentative peak-like event excess around (1.3−
+1.5) TeV, which stimulated numerious studies on its possible interpretations [10]-[17], ranging
+from the conventional astrophysical sources (including pulsars and supernova remnants) to
+models of dark matter annihilations or decays into e+e− events [18].
+
+Our previous study [16] revealed a signiﬁcant new hidden excess in the energy region (0.6−
+1.1) TeV on the left-hand-side of the peak bin (1.3−1.5) TeV, and we proposed that this new
+excess originates from decays of the 1.5 TeV µ± (τ±) events which are produced together with
+the 1.5 TeV e± peak events.
+
+In this work, we perform a systematical analysis of the ﬂavor structure of the CRE spec-
+tra and study their implications for indirect DM searches including the DAMPE, Fermi-
+LAT and CALET experiments. We make improved analysis with a physical CRE back-
+ground, which is composed of the primary electrons produced by galactic supernova remnants
+(SNR) and the secondary electrons from the collision between primary nuclei and interstellar
+medium (ISM). We study annihilations of TeV scale DM particles into charged lepton pairs
+(e+e−, µ+µ−, τ +τ−) in a nearby subhalo. In addition to the possible peak-like structure mea-
+sured by DAMPE, we pay special attention to the possible non-resonant excess mentioned
+above. We will show that the resultant CRE spectrum is consistent with the current CRE
+data of DAMPE and Fermi-LAT, and also the AMS-02 and CALET data. We demonstrate
+that including the muon decay channel not only improves the ﬁtting quality, but also gives
+important constraint on the ﬂavor structure of ﬁnal state leptons from DM annihilations. We
+also take into account the photon radiation of the ﬁnal state leptons, and derive nontrivial
+constraints on the ﬂavor compositions of the ﬁnal state leptons from the γ ray measurements
+
+3
+
+of Fermi-LAT.
+
+This paper is organized as follows. In Section 2, we ﬁrst revisit our previous study [16], in
+which we ﬁt the DAMPE data with a double-broken power-law background and with CRE
+signals from χχ → e+e−, µ+µ−, τ +τ− channels. Then, we perform improved analysis with a
+physical CRE background and the CRE signal spectrum from DM annihilations in both e+e−
+and µ+µ−(τ +τ−) channels. With these we derive constraints on the ﬂavor composition of
+the ﬁnal state leptons from DM annihilations. We further estimate the increased sensitivities
+by the projected future DAMPE running. In Section 3, we ﬁt the Fermi-LAT, AMS-02 and
+CALET data, and show the consistency with the µ± (τ±) decay contribution invoked for
+explaining the DAMPE data. In Section 4, we further use the γ-ray measurement of Fermi-
+LAT to constrain the ﬂavor composition of the ﬁnal state leptons. Finally, we conclude in
+Section 5.
+
+2. Improved Fit to the DAMPE CRE Spectrum
+
+In our previous study [16], we used an empirical broken power-law formula to ﬁt the back-
+ground. In the present work, we will use a better justiﬁed CRE physical background instead
+and perform a more realistic analysis.
+In addition, we will allow the DM mass as a free
+parameter for the ﬁt.
+
+2.1. Fit with Broken Power-Law Background
+
+In this subsection, we review what was done in Ref. [16], as a comparison with our new
+analysis in the current study. For clarity of our presentation, we replot in Fig. 1 all the
+DAMPE data points with ±1σ errors [8]. From this, we observed [16] that the DAMPE data
+points exhibit another rather intriguing structure on the left-hand-side of the peak region
+(1.3− 1.5) TeV. We found that the energy range of (0.616−1.07) TeV contains ﬁve consecutive
+data points (marked in red color), which all lie above the background curve (as ﬁtted from
+the other background points marked in black color). These ﬁve red data points are distinctive
+and form a non-peak-like new excess with (cid:38) 2σ signiﬁcance.
+
+In Ref. [16], an empirical broken power-law formula is adopted to describe the CRE back-
+grounds, without taking into account their origin (including the sources and the propaga-
+tion eﬀect). We ﬁrst ﬁt the background without including the ﬁve red data points over
+(0.616−1.07) TeV and the blue peak point at (1.3−1.5) TeV shown in Fig. 1. The ﬁt gives
+a minimum χ2 per degree of freedom (d.o.f.), χ2/d.o.f = 3.95/23 = 0.172 . We show the back-
+ground ﬁt as the black dashed curve in Fig. 1.
+
+We then ﬁt all the data points over the 25 GeV−2.6 TeV region by adding the DM annihi-
+
+4
+
+Figure 1: Fitting the CRE spectrum of DAMPE data. The ﬁt of the background contribution is
+shown by the black dashed curve; the ﬁt further including the decay contribution from 1.5 TeV µ±
+(τ±) composition is depicted by the red dashed curve; and the ﬁt further including 1.5 TeV e± peak-
+like contribution is given by the blue curve [16]. The DAMPE data [8] are shown by the dots with
+±1σ error bars.
+
+lation contributions χχ→ e+e− and χχ→ µ+µ−(τ +τ−)→ e+e− to the background. For this
+analysis, we consider the DM particles with mass Mχ = 1.5 TeV and suppose that they are ac-
+cumulated in a nearby DM subhalo whose density distribution is described by the generalized
+NFW proﬁle [19], ρχ(r) ≡ ρs(r/rs)−γ(1+ r/rs)γ−3, with ρs = 100 GeV/cm3, rs = 0.1 kpc, and
+γ = 0.5 . We set the distance between the earth and the subhalo center as ds = 0.2 kpc . For
+the CRE spectra at source, the annihilation channel χχ→ e+e− produces e± ﬂux with exactly
+1.5 TeV energy, while the energy spectrum of e± from χχ→ µ+µ−(τ +τ−)→ e+e− channels is
+given by
+
+(cid:18) 5
+
+12
+
+(cid:19)
+
+1
+Ne
+
+dNe
+dEe
+
+(cid:39) 4
+Mχ
+
+− 3E2
+e
+4M 2
+χ
+
++
+
+E3
+e
+3M 3
+χ
+
+,
+
+(2.1)
+
+where the ﬁnal states e± arise from the 3-body-decays µ → e¯νeνµ or τ → e¯νeντ . We note
+that µ and τ share almost the same decay spectra due to their energy E = Mχ (cid:29) mµ, mτ ,
+except for their diﬀerent decay branching fractions Br[µ→ e¯νeνµ](cid:39) 100% and Br[τ → e¯νeντ ](cid:39)
+17.82%(cid:39) 1/5.6 [20]. The lifetime of ﬂying µ± with energy Eµ = 1.5 TeV is about 0.031s and
+could travel a distance about 9.36×106 m. The lifetime of τ± is shorter than µ± by another
+7 orders of magnitude. Thus, the distances which µ± and τ± ﬂuxes could travel before their
+decays are negligible as compared to rs and ds . So we can treat the initial e± ﬂuxes from all
+channels as produced at the source. For the ﬂux propagating from the source xs to a position
+
+5
+
+bkg+decay+peakbkg+decaybkgonly●decaybin■peakbin◆bkgbin105010050010005000050100150200250Ee[GeV]Ee3Φe[m-2s-1sr-1GeV2]DAMPEFitx , it can be formulated as
+
+Φe(Ee) =
+
+(cid:90)
+
+(cid:90)
+
+d3xs
+
+dEs G(x, Ee; xs, Es) Q(xs, Es) ,
+
+(2.2)
+
+where G(x, Ee; xs, Es) is the Green’s function and Q is the source function. (The propagation
+part will be further described in Section 2.3.) We ﬁt the e± and µ± (τ±) spectra together for
+the DAMPE data. This ﬁt gives χ2/d.o.f = 16.5/27 = 0.609 , which has a better quality than
+any other naive ﬁts (with the peak bin included).
+
+From the above ﬁt, we also derive the thermally averaged cross sections of the DM an-
+nihilations: (cid:104)σv(cid:105)e = 1.72× 10−26 cm3/s and (cid:104)σv(cid:105)µ + 0.178(cid:104)σv(cid:105)τ = 1.47× 10−25 cm3/s . Their
+ratio (with 1σ bound) is given by y = yµ + yτ = 8.6+1.4−2.5 , where yµ = (cid:104)σv(cid:105)µ/(cid:104)σv(cid:105)e and
+yτ = 0.178(cid:104)σv(cid:105)τ /(cid:104)σv(cid:105)e . We further deduce the 90% conﬁdence limit (C.L.), y = 2.6 − 10.8 .
+For lepton portal DM models [10, 21], we derive a non-trivial bound on the lepton-DM-
+mediator couplings λj (j = e, µ, τ ) [16],
+
+(cid:18)
+
+(cid:19)1
+
+4
+
+λe :
+
+λ4
+µ +
+
+1
+6
+
+λ4
+τ
+
+= 1 : y
+
+1
+4 ,
+
+(2.3)
+
+with a fairly narrow range y 1
+
+4 (cid:39) 1.3−1.8 (90% C.L.).
+
+2.2. Physical Spectra for the CRE Backgrounds
+
+In the previous subsection, we discussed ﬁtting the CRE backgrounds with the empirical
+broken power-law formula as in Ref. [16]. For the current study, we will consider the physical
+components of the CRE backgrounds. The CRE backgrounds consist of the primary electrons
+from supernova remnants (SNR) and the secondary electrons/positrons produced by inelastic
+hadronic interactions of cosmic ray nuclei in the interstellar medium (ISM) [18]. They can be
+estimated numerically by the LIKEDM code [22].
+
+trum can be formulated as [22],
+
+The primary electrons are considered to mainly arise from the SNR. Their injection spec-
+
+(cid:19)−γ2(cid:34)
+
+(cid:18) Es
+
+1GeV
+
+(cid:18) Es
+
+Ebr2
+
+1 +
+
+(cid:19)2(cid:35)γ2−γ3
+
+2
+
+(cid:18)
+
+exp
+
+− Es
+Ecut
+
+(cid:19)
+
+,
+
+(2.4)
+
+dN
+dEs
+
+= Ae
+
+(cid:38) 20 GeV. To estimate the primary electron background spectrum after propagation,
+
+for Es
+we ﬁrst approximate the injection spectrum with a series of Gaussian kernels,
+
+n(cid:88)
+
+j=1
+
+dN
+dEs
+
+=
+
+Cj√
+2π σj
+
+exp
+
+−(Es−Ej)2
+
+2σ2
+j
+
+(cid:20)
+
+(cid:21)
+
+,
+
+(2.5)
+
+where Ej = 0.01×10(j−1)/7 GeV and σj = 0.15Ej for n = 50 [22]. The post-propagation ﬂux
+for each Gaussian kernel, Φi(Ee), is included in the LIKEDM code. For the present analysis,
+
+6
+
+n(cid:88)
+
+we will adopt its third set of the propagation parameters, in which the diﬀusion coeﬃcient
+is parametrized as D(x, E) = D0(E/4GeV)δ with D0 = 7.1×1028cm2/s and δ = 0.33 [22].
+Thus, we obtain the total primary electron ﬂux as a linear combination
+
+Φ(Ee) =
+
+CjΦj(Ee) .
+
+(2.6)
+
+j=1
+
+The secondary e+ ﬂux is computed according to the cosmic ray proton and Helium nuclei
+interactions with the ISM during their propagation. The secondary e− shares almost the same
+spectrum as the secondary e+, but has an additional suppression factor of 0.6 [22]. This
+spectrum is also provided by the LIKEDM code. Since the solar modulation eﬀect is only
+signiﬁcant in the low energy region E < 10 GeV, it can be neglected in our ﬁt.
+
+2.3. CRE Spectra from DM Annihilations
+
+We use the PPPC4DMID [23][24] package to calculate the electron spectra of the DM
+annihilation processes χχ → e+e− and χχ → µ+µ−(τ +τ−) → e+e−. The ﬁnal state radiation
+(FSR) in the DM annihilation process will soften the CRE spectra. In Fig. 2(a), we show the
+injection spectra before and after FSR as dashed and solid curves, respectively. For clarity of
+presentation, we also rescaled the spectra of µ± decay channel by an extra enhanecment factor
+of 50. Here we do not distinguish the spectra of µ± and τ± channels, since their shapes are
+rather similar except that the τ± channel is suppressed by the much lower branching fraction
+of the 3-body-decays of τ±.
+
+Next, we analyze the propagation of the e± ﬂux from the nearby DM subhalo. When
+traveling across the interstellar space, CREs experience diﬀusion and energy loss, as described
+by the following propagation equation,
+
+∂Ne
+∂t
+
+− ∂[b(x, E)Ne]
+
+− ∇(D(x, E)∇Ne) = Q ,
+
+(2.7)
+where Ne(Ee, t, x) is the number density distribution as a function of the e± energy Ee and
+the spacetime coordinates (t, x).
+
+∂E
+
+The energy loss, b(E) ≡ −dE/dt , is deﬁned as [23]:
+
+(cid:34)
+
+(cid:88)
+
+i
+
+(cid:35)
+
+b(x, E) =
+
+4σT
+3m2
+e
+
+E2
+
+uB(x) +
+
+u(i)
+γ (x, E)
+
+,
+
+(2.8)
+
+where uB = 1
+2B2 stands for the energy density contribution from the galactic magnetic ﬁelds,
+and u(i)
+is the energy density of photons from the CMB, starlight and dust-diﬀused infrared
+γ
+light. In the above equation, σT = 8πα2
+e) is the Thompson cross section. Since the
+size of the DM subhalo and its distance to earth are fairly small as compared to the galaxy
+size, we can ignore the x dependence of b . Furthermore, at the location of solar system, which
+
+em/(3m2
+
+7
+
+Figure 2: CRE energy spectrum at source and the ﬂuxes after their propagation to the earth.
+Plot (a) presents the injection spectra of the CRE from DM annihilations. The blue curves show the
+e± channel and the red curves present the µ± decay channel. The spectra after including the FSR
+are given by solid curves, while those without FSR are shown by dashed curves. For clarity, the
+spectra of µ± decay channel is rescaled by an enhanecment factor of 50. Plot (b) presents the CRE
+ﬂuxes after the propagation to the earth. For illustration, the thermally averaged annihilation cross
+section of each channel is chosen as (cid:104)σv(cid:105)e = 2.0×10−26 cm3/s and (cid:104)σv(cid:105)µ = 1.5×10−25 cm3/s, while
+the DM mass is set as Mχ = 1.5 TeV for both plots.
+
+is about 8 kpc away from our galaxy center, the galactic magnetic ﬁeld is B ∼ 10−6 G, and
+hence uB is negligible. Thus, the energy-loss term can be rewriten as
+
+(cid:80)
+
+3m2
+e
+
+4σT
+
+iu(i)
+
+γ
+
+E2 = b0
+
+(cid:18) E
+
+(cid:19)2
+
+GeV
+
+,
+
+(2.9)
+
+For the diﬀusion coeﬃcient D(x, E), we use the same parametrization as in Section 2.2.
+
+b(x, E) =
+
+with b0 = 10−16 GeV/s .
+
+After conversion of units, we have
+
+D(E) = 149
+
+(cid:18) E
+
+(cid:19)0.33
+
+GeV
+
+pc2/kyr .
+
+The right-hand-side of Eq.(2.7) is the e± source function,
+
+Q(x, Ee) = C
+
+(cid:104)σv(cid:105)ρ2
+M 2
+χ
+
+χ(x)
+
+dN
+dEe
+
+,
+
+(2.10)
+
+(2.11)
+
+where ρχ(x) is the DM density distribution, Mχ is the mass of the DM particle, (cid:104)σv(cid:105) is the
+thermally averaged annihilation cross section, and dN/dEe the e± is the energy spectrum
+from the DM annihilations. The coeﬃcient C = 1
+2 for Majorana
+DM [17]. For the current illustration, we will set C = 1
+In this work, we use
+the generalized NFW density proﬁle as in Ref. [16], ρχ(r) ≡ ρs(r/rs)−γ(1 + r/rs)γ−3, with
+ρs = 100 GeV/cm3, rs = 0.1 kpc and γ = 0.5. We set the distance between the earth and the
+
+4 for Dirac DM, and C = 1
+
+4 hereafter.
+
+8
+
+χχ→μ+μ-→e+e-,afterFSRχχ→e+e-,afterFSRχχ→μ+μ-→e+e-,beforeFSRχχ→e+e-,beforeFSR2005001000200002×1074×1076×1078×1071×108Ee[GeV]Ee3dN/dEe[GeV2](a)CREInjectionsatSourceχχ→μ+μ-→e+e-χχ→e+e-20050010002000020406080100Ee[GeV]Ee3Φe[m-2s-1sr-1GeV2](b)CREFluxesAfterPropagationcenter of the subhalo as ds = 0.2 kpc.
+
+The propagation function (2.7) can be solved with the Green’s function [25],
+
+G(x, E; xs, Es) =
+
+exp[−|x − xs|2/λ2]
+
+b(E)(πλ2)3/2
+
+,
+
+(2.12)
+
+where Es is the e± energy at source, and E is the corresponding energy after propagation.
+The propagation scale λ is given by
+
+λ2 = 4
+
+.
+
+(2.13)
+
+(cid:90) Es
+dE(cid:48) D(E(cid:48))
+b(E(cid:48))
+
+E
+
+(cid:90)
+
+(cid:90)
+
+Then, the solution of Eq.(2.7) can be expressed as
+
+Ne(x, Ee) =
+
+d3xs
+
+dEsG(x, Ee; xs, Es)Q(xs, Es) .
+
+(2.14)
+
+Finally, the CRE ﬂux Φe is related to the density distribution Ne by
+
+Φe(x, Ee) ≡ 1
+4π
+
+Ne(x, Ee)v(Ee) ,
+
+(2.15)
+where v(Ee) is the velocity of electron with energy Ee. Since Ee (cid:29) me holds for the DAMPE
+data, we have v (cid:39) c .
+In Fig. 2(b), we plot the CRE ﬂux from all channels after e± signals
+propagate to the earth. For illustration, we chose the thermally averaged annihilation cross
+section of each channel to be (cid:104)σv(cid:105)e = 2.0×10−26cm3/s and (cid:104)σv(cid:105)µ = 1.5×10−25cm3/s, and set
+the DM mass Mχ = 1.5 TeV.
+
+2.4. Fitting Event Excesses in CRE Spectrum
+
+The total e± ﬂux contains three parts, i.e., Φe ≡ Φbkg +Φdecay +Φpeak, where the ﬂux Φbkg
+denotes the CRE backgrounds, Φdecay arises from the decay contributions of the µ± (τ±) as
+produced from the DM annihilations, and Φpeak is the contribution of e± as produced by the
+DM annihilations. We ﬁt the DAMPE data points by minimizing the χ2 function,
+
+(cid:34)
+
+(cid:88)
+
+j
+
+1
+σj
+
+(cid:32)
+Φj −
+
+(cid:90) Eu
+
+j
+
+El
+j
+
+dE
+
+Φe(E)
+j −El
+Eu
+
+j
+
+(cid:33)(cid:35)2
+
+χ2 =
+
+(2.16)
+
+where Φj, σj, El
+energy bounds of the jth bin, respectively.
+
+j and Eu
+
+j stand for the detected CRE ﬂux, the error, the lower and upper
+
+Our best-ﬁt result gives the DM mass Mχ = 1.54 TeV, and the thermally averaged annihi-
+
+lation cross sections:
+
+(cid:104)σv(cid:105)e = 1.54×10−26cm3/s ,
+(cid:104)σv(cid:105)µτ = (cid:104)σv(cid:105)µ + 0.178(cid:104)σv(cid:105)τ = 1.39×10−25cm3/s .
+
+(2.17a)
+
+(2.17b)
+
+9
+
+Figure 3: Plot (a): Improved ﬁt for the DAMPE CRE spectrum, with the central value of the ﬂavor
+ratio y = 9.0 . Plot (b): ∆χ2 as a function of the ﬂavor ratio y . The allowed ranges of the ﬂavor ratio
+are y = 9.0+8.4−4.2 (1σ) and 2.4 < y < 34.7 (90% C.L.). Plot (c): ∆χ2 contours for the DM annihilation
+cross sections of e± versus µ± (τ±) channels. The µ± (τ±) decay contribution is nonzero at 90% C.L.
+Plot (d): The cross sections (cid:104)σv(cid:105)e and (cid:104)σv(cid:105)µτ as functions of the ﬂavor ratio y .
+
+The ratio of cross sections between the ﬁnal state µ± (τ±) and the ﬁnal state e± is given
+by y = yµ + yτ (cid:39) 9.0 , with yµ = (cid:104)σv(cid:105)µ/(cid:104)σv(cid:105)e and yτ = 0.178(cid:104)σv(cid:105)τ /(cid:104)σv(cid:105)e . For the CRE
+background spectrum (2.4), this ﬁt gives the following parameters:
+Ae = 0.130 GeV−1,
+
+γ3 = 2.29, Ebr2 = 46.3 GeV, Ecut = 2.56 TeV.
+
+γ2 = 2.80,
+
+(2.18)
+
+The ﬁtting quality is given by χ2/d.o.f. = 19.6/26 = 0.756 , which is fairly good. We note that
+the largest deviation between the data and our model comes from the (1.1−1.3) TeV bin in
+Fig. 3(a), i.e., the black bin lying between the red bins and the blue peak bin, which is 2.8σ
+below the best ﬁt value in the blue curve. This contributes about 40% of the total χ2 value.
+We present our new ﬁt of the CRE spectrum including the µ± (τ±) decay contribution
+(red curve) and the peak signal (blue curve) in Fig. 3(a). Impressively, this demonstrates that
+including the µ± (τ±) decay events can fully explain this non-peak-like new excess over the
+
+10
+
+bkg+decay+peakbkg+decaybkgonly●DAMPE-decaybins■DAMPE-peakbin◆DAMPE-bkgbins105010050010005000050100150200250Ee[GeV]Ee3Φe[m-2s-1sr-1GeV2](a)DAMPEFit01020304001234yΔχ2(b)DAMPEFit0.000.050.100.150.200.250.300.00.51.01.52.02.53.0<σv>e[10-25cm3/s]<σv>μτ[10-25cm3/s](c)DAMPEFit90%C.L.68%C.L.(0.154,1.39)e±channalμ±(τ±)channal0102030400.050.10.515y<σv>[10-25cm3/s](d)DAMPEFitVarying Peak Signals
+
+(cid:104)σv(cid:105)e (10−25cm3/s)
+
+(cid:104)σv(cid:105)µτ (10−25cm3/s) Flavor Ratio y
+
+original value
+
++1σ upper value
+−1σ lower value
+
+0.154
+
+0.215
+
+0.094
+
+1.39
+
+1.30
+
+1.47
+
+9.0
+
+6.1
+
+15.7
+
+Table 1: Fluctuation of the peak signals versus the contribution of µ± (τ±) channel. When the
+number of peak signal events ﬂuctuates within ±1σ range, the contribution of the e± channel varies
+accordingly (2nd column), but the contribution of µ± (τ±) channel (3rd column) only changes by
+less than 6% and remains nearly the same in the ﬁt. The last column shows that the corresponding
+change of the ﬂavor ratio y is mainly due to the ﬂuctuation of peak signals.
+
+(0.6 − 1.1) TeV energy region.
+
+We can derive the constraints on the ﬂavor ratio y through marginalization. We scan the
+value of y in a wide range, and compute the ∆χ2 as a function of y . This is plotted as the blue
+curve in Fig. 3(b). We ﬁnd that the ﬂavor ratio with 1σ bounds is y = 9.0+8.4−4.2 , and its 90%
+conﬁdence limits are 2.4 < y < 34.7 .1 If we set y = 0 , the best ﬁt has its χ2 value increase to
+χ2/d.o.f. = 24.7/27 = 0.914 . For this case, the minimal χ2 increases by ∆χ2 = 5.02, in which
+the 5 non-resonant red bins contribute ∆χ2 = 4.68 . This shows that including the µ± (τ±)
+decay contribution (y > 0) for ﬁtting the 5 red bins does play an important role to improve
+the ﬁtting quality.
+
+In Fig. 3(c), we marginalize the two cross sections, (cid:104)σv(cid:105)e and (cid:104)σv(cid:105)µτ=(cid:104)σv(cid:105)µ+ 0.178(cid:104)σv(cid:105)τ ,
+which determines the ﬁnal state e± events from the 3-body decays of the ﬁnal states µ± and
+τ±. We show their 68% and 90% conﬁdence limits as the yellow and light blue contours,
+respectively. Our ﬁt demonstrates that a nonzero µ± (τ±) decay contribution is required at
+90% C.L.
+
+We also note that in Fig. 3(c), the shapes of the ∆χ2 contours are close to ellipses with
+two axes nearly parallel to the horizontal/vertical directions, which means that the statistical
+correlation between the cross sections is quite weak. This fact means that these two parameters
+may be ﬁtted independently. We illustrate this point in Table 1. Here we ﬂuctuate the number
+of peak signal events by ±1σ and ﬁnd that although the contribution of e± channel varies
+accordingly (2nd column), the contribution of µ± (τ±) channel only changes by less than 6%
+(3rd column) and remains nearly the same in the ﬁt. Then, we note that the ﬂavor ratio y
+(4th column) has signiﬁcant changes mainly due to the ﬂuctuation of peak signals. It shows
+that even if the annihilation rate to the e± channel and hence the value of the ﬂavor ratio y
+may change signiﬁcantly, the contribution from the non-resonant µ± (τ±) channel is largely
+
+1This improved analysis diﬀers from our previous ﬁt [16], where we made a separate background ﬁt, and then
+with the background parameter Ebr2 varying within its 90% limits we further ﬁtted the signal contributions.
+In the current analysis, we ﬁt the background parameters and signal parameters simultaneously, so it gives
+weaker but more reasonable limits.
+
+11
+
+independent of the event number in the peak bin and fairly robust. Finally, we note that the
+small change of the cross section (cid:104)σv(cid:105)µτ [ =(cid:104)σv(cid:105)µ+ 0.178(cid:104)σv(cid:105)τ ] in the above ﬁt mainly comes
+from the tension in the non-resonant bin of (1.1−1.3) TeV (which is on the left-hand-side of
+the peak bin). Namely, in Fig. 3(a) we see that this (1.1−1.3) TeV bin is signiﬁcantly below
+the blue curve; so reducing events in the peak bin will slightly soften the tension with this bin
+and thus allow more µ± (τ±) contribution. From the above analysis, we ﬁnd that the evidence
+of the non-peak excess can stand by itself, and is fairly independent of the peak excess.
+
+When making the χ2 ﬁt in Fig. 3(b) for each given y value, we also obtain the ﬁt values for
+other free parameters as functions of y, including the two cross sections. We explicitly plot the
+(cid:38) 9 the
+two ﬁtted cross sections in Fig. 3(d). From these curves, we observe that for y = yµ+ yτ
+µ± (τ±) decay contribution remains fairly ﬂat, and the cross section (cid:104)σv(cid:105)e drops roughly as
+y−1 . This means that for larger values of y , the contribution from µ± (τ±) decays is already
+maximized, so the increase of y is mainly caused by the decrease of the e± cross section (cid:104)σv(cid:105)e .
+The fact that the contribution of e± channel gets suppressed for large y is important for our
+γ ray analysis, which will be discussed in Section 4.
+
+2.5. Origin of Flavor Composition of CRE Spectrum
+
+From the analysis in Section 2.4, we ﬁnd that the original lepton ﬁnal state produced at
+a nearby source should have a ﬂavor composition ratio, Ne : (Nµ + 0.178Nτ ) = 1 : y , with the
+constrained range 2.4 < y < 34.7 at 90% C.L. (Our analysis here used the current improved
+ﬁt of y which diﬀers from our previous analysis [16] and is more reliable.) We note that in
+the above ratio, the τ component could only play a minor role due to the suppression by its
+small decay branching fraction Br[τ → e ¯νeντ ](cid:39) 17.82% . The simplest realization of this ﬂavor
+composition condition is Ne : Nµ : Nτ ≈ 1 : y : 0 , where all the non-peak excesses are given by
+the decay contribution of muon ﬂavor.
+
+The above ﬂavor composition condition will place important constraint on the lepton-
+related DM model building. For instance, we can consider the typical lepton portal DM
+models [10, 21], where the DM particle is either a fermion or scalar. For the case of fermionic
+DM, consider a neutral singlet Dirac fermion χ as the DM, which interacts with a scalar
+mediator S and the right-handed charged lepton (cid:96)Rj,
+Lχ ⊃ λjSj χ(cid:96)j + h.c.
+
+(2.19)
+
+where (cid:96)j = e, µ, τ . For the case of scalar DM, consider a neutral complex singlet scalar X as
+the DM particle and a Dirac fermion ψ as the mediator (which has the same electric charge
+and lepton number as the charged leptons). The relevant interaction Lagrangian is given by
+
+LX ⊃ λjXψj(cid:96)j + h.c.
+
+12
+
+(2.20)
+
+The above interactions will realize the DM annihilation process χ ¯χ → (cid:96)j(cid:96)j or XX → (cid:96)j(cid:96)j
+via the t-channel exchange of Sj or ψLj. We note that the cross section of DM annihilations
+is proportional to λ4
+j . For the above simplest realization of the ﬂavor composition condition,
+we can deduce Ne : Nµ : Nτ = λ4
+τ = 1 : y : 0 , where the ﬂavor ratio y is constrained
+within 2.4 < y < 34.7 at 90% C.L. Hence, this results in a simple coupling relation, λe : λµ :
+4 (cid:39) 1.2−2.4 . In general, including the possible decay contribution of τ
+λτ = 1 : y 1
+leptons, we infer the following condition for DM couplings,
+
+4 : 0 , with y 1
+
+µ : λ4
+
+e : λ4
+
+(cid:18)
+
+(cid:19)1
+
+4
+
+λe :
+
+λ4
+µ+
+
+1
+6
+
+λ4
+τ
+
+= 1 : y
+
+1
+4 .
+
+(2.21)
+
+4 (cid:39) 1.2− 2.4 (90% C.L.).
+where the ﬂavor ratio y is conﬁned into a rather narrow range y 1
+We may consider that the lepton-DM portal sector poses a µ−τ ﬂavor symmetry and thus
+realizes λµ = λτ . Then, we can use this to derive a neat coupling relation from Eq.(2.21),
+
+4 =(cid:0) 6
+7y(cid:1) 1
+
+λe : λµ : λτ = 1 : ˜y
+
+(2.22)
+4 (cid:39) 1.2−2.3 . This constraint provides important guideline for the DM model
+with ˜y 1
+buildings. It is encouraging to further apply this analysis for testing DM interactions with
+leptons.
+
+4 : ˜y
+
+1
+
+1
+4 ,
+
+2.6. Impacts of DAMPE Future Running
+
+Up to the end of 2019, the DAMPE satellite had accumulated data for 4 years, and is
+expected to run up to 6 years or even longer. As the data size grows, the statistical errors
+will decrease. Assuming the same central values of the detected CRE ﬂuxes, the statistical
+errors will scale with time as σstat∝ t−1/2. This means that the statistical errors of the 4-year
+
+data is reduced to (cid:112)1.5/4 (cid:39) 61% of that of the released data in 2017 [8], and the 6-year
+measurements will reduce the statistical errors to(cid:112)1.5/6 = 50% . We assume that the same
+
+systematical errors as before.
+
+We redo the ﬁt for the projected 6-year data taking of DAMPE, and present the results in
+
+Fig. 4(a). This new ﬁt gives
+
+Ae = 0.106 GeV−1,
+
+γ2 = 2.73,
+
+γ3 = 2.27, Ebr2 = 57 GeV, Ecut = 2.46 TeV,
+
+(2.23)
+
+for the background parameters, together with the DM mass Mχ = 1.54 TeV, and the DM
+annihilation cross sections (cid:104)σv(cid:105)e = 1.52× 10−26cm3/s and (cid:104)σv(cid:105)µτ = 1.22× 10−25cm3/s . For
+the ﬁtting quality, we have χ2/d.o.f. = 51.6/26 = 1.98 . The increased χ2 value of this ﬁt is
+mainly due to the reduction of the statistical errors of the 6-year data taking. The ∆χ2 as a
+function of the ﬂavor ratio y is plotted in Fig. 4(b). We obtain the ﬂavor ratio y = 8.0+3.9−3.0
+(1σ) and 3.4 < y < 15.7 at 90% C.L. For the case of y = 0 , we ﬁnd that χ2 increases by
+
+13
+
+Figure 4: Fits of DAMPE CRE spectra for projected 4-year and 6-year data taking. Plot (a): Fitting
+the DAMPE data with the projected 6-year data taking, which reduces the current statistical errors
+by 50%. (Accordingly, the error bars are smaller than those in Fig. 3(a) by about a factor of 1/2
+at high energies.) Plot (b): Marginalization of y for the projected 6-year data taking of DAMPE,
+which gives the constraints on the ﬂavor ratio y = 8.0+3.9−3.0 (1σ) and 3.4 < y < 15.7 (90% C.L.).
+Plot (c): Fitting the DAMPE data with the projected 4-year data taking. Plot-(d): Marginalization
+of y for the projected 4-year data taking of DAMPE, which gives the bounds y = 8.4+4.6−3.3 (1σ) and
+3.3 < y < 18.2 (90% C.L.).
+
+∆χ2 = χ2(y = 0)−χ2
+min = 11.1, in which the 5 red bins provide ∆χ2 = 12.4 as the dominant
+contribution. The reason why the total increase ∆χ2 is less than the contribution from the 5
+red bins is because in certain bins the changes in ∆χ2 are negative.
+
+For comparison, we apply the same analysis to the projected 4-year DAMPE data. We
+present the results in Fig. 4(c)-(d). This ﬁt gives the DM mass Mχ = 1.54 TeV, and annihilation
+cross sections (cid:104)σv(cid:105)µτ = 1.28×10−25cm3/s and (cid:104)σv(cid:105)e= 1.53×10−26cm3/s . From Fig. 4(d), we
+derive bounds on the ﬂavor ratio, as y = 8.4+4.6−3.3 at 1σ level and 3.3 < y < 18.2 at 90% C.L.
+This ﬁt also gives corresponding background parameters,
+
+Ae = 0.116 GeV−1,
+
+γ2 = 2.76,
+
+γ3 = 2.28, Ebr2 = 52 GeV, Ecut = 2.50 TeV.
+
+(2.24)
+
+It has the ﬁtting quality χ2/d.o.f. = 39.6/26 = 1.52 .
+
+14
+
+bkg+decay+peakbkg+decaybkgonly●DAMPE-decaybins■DAMPE-peakbin◆DAMPE-bkgbins105010050010005000050100150200250Ee[GeV]Ee3Φe[m-2s-1sr-1GeV2](a)DAMPEFit(6years)0510152001234yΔχ2(b)DAMPEFit(6years)bkg+decay+peakbkg+decaybkgonly●DAMPE-decaybins■DAMPE-peakbin◆DAMPE-bkgbins105010050010005000050100150200250Ee[GeV]Ee3Φe[m-2s-1sr-1GeV2](c)DAMPEFit(4years)0510152001234yΔχ2(d)DAMPEFit(4years)3. Comparison with Other CRE Detections
+
+In this section, we will extend our analysis of Section 2 to further combine the CRE mea-
+surement of Fermi-LAT [6] in Section 3.1, and then compare it with the recent data from
+AMS-02 [5] and CALET [7] in Section 3.2.
+
+3.1. Combined Fit with Fermi-LAT
+
+We note that the CRE measurement by Fermi-LAT [6] shows good consistency with the
+DAMPE result [8] even for the high energy region. We observe that the CRE spectrum of
+Fermi-LAT exhibits a rise around (0.6− 1.2) TeV region, which is consistent with the non-
+resonant excess (5 red bins) of the DAMPE result in Fig. 1, and thus may hint the µ± (τ±)
+decay signals. Although the Fermi-LAT data do not show a clear peak-like signal around
+(1.3−1.5) TeV (unlike DAMPE), this is still consistent because the energy resolution of Fermi-
+LAT is about (10−20)% [6] above 1 TeV energy scale, and is much larger than the DAMPE
+energy resolution (1−2)% [8, 9].
+
+In the following, we will make a combined ﬁt for both the DAMPE data (25 GeV−2.6 TeV)
+and the Fermi-LAT data with the high energy (HE) selection (42 GeV−2.1 TeV). For this, we
+deﬁne the total χ2 as follows,
+
+χ2 = χ2(DAMPE) + χ2(Fermi-LAT)
+
+(cid:34)
+(cid:88)
+
+j
+
+=
+
+(cid:90) EuD
+
+j
+
+ElD
+
+j
+
+j −
+ΦD
+
+1
+σD
+j
+
+ΦD
+e (E)
+j − ElD
+EuD
+
+j
+
+dE
+
+(cid:33)(cid:35)2
+
++ (D ↔ F) ,
+
+(3.1)
+
+(cid:32)
+
+(cid:90)
+
+where the superscript D (F) stands for DAMPE (Fermi-LAT), and the quantities Ej, El
+σj and Φj are the same as those deﬁned in Eq.(2.16).
+
+The DAMPE detector has high energy resolution of (1−2)% [8, 9], so we have ΦD
+
+e (cid:39) Φe
+for DAMPE data, where Φe is the original CRE ﬂux spectrum. But for Fermi-LAT data,
+because the energy resolution is much lower than DAMPE, we should take it into account for
+the measured ﬂux ΦF
+e . The energy resolution can be described by a Gaussian distribution.
+For the Fermi-LAT data, we convolve Φe with this Gaussian distribution through the integral,
+
+j, Eu
+j ,
+
+e (EF) ≡
+ΦF
+
+Φe(E)
+
+1√
+2π∆E
+
+exp
+
+dE ,
+
+(3.2)
+
+(cid:20)
+−(EF−E)2
+
+(cid:21)
+
+2∆2
+E
+
+where ∆E is the energy resolution at a given energy E . The speciﬁc values of ∆E (as a
+function of E) are adopted from Fig. 10 of Ref. [6].
+
+We ﬁt the DAMPE data and Fermi-LAT data by minimizing the combined χ2. The quality
+
+of the best ﬁt is χ2/d.o.f. = 61.0/53 (cid:39) 1.15 . The ﬁt gives the background parameters,
+
+Ae = 0.762 GeV−1,
+
+γ2 = 3.42,
+
+γ3 = 2.28, Ebr2 = 28 GeV, Ecut = 3.09 TeV,
+
+(3.3)
+
+15
+
+Figure 5: Combined ﬁt of CRE energy spectra for both DAMPE and Fermi-LAT data. Plot (a): The
+best-ﬁt result is compared with the DAMPE data points (with error bars). Plot (b): The same best-
+ﬁt result is convolved with Fermi-LAT’s energy resolution (marked as “smeared”), and is compared
+with the Fermi-LAT data points (with error bars). Plot (c): The ∆χ2 values versus y from our ﬁt,
+which gives y = 6.6+4.9−2.8 at 1σ and 2.2 < y < 18.1 at 90% C.L.
+as well as the DM mass Mχ = 1.54 TeV, and annihilation cross sections (cid:104)σv(cid:105)µτ = 1.07×
+10−25cm3/s and (cid:104)σv(cid:105)e = 1.61×10−26cm3/s . In Fig. 5, we present our ﬁt of both ﬂuxes ΦD (for
+DAMPE data) and ΦF (for Fermi-LAT data) in the plots (a) and (b), respectively. These arise
+from the same ﬁt, but due to the convolution with the energy resolution of Fermi-LAT, the
+shape of the curve of ΦF [plot (b)] is not identical to that of ΦD [plot (a)].
+
+Furthermore, we plot ∆χ2 as a function the ﬂavor ratio y in Fig. 5(c). From this, we derive
+the 1σ bound on the ﬂavor ratio y = 6.6+4.9−2.8, and the 90% C.L. bound, 2.2 < y < 18.1 . We
+note that the case of y = 0 worsens the ﬁt quality considerably, with the χ2 value increasing
+by 5.9 . This indicates again that including the µ± (τ±) decay contribution is favored by the
+combined data of DAMPE and Fermi-LAT.
+
+Finally, for comparison, we summarize in Table 2 our ﬁts of the CRE energy spectra for the
+current DAMPE data, the projected 4-year and 6-year running of DAMPE, and the combined
+data set of DAMPE+Fermi-LAT.
+
+16
+
+bkg+decay+peakbkg+decaybkgonly●decaybin■peakbin◆bkgbin105010050010005000050100150200250Ee[GeV]Ee3Φe[m-2s-1sr-1GeV2](a)DAMPE+FermiLATFitbkg+decay+peakbkg+decaybkgonly●FermiLAT-bkgbins●FermiLAT-decaybins●FermiLAT-peakbins105010050010005000050100150200250Ee[GeV]Ee3Φe[m-2s-1sr-1GeV2](b)DAMPE+FermiLATFit(smeared)0510152001234yΔχ2(c)DAMPE+FermiLATFitExperiments
+
+χ2/d.o.f
+
+Mχ (TeV)
+
+DAMPE
+
+19.6/26=0.756
+
+DAMPE (in 4y)
+
+39.6/26=1.52
+
+DAMPE (in 6y)
+
+51.6/26=1.98
+
+DAMPE+Fermi-LAT
+
+61.0/53=1.15
+
+1.54
+
+1.54
+
+1.54
+
+1.54
+
+(cid:104)σv(cid:105)e
+0.154
+
+0.153
+
+0.152
+
+0.161
+
+(cid:104)σv(cid:105)µτ
+1.39
+
+1.28
+
+1.22
+
+1.07
+
+y
+
+9.0+8.4−4.2
+8.4+4.6−3.3
+8.0+3.9−3.0
+6.6+4.9−2.8
+
+Table 2: Comparison of the ﬁtting results for DAMPE and Fermi-LAT experiments. The second row
+presents our ﬁt of the current DAMPE data, the third (fourth) row shows the ﬁt for the projected 4-
+year (6-year) data taking of DAMPE, and the ﬁfth row gives our combined ﬁt of the current DAMPE
+and Fermi-LAT data. The fourth and ﬁfth columns summarize the best ﬁts of DM annihilation cross
+sections via e± and µ± (τ±) channels, respectively (in the unit of 10−25cm3/s). The last column
+shows the central value and the 1σ bounds of the ﬂavor ratio y = (cid:104)σv(cid:105)µτ /(cid:104)σv(cid:105)e .
+
+3.2. Comparison with AMS-02 and CALET
+
+In this subsection, we will further compare our DAMPE analysis (Section 2) with the
+
+AMS-02 and CALET data.
+
+The CALET collaboration gave a recent update of its CRE measurement over the energy
+range (0.011−4.8)TeV in June, 2018 [7]. The CRE spectrum of CALET is consistent with a
+break at 0.9 TeV (as found by the DAMPE observation [8]). The CALET data do not show a
+peak structure around (1.3−1.5) TeV, but it is premature to draw any ﬁrm conclusion since
+CALET still has sizable statistical uncertainties beyond 1 TeV energy. The AMS collaboration
+published new precision measurements of cosmic ray electrons up to 1.4 TeV in March, 2019 [5].
+Together with their positron measurement published in January, 2019, the CRE spectrum of
+AMS-02 shows agreement with the CALET result [7] up to 1 TeV. However, this measurement
+does not reach the energy region of the peak excess shown by DAMPE data. We can hardly
+compare the non-peak excess of DAMPE with the AMS-02 result as well, because the latter
+only shows two data points over the energy region (0.6 − 1.1) TeV.
+
+In view of the current situation discussed above, we need not to ﬁt all the DM parameters
+with the AMS-02 and CALET data in this subsection. Instead, we will just test a few bench-
+mark cases motivated by our analysis in Section 2.4. We combine the CALET data (using the
+same energy binning as DAMPE analysis) with the AMS-02 data (electron + positron), and
+apply the χ2 ﬁt to the following three cases:
+(a). There is only background CRE ﬂux without assuming any e± signals from the DM
+
+annihilation.
+
+(b). There exist e± signals from the DM annihilations, with the DM mass Mχ = 1.535 TeV,
+the annihilation cross section (cid:104)σv(cid:105)e = 1.54×10−26cm3/s and the ﬂavor ratio y = 9.0 as
+given by the best ﬁt of Section 2.4.
+
+(c). Same as Case-(b), but the DM mass is allowed to vary within the range Mχ∈ [1.7, 1.9] TeV.
+
+17
+
+Figure 6: Combined ﬁt of the CRE energy spectra from AMS-02 and CALET. In each plot, the
+AMS-02 (CALET) data are shown as green (black) dots, including their 1σ error bars. Plot (a): The
+best ﬁt without DM contribution, deﬁned as Case-(a) in the text, with χ2/d.o.f. = 36.32/64 = 0.567.
+Plot (b): The best ﬁt of CALET in Case-(b) with χ2/d.o.f. = 43.95/61 = 0.721, where we input
+the best-ﬁt of the ﬂavor ratio y from DAMPE data as in Section 2.4. Plot (c): The best ﬁt of Case-
+(c) which includes the DM mass for ﬁt and gives Mχ = 1.745 TeV. The corresponding ﬁt quality,
+χ2/d.o.f. = 37.39/61 = 0.613, is comparable to Case-(a).
+
+For the above three cases, our ﬁts have the ﬁt quality
+
+χ2/d.o.f. = (36.32/64, 43.95/61, 37.39/61) (cid:39) (0.567, 0.721, 0.613),
+
+(3.4)
+
+respectively. Also, the ﬁt of Case-(c) gives the DM mass Mχ = 1.745 TeV. We see that adding
+the dark matter contribution does not aﬀect much the ﬁtting quality. We present the ﬁtted
+CRE energy spectra for the three cases in plots (a)-(c) of Fig. 6.
+
+Inspecting the CALET CRE spectrum alone, we note that there apppear two broad ex-
+cesses around the windows (0.75− 1.2) TeV and (1.5− 2.0) TeV. The ﬁrst one is not only
+compatible with AMS-02 data, but also coincide with the non-peak excess range of DAMPE
+as we uncovered in Fig. 1 (the 5 red bins). The second excess is around the energy window
+somewhat higher than the peak excess of DAMPE (the blue bin in Fig. 1), but our ﬁt shows
+
+18
+
+fittedcurve(w/oDM)●AMS-02data●CALETdata105010050010005000050100150200250Ee[GeV]Ee3Φe[m-2s-1sr-1GeV2](a)AMS-02+CALETFitbkg+decay+peakbkg+decaybkgonly●AMS-02data●CALETdata105010050010005000050100150200250Ee[GeV]Ee3Φe[m-2s-1sr-1GeV2](b)AMS-02+CALETFitbkg+decay+peakbkg+decaybkgonly●AMS-02data●CALETdata105010050010005000050100150200250Ee[GeV]Ee3Φe[m-2s-1sr-1GeV2](c)AMS-02+CALETFitFigure 7: Final state radiation (FSR) spectra for e±, µ± and τ± (with 1.54 TeV energy), shown as
+(blue, black, red) curves, respectively. The τ± channel (red curve) dominates the sub-TeV region, so
+its fraction will be strongly constrained.
+
+that it can match a peak structure from the DM signals with mass Mχ = 1.745 TeV.
+
+The current CRE spectra of DAMPE and CALET data show some diﬀerent features,
+especially at energies around 1.5 TeV, which are yet to be resolved after collecting much
+larger data samples in the near future. But such diﬀerences are not signiﬁcant given the
+much larger error bars of CALET data at energies above 1 TeV. Regardless of the unknown
+systematic eﬀects, our above analysis still shows some compatible spectral features between
+these experimental data, which may be the hint of certain dark matter annihilation processes
+nearby and are worth of attention. Hence, the upcoming data of the on-going DAMPE and
+CALET measurements will be extremely helpful.
+
+4. Gamma Ray Constraints from Fermi-LAT
+
+In this section, we analyze constraints on the DM annihilation signals from the γ-ray mea-
+surements of Fermi-LAT. There have been some discussions on possible constraints from the
+γ-ray observations [26]. Most of the literatures assumed point-like sources of the γ-ray emis-
+sion from the nearby subhalo. But such a nearby subhalo is in fact a largely extended object,
+so more dedicated search and analysis are necessary. The γ-rays produced by the leptons from
+DM annihilations consist of two main components, the prompt γ-rays and the secondary γ-
+rays. The former are emitted during the DM annihilations, including the ﬁnal state radiation
+and photons from the hadronic decays of τ leptons. The latter case is the secondary emission,
+mainly due to the Inverse Compton Scattering (ICS) emission of electrons/positrons when
+propagating in the interstellar radiation ﬁeld. For the nearby subhalo scenario considered in
+the present study, the ICS γ-rays are less than 1% and thus negligible as compared to the
+prompt γ-rays [26]. Thus, we will focus on the prompt γ-rays in this analysis.
+
+19
+
+e±μ±τ±10501005001000050100150200250300Ee[GeV]Ee2dN/dEe[GeV]FSRSpectraAngular Radius θ0
+
+0.1◦
+
+1.0◦
+
+10◦
+
+Integrated J Factor (1020 GeV2cm−5)
+Averaged J Factor (1025 GeV2cm−5sr−1)
+
+2.819
+
+146.5
+
+3138
+
+2.946
+
+1.531
+
+0.3288
+
+Table 3: Typical values of the integrated and averaged J factors.
+
+4.1. Prompt Gamma Rays
+
+We apply the PPPC4DMID code [23] to compute the energy spectra of the prompt photon
+emissions, as shown in Fig. 7. The τ± channel signiﬁcantly diﬀers from that of the e± and µ±
+channels, because of the π0 products from τ± decays. For the e± and µ± channels, the ﬁnal
+state radiation (FSR) comes from the internal bremsstrahlung radiation only. In Sections 2
+and 3, we have determined the value of the ﬂavor ratio y , which is a combination of the µ±
+fraction and the τ± fraction, through ﬁtting to the CRE data. The γ-ray data are expected
+to give further constraints on the τ± fraction due to its abundant photon production.
+
+4.2. The J factor
+
+The expected photon ﬂux from the DM annihilations in a nearby subhalo is given by
+
+In the above, the J factor is deﬁned as
+
+J(θ) =
+
+ds ρ2
+
+χ(r) ,
+
+distance from a point on l.o.s. to the subhalo center, and s =(cid:112)r2+ d2
+
+where θ is the angle between the line-of-sight (l.o.s.) and the subhalo center, r is the radial
+s− 2rdscos θ is the l.o.s.
+
+l.o.s.
+
+distance to the observer.
+
+For convenience, we ﬁt the distribution of lnJ as a function of ln θ, and obtain
+
+ln[J(θ)] = C − 0.479507 ln θ − 0.12386(ln θ)2 − 0.0265383(ln θ)3,
+
+(4.3)
+where J is in unit of 1020 GeV2cm−5 and θ is in unit of degrees. The constant C is irrelevant
+here, since we are going to use a normalized skymap in the data analysis. The error of this
+parametrization as compared to the numerical integral of Eq.(4.2) is less than 2.5% for the
+angular range θ < 20◦.
+
+We present in Fig. 8 the skymap of the normalized J factor distribution of the subhalo in a
+40◦×40◦ region, which will be used in the analysis of Fermi-LAT data in the next subsection.
+
+In Table 3, we list some typical values of the integrated J factor(cid:82)JdΩ in the second row and
+the averaged J factor(cid:82)JdΩ /(cid:82)dΩ in the third row.
+
+20
+
+(cid:88)
+(cid:104)σv(cid:105)f
+
+dNf
+dE
+
+.
+
+d2Φγ
+dΩdE
+
+=
+
+16πM 2
+χ
+
+f
+
+J
+
+(cid:90)
+
+(4.1)
+
+(4.2)
+
+Figure 8: Skymap of the normalized J factor for the DM subhalo used in our CRE ﬁts. The vertical
+legend shows normalized J values with the corresponding colors in the plot.
+
+4.3. Gamma Ray Searches with Fermi-LAT
+
+We use the Pass 8 data recorded by Fermi-LAT between August 4, 2008 and July 2, 2018
+to search for possible γ-ray emission from such a DM subhalo. We restrict our study with the
+CLEAN event class (evclass = 256 and evtype = 3). To reduce the impact from the Earth limb,
+the events with zenith angles > 90◦ are excluded. We perform the searches (in a series of sky di-
+rections) within regions of interest (ROIs) centered at galactic coordinates ((cid:96), b) = (0◦, ±90◦),
+(0◦, ±70◦), (90◦, ±70◦), (180◦, ±70◦), (270◦, ±70◦), (0◦, 0◦), (0◦, 30◦), and (120◦, 45◦), re-
+spectively. The ROI radius is chosen to be 20◦. For most of ROIs, the energy range is chosen
+as 100 MeV−500 GeV. Since the expected signal appears mainly in the high energy band, we
+perform the analysis in the range (1−500) GeV for ROIs (0◦, 30◦) and (120◦, 45◦), and the
+range (10−500) GeV for the ROI (0◦, 0◦), in order to speed up the analysis. For the (0◦, 0◦)
+case, a higher energy threshold can also reduce the impact from the reported Galactic center
+GeV γ-ray excesses [27].
+
+We use the standard binned likelihood method with the science tool version v10r0p5.2 The
+model includes point sources from the 3FGL catalog [28], the diﬀuse background templates
+gll iem v06 and iso P8R2 CLEAN V6 v06,3 as well as our postulated DM subhalo. If no clear
+signal is found, the 95% conﬁdence upper limits (UL) on the annihilation cross section are
+derived (cf. Appendix A for detail). The mass of the DM particle is ﬁxed to be Mχ= 1.54 TeV.
+We study the following benchmark cases for the DM annihilation:
+(a). (cid:104)σv(cid:105)e = (cid:104)σv(cid:105)µ = (cid:104)σv(cid:105)τ = 0, which corresponds to background only;
+(b). (cid:104)σv(cid:105)e = free, (cid:104)σv(cid:105)µ = (cid:104)σv(cid:105)τ = 0 ;
+2http://fermi.gsfc.nasa.gov/ssc/data/analysis/software/
+3http://fermi.gsfc.nasa.gov/ssc/data/access/lat/BackgroundModels.html
+
+21
+
+(c). (cid:104)σv(cid:105)µ = free, (cid:104)σv(cid:105)e = (cid:104)σv(cid:105)τ = 0 ;
+(d). (cid:104)σv(cid:105)τ = free, (cid:104)σv(cid:105)e = (cid:104)σv(cid:105)µ = 0 ;
+(e). (cid:104)σv(cid:105)e = (cid:104)σv(cid:105)µ = (cid:104)σv(cid:105)τ = free, which corresponds to Ne : Nµ : Nτ = 1 : 1 : 1 ;
+(f). (cid:104)σv(cid:105)e = 1.54×10−26cm3/s, (cid:104)σv(cid:105)µ = free, (cid:104)σv(cid:105)τ = 0 ;
+(g). (cid:104)σv(cid:105)e = 1.54×10−26cm3/s, (cid:104)σv(cid:105)µ = 0, (cid:104)σv(cid:105)τ = free ;
+(h). (cid:104)σv(cid:105)e = 1.54×10−26cm3/s, (cid:104)σv(cid:105)µ = free, (cid:104)σv(cid:105)τ = free ;
+(i). (cid:104)σv(cid:105)e = 1.54×10−26cm3/s, (cid:104)σv(cid:105)τ = free, (cid:104)σv(cid:105)µ = 1.39×10−25cm3/s − 0.178(cid:104)σv(cid:105)τ , which
+
+corresponds to y ≡ 9.0 .
+
+Here the Cases (a)-(e) are generic ﬁts, and the rest of cases are more or less motivated by our
+ﬁts to the DAMPE CRE data. For illustration, we summarize the ﬁtting results for ROIs
+(0◦, 30◦) and (90◦, 70◦) in Table 4, where we deﬁne the diﬀerence of log-likelihoods for a given
+Case-(j) as
+
+−∆lnLj = ln[L(background)] − ln[L(Case-j)] .
+
+(4.4)
+Note that a negative value of −∆lnLj indicates a better ﬁtting quality than the background-
+only ﬁt (corresponding to the Case-(a)). Further discussions are given in Appendix A. The
+full results of all the ROIs are summarized in Appendix B.
+
+We ﬁnd that in general there lacks any DM signal from the selected ROIs. The corre-
+sponding upper limits (ULs) on the thermally averaged annihilation cross sections are derived
+to be about (0.1−1)×10−25 cm3 s−1 for the e± and µ± channels, and 1−2 orders of magnitude
+stronger for τ± channel. These limits depend on the directions of the sky regions which have
+diﬀerent background intensities. The weakest constraints come from the direction towards
+the Galactic center region, where the backgrounds are the highest. For instance, when the
+DM subhalo is located at high galactic latitude such as the ROI (90◦, 70◦), the existence of
+such a DM subhalo may be marginally constrained by the data. On the other hand, when the
+DM subhalo sits at low galactic latitudes such as the ROI (0◦, 30◦), we see that the annihila-
+tion channels χχ→ e+e−, µ+µ− are still allowed, but as expected, the channel χχ→ τ +τ− is
+strongly constrained.
+
+The Cases (f)-(h) which can potentially explain the peak excesses of the DAMPE measure-
+ment are generally consistent with the Fermi-LAT data. Only in a few ROIs the inclusion of
+such a DM component leads to slight tension with the data (−∆lnL (cid:46) 3.5 ). The Case-(i)
+is proposed to explain both the peak excess around 1.4 TeV and the non-peak feature below
+1 TeV, which can be further constrained by the Fermi-LAT data. But, when the subhalo is
+located in low galactic latitude regions (such as b < 30◦), this case is also consistent with the
+Fermi-LAT data. Whenever τ± channel is open, it is shown that the τ± fraction in the DM
+annihilation ﬁnal states is severely constrained. This also provides important guideline for the
+DM model building.
+
+22
+
+Case −∆lnL
+
+(a)
+(b)
+(c)
+(d)
+(e)
+(f)
+(g)
+(h)
+(i)
+
+0.00
+−0.05
+−0.30
+0.00
+0.00
+−0.15
+−0.05
+−0.17
+0.79
+
+Case −∆lnL
+
+(a)
+(b)
+(c)
+(d)
+(e)
+(f)
+(g)
+(h)
+(i)
+
+0.00
+0.00
+0.00
+0.00
+0.00
+2.93
+2.93
+2.93
+28.66
+
+best ﬁt
+0.16±0.54
+
+/
+
+/
+/
+10−8
+0.154
+0.154
+0.154
+0.154
+
+UL
+/
+
+1.11
+
+/
+/
+
+0.071
+
+/
+/
+/
+/
+
+/
+/
+
+0.54±0.72
+
+0.34±0.72
+0.34±0.72
+
+/
+
+/
+same as e±
+
+/
+
+UL
+/
+/
+
+1.79
+
+1.58
+
+/
+
+1.60
+1.39
+
+1.39
+((cid:96), b) = (90◦, 70◦)
+
+((cid:96), b) = (0◦, 30◦)
+
+e± channel
+
+µ± channel
+best ﬁt
+
+e± channel
+
+best ﬁt
+
+/
+
+10−11
+
+/
+/
+10−9
+0.154
+0.154
+0.154
+0.154
+
+UL
+/
+
+0.072
+
+/
+/
+
+0.011
+
+/
+/
+/
+/
+
+µ± channel
+best ﬁt
+
+/
+/
+
+10−12
+
+UL
+/
+/
+
+0.087
+
+/
+
+/
+same as e±
+10−10
+
+0.083
+
+/
+
+10−10
+1.39
+
+/
+
+0.083
+1.39
+
+best ﬁt
+
+τ± channel
+UL
+/
+/
+/
+
+/
+/
+/
+10−7
+same as e±
+/
+/
+10−7
+10−7
+10−8
+
+0.066
+0.061
+0.037
+
+0.076
+
+best ﬁt
+
+τ± channel
+UL
+/
+/
+/
+
+/
+/
+/
+
+0.015
+
+10−11
+same as e±
+/
+/
+
+10−11
+10−12
+10−9
+
+0.014
+0.014
+0.011
+
+Table 4: Likelihood analysis for selected ROIs with ((cid:96), b) = (0◦, 30◦) and (90◦, 70◦). Columns from
+left to right correspond to the model ﬂags, −∆lnL , the best-ﬁt and the 95% C.L. upper limits (ULs)
+of the cross sections (in unit of 10−25cm3 s−1) for each channel, respectively.
+
+4.4. Constraints on τ± Fraction
+
+In this subsection we consider the ﬂavor ratios yµ = (cid:104)σv(cid:105)µ/(cid:104)σv(cid:105)e and yτ = 0.178(cid:104)σv(cid:105)τ /(cid:104)σv(cid:105)e.
+We scan the parameter space of the full plane of yµ− yτ to further pin down the viable region
+for the ﬂavor ratios in certain ROIs.
+
+In Fig. 9(a), we plot the result in the ROI with ((cid:96), b) = (0◦, 30◦). We scan the values of
+(yµ, yτ ) in the regions yµ ∈ [0, 20] and yτ ∈ [0, 0.20]. As for the cross sections, we apply the
+ﬁt relation for ytotal versus (cid:104)σv(cid:105)e as in Fig. 3(d), rather than using the ﬁxed value (cid:104)σv(cid:105)e =
+1.54×10−26cm3/s . For the Fermi-LAT data, the χ2 function is deﬁned as χ2(yµ, yτ ) = −2lnL ,
+and ∆χ2 is the variation from its best ﬁt point. In Fig. 9(a), we present the allowed regions
+by the γ-ray data of Fermi-LAT, in the (yµ, yτ ) plane at 68% (red region) and 90% (pink
+region) conﬁdence limits. In the same (yµ, yτ ) plane, we present the DAMPE constraints from
+Fig. 3(b) as the blue region (light blue region) at 68% (90%) conﬁdence limit. We see that for
+
+23
+
+Figure 9: Allowed regions in the plane of ﬂavor ratios yµ− yτ .
+In each plot, the red region (pink
+region) are allowed by the γ-ray constraints of Fermi-LAT at 68% (90%) conﬁdence limit, while
+the blue region (light blue region) are allowed by the DAMPE constraints at 68% (90%) conﬁdence
+limit. Plot-(a) is for the ROI centered in ((cid:96), b) = (0◦, 30◦) and plot-(b) is for the ROI centered in
+((cid:96), b) = (90◦, 70◦).
+
+yτ = 0.035, the case of Ne : Nµ : Nτ (cid:39) 1 : 9.0 : 0.2 is fully allowed at 90% C.L. in this ROI.
+For the lepton portal DM models discussed in Section 2.5, this corresponds to the coupling
+relation, λe : λµ : λτ (cid:39) 1 : 1.7 : 0.7 .
+
+Note that as explained in Fig. 3(d) and Section 2.4, for a large ratio y , the combined
+contribution from the µ± (τ±) channels does not vary much as y increases, but the fraction of
+e± channel will drop. Thus, the total γ-ray ﬂux from e± channel will decrease, which allows
+more τ± contribution. This is why for the 90% C.L. contour of Fermi-LAT in Fig. 9(a), the τ±
+(cid:38) 10 . We see that in the ROI with ((cid:96), b) = (0◦, 30◦), the
+fraction rises up in the region of yµ
+90% C.L. pink region allowed by the Fermi-LAT γ-ray constraint has signiﬁcant overlap with
+that of the DAMPE CRE constraint.
+
+For comparison, we further show the contour plot in Fig. 9(b) for the ROI with ((cid:96), b) =
+(90◦, 70◦). It shows that in this case the Fermi-LAT γ-ray constraint is so strong that the DM
+subhalo scenario in this ROI is already excluded at the 90% C.L.
+
+5. Conclusions
+
+Detecting signals of TeV energy CREs has been an exciting frontier for many experimental
+activities in recent years [3]-[8]. These provide important means for probing the nearby galactic
+sources and the possible annihilations or decays of DM particles.
+
+In Section 2, extending our previous work [16], we performed a systematically improved
+analysis of the DAMPE CRE data, with focus on the new hidden excess of non-peak structure
+over the energy range (0.6 − 1.1) TeV (red bins in Fig. 1), in connection to the peak excess
+
+24
+
+DAMPEFermiLAT051015200.000.050.100.15yμyτ(a)(l,b)=(0°,30°)90%C.L.68%C.L.y=9.0DAMPEFermiLAT051015200.000.050.100.15yμyτ(b)(l,b)=(90°,70°)90%C.L.y=9.0around (1.3−1.5) TeV (blue bin in Fig. 1). We explain this new non-peak excess and the peak
+excess from the 1.5 TeV µ± (τ±) events and the 1.5 TeV e± events which are produced together
+from DM annihilations in a nearby subhalo, with the subsequent 3-body decays of µ± (τ±) into
+e± plus neutrinos (Fig. 2). We made an improved analysis of the CRE physical backgrounds
+which consist of CRE ﬂuxes from SNR and ISM. Then, we systematically analyzed the CRE
+spectra from the DM annihilations including the ﬁnal state photon radiations (which soften
+the CRE spectra), as shown in Fig. 2. Our improved ﬁt analysis demonstrates that the ﬂavor
+structure of the original lepton ﬁnal-state of DM annihilations in a nearby subhalo or clump
+should have a ﬂavor composition ratio Ne : (Nµ + 0.178Nτ ) = 1 : y with y = 9.0+8.4−4.2 (1σ
+bound) and 2.4 < y < 34.7 (90% C.L.) for the current DAMPE data, as shown in Fig. 3.
+Using this new ﬁt, we analyzed the lepton-portal DM models and deduced a bound on the
+4 (cid:39) 1.2− 2.4 .
+lepton-DM-mediator couplings λe : (λ4
+Such constraints are important for DM model buildings. We further analyzed the improved
+sensitivities from the projected 4-year and 6-year runnings of DAMPE detector, as presented
+in Fig. 4. We found that assuming the current central values of the CRE spectrum, the
+DAMPE 6-year running will constrain the lepton ﬂavor ratio to y = 8.0+3.9−3.0 at 1σ level and
+3.4 < y < 15.7 at 90% C.L., while the bounds from the 4-year running give y = 8.4+4.6−3.3 at 1σ
+level and 3.3 < y < 18.2 at 90% C.L.
+
+4 with a narrow range y 1
+
+4 = 1 : y 1
+
+µ + 1
+
+6λ4
+
+τ ) 1
+
+In Section 3, extending our analysis of Section 2, we further combined with the CRE mea-
+surement of Fermi-LAT [6], and then compare with the recent data from AMS-02 [5] and
+CALET [7]. We found that the new non-peak excess of DAMPE is consistent with the Fermi-
+LAT data [6]. The absence of the peak excess (∼1.4 TeV) at Fermi-LAT may be due to its
+much lower energy resolution above 1 TeV scale. Our combined ﬁt of the DAMPE and Fermi-
+LAT spectra is presented in Fig. 5 and constrains the ﬂavor ratio as y = 6.6+4.9−2.8 at 1σ level
+and 2.2 < y < 18.1 at 90% C.L. On the other hand, the data of AMS-02 [5] and CALET [7]
+show more diﬀerences from DAMPE, especially for the high energy range E > 500 GeV. Nev-
+ertheless, we observe that the CALET CRE spectrum shows two broad excesses around the
+energy windows (0.75− 1.2) TeV and (1.5− 2.0) TeV, although their statistical uncertainties
+are still rather sizable. The ﬁrst excess is compatible with the non-peak excess of DAMPE
+and the second excess lies at energies somewhat higher than the DAMPE peak excess. By
+inputting the DM mass Mχ= 1.78 TeV and using the DM cross sections from our best ﬁt of
+DAMPE data, we can still ﬁt the CALET data with good quality (Fig. 6). As compared to
+the pure background ﬁt, the total χ2 only has a minor rise ∆χ2 = 1.59 .
+
+In Section 4, we further analyzed the γ-ray measurements of Fermi-LAT and derived new
+constraints on the ﬂuxes of diﬀerent ﬁnal state leptons from the DM annihilations. Our
+analysis considered for the ﬁrst time the spatial extension of the γ-ray emission from the
+subhalo (Fig. 8). We showed in Tables 4-8 that the existence of such a nearby DM subhalo
+
+25
+
+at high galactic latitude is within the sensitivity reach of Fermi-LAT, although no signiﬁcant
+γ-ray signals show up yet. For the low galactic latitude regions such as the ROI centering
+at ((cid:96), b) = (0◦, 30◦), we found in Tables 4 and 8 that the DM annihilation channels χχ →
+e+e−, µ+µ− are still viable, while the channel χχ → τ +τ− is subject to a strong constraint.
+We presented the Fermi-LAT constraints together with the DAMPE CRE ﬁt on the ﬂavor
+ratios (yµ, yτ ) in Figs. 9(a) and 9(b) for two sample ROIs with low and high galactic latitudes.
+In the ROI centered at ((cid:96), b) = (0◦, 30◦), Fig. 9(a) shows that the range of the ﬂavor ratio
+(cid:46) 0.035 is always allowed by the Fermi-LAT γ-ray data. For instance, the ﬂavor ratios
+yτ
+(yµ, yτ ) = (9.0, 0.035) present a viable realization, which correspond to Ne : Nµ : Nτ (cid:39) 1 : 9.0 : 0.2
+and thus the ratio of DM-lepton-mediator couplings λe : λµ : λτ (cid:39) 1 : 1.7 : 0.7 . Such constraints
+give important guideline for the lepton-portal type of DM model buildings.
+
+Our current study shows that the non-peak new excess around (0.6− 1.1) TeV and the
+tentative 1.4 TeV peak structure in the DAMPE CRE spectrum provide encouraging clues to
+the possible new physics related to DM annihilations (decays) and the ﬂavor composition of
+the ﬁnal state leptons. These deserve further investigations. The future high energy CRE
+measurements are important to further pin down these new excesses.
+
+Acknowledgements
+
+HJH and YCW were supported in part by the National NSF of China (under grants 11675086
+and 11835005), by the CAS Center for Excellence in Particle Physics (CCEPP), and by the Na-
+tional Key R & D Program of China (No.2017YFA0402204). HJH was also supported in part by
+the Shanghai Laboratory for Particle Physics and Cosmology under Grant No. 11DZ2260700,
+and by the Oﬃce of Science and Technology, Shanghai Municipal Government (No. 16DZ2260200).
+QY was supported by the National NSF of China (No. 11722328, 11851305), and the 100 Tal-
+ents Program of Chinese Academy of Sciences.
+
+26
+
+Appendix:
+
+A. Likelihood and Upper Limits for the γ-Ray Analysis
+
+The log-likelihood function of the model parameter set p is given by the Possion probability
+
+(cid:88)
+
+lnL(p) =
+
+(njln ej− ej− ln nj!) ,
+
+(A.1)
+
+j
+
+where nj is the observed number of photons in a given energy and spatial bin, and ej is the
+expected number of photons in the same bin given the model parameters. The subscript
+j runs over all energy and spatial bins.
+In our analysis, the paremeter set p includes all
+the background parameters (i.e., spectral parameters of point sources in the ROI and the
+normalizations of the diﬀuse backgrounds), the cross section and/or the branching fraction of
+the DM annihilation. We adopt the proﬁle likelihood method to deal with the background
+parameters [29].
+
+In case that no signal is found, we derive the upper limits on the DM annihilation cross
+sections. The 95% upper limit for one-parameter ﬁt is derived by setting −∆lnL = lnL((cid:104)σv(cid:105)=
+0)−lnL((cid:104)σv(cid:105)) < 1.35 . For the Case-(h) which has two free parameters of the DM annihilation,
+the 95% C.L. upper limit is deﬁned by −∆lnL < 2.30 .
+
+B. Summary of γ-ray Fitting Results for All ROIs
+
+In this Appendix, we summarize the ﬁtting results in all ROIs, in addition to Table 4
+as presented in Section 4.3. In each table, the columns from left to right correspond to the
+model ﬂags, −∆ lnL, best-ﬁt and 95% upper limit (UL) of the cross sections (in units of
+10−25cm3 s−1) for each channel.
+
+From Tables 5-7, we see that at high latitudes with b (cid:62) 70◦, the Fermi-LAT γ-ray data
+not only show null results for the DM annihilation signal at its best ﬁts, but also exclude our
+model motivated by the DAMPE data at 95% C.L.
+
+On the other hand, in the ROIs at low latitudes with b(cid:54) 30◦, we ﬁnd that our proposed DM
+subhalo is allowed by the constraints of the 10-year γ-ray data from Fermi-LAT experiment,
+although no signiﬁcant signals show up yet. But in this case, we can derive an upper bound
+on the ﬂavor ratio of τ±. We present this analysis in Table 4 (Section 4.3) and the following
+Table 8.
+
+27
+
+Case −∆lnL
+
+e± channel
+UL
+
+µ± channel
+best ﬁt
+UL
+((cid:96), b) = (0◦, 90◦)
+
+best ﬁt
+
+τ± channel
+UL
+
+best ﬁt
+
+(a)
+(b)
+(c)
+(d)
+(e)
+(f)
+(g)
+(h)
+(i)
+
+(a)
+(b)
+(c)
+(d)
+(e)
+(f)
+(g)
+(h)
+(i)
+
+0.00
+0.00
+0.00
+0.00
+0.00
+1.46
+1.46
+1.46
+20.52
+
+0.00
+0.00
+0.00
+0.00
+0.00
+2.27
+2.27
+2.27
+24.31
+
+/
+10−6
+/
+/
+10−6
+0.154
+0.154
+0.154
+0.154
+
+/
+10−6
+/
+/
+10−6
+0.154
+0.154
+0.154
+0.154
+
+/
+
+0.143
+
+/
+/
+
+0.025
+
+/
+/
+/
+/
+
+0.160
+
+/
+/
+
+/
+/
+10−6
+/
+/
+same as e±
+10−6
+/
+10−6
+1.39
+
+/
+
+0.133
+
+0.133
+1.39
+
+((cid:96), b) = (0◦, −90◦)
+
+/
+
+0.093
+
+/
+/
+
+0.016
+
+/
+/
+/
+/
+
+0.108
+
+/
+/
+
+/
+/
+10−6
+/
+/
+same as e±
+10−6
+/
+10−6
+1.39
+
+/
+
+0.101
+
+0.100
+1.39
+
+0.037
+
+/
+/
+/
+
+/
+/
+/
+10−6
+same as e±
+/
+/
+10−7
+10−7
+10−7
+
+0.028
+0.028
+0.015
+
+0.011
+
+/
+/
+/
+
+/
+/
+/
+10−6
+same as e±
+/
+/
+10−7
+10−7
+10−7
+
+0.021
+0.021
+0.014
+
+Table 5: The likelihood analysis for ROIs centered at the north and south Galactic poles. Columns
+from left to right correspond to the model ﬂags, −∆lnL , best-ﬁt, and 95% conﬁdence upper limits
+(UL) of the cross sections (in unit of 10−25cm3s−1) for each channel, respectively.
+
+28
+
+Case −∆lnL
+
+e± channel
+UL
+
+µ± channel
+best ﬁt
+UL
+((cid:96), b) = (0◦, 70◦)
+
+best ﬁt
+
+τ± channel
+UL
+
+best ﬁt
+
+0.080
+
+/
+
+/
+/
+
+/
+/
+
+0.010
+
+0.066
+
+/
+/
+10−7
+/
+/
+same as e±
+10−8
+/
+10−8
+1.39
+((cid:96), b) = (90◦, 70◦)
+
+/
+/
+/
+/
+
+/
+
+0.077
+
+0.077
+1.39
+
+0.013
+
+/
+/
+/
+
+/
+/
+/
+10−9
+same as e±
+/
+/
+10−9
+10−9
+10−10
+
+0.012
+0.012
+0.011
+
+/
+/
+/
+
+/
+/
+/
+
+0.015
+
+10−11
+same as e±
+/
+/
+
+10−11
+10−12
+10−9
+
+0.014
+0.014
+0.011
+
+0.018
+
+/
+/
+/
+
+/
+/
+/
+10−6
+same as e±
+/
+/
+10−7
+10−7
+10−7
+
+0.016
+0.016
+0.013
+
+0.021
+
+/
+/
+/
+
+/
+/
+/
+10−6
+same as e±
+/
+/
+10−6
+10−6
+10−6
+
+0.019
+0.019
+0.014
+
+(a)
+(b)
+(c)
+(d)
+(e)
+(f)
+(g)
+(h)
+(i)
+
+(a)
+(b)
+(c)
+(d)
+(e)
+(f)
+(g)
+(h)
+(i)
+
+(a)
+(b)
+(c)
+(d)
+(e)
+(f)
+(g)
+(h)
+(i)
+
+(a)
+(b)
+(c)
+(d)
+(e)
+(f)
+(g)
+(h)
+(i)
+
+0.00
+0.00
+0.00
+0.00
+0.00
+3.18
+3.18
+3.18
+30.08
+
+0.00
+0.00
+0.00
+0.00
+0.00
+2.93
+2.93
+2.93
+28.66
+
+0.00
+0.00
+0.00
+0.00
+0.00
+2.48
+2.48
+2.48
+24.98
+
+0.00
+0.00
+0.00
+0.00
+0.00
+2.55
+2.55
+2.55
+27.31
+
+/
+
+10−11
+
+/
+/
+
+10−11
+0.154
+0.154
+0.154
+0.154
+
+/
+
+10−11
+
+/
+/
+10−9
+0.154
+0.154
+0.154
+0.154
+
+/
+10−6
+/
+/
+10−6
+0.154
+0.154
+0.154
+0.154
+
+/
+10−6
+/
+/
+10−6
+0.154
+0.154
+0.154
+0.154
+
+/
+
+0.072
+
+/
+/
+
+0.011
+
+/
+
+0.085
+
+/
+/
+
+0.018
+
+/
+/
+/
+/
+
+/
+/
+/
+/
+
+((cid:96), b) = (180◦, 70◦)
+
+/
+/
+
+10−12
+
+/
+/
+
+0.087
+
+/
+/
+same as e±
+10−10
+
+0.083
+
+/
+
+10−10
+1.39
+
+/
+
+0.083
+1.39
+
+0.102
+
+/
+/
+
+/
+/
+10−6
+/
+/
+same as e±
+10−6
+/
+10−6
+1.39
+
+/
+
+0.096
+
+0.096
+1.39
+
+((cid:96), b) = (270◦, 70◦)
+
+/
+
+0.083
+
+/
+/
+
+0.015
+
+/
+/
+/
+/
+
+0.094
+
+/
+/
+
+/
+/
+10−6
+/
+/
+same as e±
+10−6
+/
+10−6
+1.39
+
+/
+
+0.088
+
+0.088
+1.39
+
+Table 6: The likelihood analysis for ROIs at high latitudes with b = 70◦. All the notations are the
+same as in Table 5.
+
+29
+
+e± channel
+UL
+
+µ± channel
+best ﬁt
+UL
+((cid:96), b) = (0◦,−70◦)
+
+best ﬁt
+
+τ± channel
+UL
+
+best ﬁt
+
+Case −∆lnL
+
+(a)
+(b)
+(c)
+(d)
+(e)
+(f)
+(g)
+(h)
+(i)
+
+(a)
+(b)
+(c)
+(d)
+(e)
+(f)
+(g)
+(h)
+(i)
+
+(a)
+(b)
+(c)
+(d)
+(e)
+(f)
+(g)
+(h)
+(i)
+
+(a)
+(b)
+(c)
+(d)
+(e)
+(f)
+(g)
+(h)
+(i)
+
+0.00
+0.00
+0.00
+0.00
+0.00
+1.33
+1.33
+1.33
+15.00
+
+0.00
+0.00
+0.00
+0.00
+0.00
+1.99
+1.99
+1.99
+22.69
+
+0.00
+0.00
+0.00
+0.00
+0.00
+1.99
+1.99
+1.99
+22.41
+
+0.00
+0.00
+0.00
+0.00
+0.00
+0.92
+0.92
+0.92
+41.08
+
+((cid:96), b) = (90◦,−70◦)
+
+((cid:96), b) = (180◦,−70◦)
+
+/
+
+10−11
+
+/
+
+0.156
+
+/
+/
+
+0.021
+
+/
+/
+
+10−13
+0.154
+0.154
+0.154
+0.154
+
+/
+10−8
+/
+/
+10−9
+0.154
+0.154
+0.154
+0.154
+
+/
+10−6
+/
+/
+10−9
+0.154
+0.154
+0.154
+0.154
+
+/
+/
+/
+/
+
+/
+/
+/
+/
+
+/
+/
+/
+/
+
+/
+
+0.106
+
+/
+/
+
+0.020
+
+/
+
+0.106
+
+/
+/
+
+0.019
+
+/
+/
+
+10−11
+
+/
+/
+
+0.197
+
+/
+/
+same as e±
+10−10
+
+0.177
+
+/
+
+10−10
+1.39
+
+/
+
+0.177
+1.39
+
+0.117
+
+/
+/
+
+/
+/
+10−9
+/
+/
+same as e±
+10−8
+/
+10−8
+1.39
+
+/
+
+0.109
+
+0.109
+1.39
+
+0.122
+
+/
+/
+
+/
+/
+10−6
+/
+/
+same as e±
+10−7
+/
+10−7
+1.39
+
+/
+
+0.112
+
+0.112
+1.39
+
+0.028
+
+10−12
+same as e±
+/
+/
+
+10−13
+10−11
+10−12
+
+0.025
+0.025
+0.017
+
+0.032
+
+10−10
+same as e±
+/
+/
+
+10−10
+10−11
+10−9
+
+0.028
+0.028
+0.017
+
+0.029
+
+10−12
+same as e±
+/
+/
+
+10−10
+10−10
+10−10
+
+0.025
+0.025
+0.016
+
+/
+/
+/
+
+/
+/
+/
+
+/
+/
+/
+
+/
+/
+/
+
+/
+/
+/
+
+/
+/
+/
+
+/
+/
+/
+
+/
+/
+/
+
+((cid:96), b) = (270◦,−70◦)
+
+/
+10−7
+/
+/
+10−9
+0.154
+0.154
+0.154
+0.154
+
+/
+
+0.209
+
+/
+/
+
+0.037
+
+/
+/
+/
+/
+
+0.243
+
+/
+/
+
+/
+/
+10−7
+/
+/
+same as e±
+10−7
+/
+10−7
+1.39
+
+/
+
+0.194
+
+0.194
+1.39
+
+0.054
+
+10−13
+same as e±
+/
+/
+
+10−10
+10−7
+10−13
+
+0.040
+0.040
+0.013
+
+Table 7: The likelihood analysis for ROIs at high latitutes with b = −70◦. All the notations are the
+same as in Table 5.
+
+30
+
+Case −∆lnL
+
+(a)
+(b)
+(c)
+(d)
+(e)
+(f)
+(g)
+(h)
+(i)
+
+(a)
+(b)
+(c)
+(d)
+(e)
+(f)
+(g)
+(h)
+(i)
+
+(a)
+(b)
+(c)
+(d)
+(e)
+(f)
+(g)
+(h)
+(i)
+
+0.00
+−0.39
+−0.31
+−0.42
+−0.41
+−0.39
+−0.39
+−0.39
+8.79
+
+0.00
+−0.05
+−0.30
+0.00
+0.00
+−0.15
+−0.05
+−0.17
+0.79
+
+0.00
+0.00
+0.18
+0.00
+0.16
+0.26
+0.27
+0.26
+2.20
+
+e± channel
+
+best ﬁt
+
+µ± channel
+best ﬁt
+((cid:96), b) = (120◦, 45◦)
+
+UL
+
+UL
+
+τ± channel
+
+best ﬁt
+
+UL
+
+/
+
+0.16 ± 0.20
+
+/
+
+0.541
+
+/
+/
+
+0.18 ± 0.25
+
+/
+/
+
+0.663
+
+/
+/
+/
+
+/
+/
+/
+
+/
+
+/
+/
+/
+
+/
+
+/
+/
+/
+
+/
+
+0.024 ± 0.030
+
+0.083
+
+same as e±
+/
+10−4
+10−4
+10−9
+
+0.061
+0.061
+0.018
+
+/
+/
+/
+10−7
+same as e±
+/
+10−7
+10−7
+10−8
+
+0.076
+
+0.066
+0.061
+0.037
+
+/
+/
+/
+10−9
+same as e±
+/
+
+10−11
+10−4
+10−10
+
+0.117
+
+0.113
+0.113
+0.089
+
+/
+/
+
+0.019 ± 0.024
+
+0.154
+0.154
+0.154
+0.154
+
+/
+
+0.16±0.54
+
+/
+/
+10−8
+0.154
+0.154
+0.154
+0.154
+
+/
+10−7
+/
+/
+10−7
+0.154
+0.154
+0.154
+0.154
+
+/
+/
+
+0.065
+
+/
+same as e±
+10−6
+/
+10−6
+1.39
+((cid:96), b) = (0◦, 30◦)
+
+/
+/
+/
+/
+
+/
+
+/
+
+0.464
+
+0.443
+1.39
+
+/
+
+1.11
+
+/
+/
+
+0.071
+
+/
+/
+
+0.54±0.72
+
+/
+/
+
+1.79
+
+/
+same as e±
+
+/
+
+/
+
+0.34±0.72
+0.34±0.72
+
+/
+/
+/
+/
+1.39
+((cid:96), b) = (0◦, 0◦)
+/
+
+1.58
+
+/
+
+1.60
+1.39
+
+0.803
+
+/
+/
+
+0.095
+
+/
+/
+/
+/
+
+/
+/
+
+/
+
+/
+
+/
+/
+10−7
+/
+same as e±
+10−7
+/
+10−7
+1.39
+
+1.15
+
+1.00
+
+1.01
+1.39
+
+Table 8: The likelihood analysis for ROIs at medium and low Galactic latitudes. All the notations
+are the same as in Table 5. As mentioned in Section 4.3, here the photon energy range for the region
+(0◦, 30◦) is chosen to be (10−500) GeV, instead of the range (1−500) GeV in other regions.
+
+31
+
+References
+
+[1] P. Meyer, “Cosmic rays in the galaxy ”, Ann. Rev. Astron. Astrophys. 7 (1969) 1;
+C. S. Shen, “Pulsars and very high-energy cosmic-ray electrons”, Astrophys. J. 162
+(1970) L181; T. Kobayashi, Y. Komori, K. Yoshida and J. Nishimura, “The most likely
+sources of high energy cosmic-ray electrons in supernova remnants”, Astrophys. J. 601
+(2004) 340 [arXiv:astro-ph/0308470]; Y. Z. Fan, B. Zhang and J. Chang, “e± Excesses in
+the Cosmic Ray Spectrum and Possible Interpretations”, Int. J. Mod. Phys. D 19 (2010)
+2011, [arXiv:1008.4646 [astro-ph.HE]].
+
+[2] M. S. Turner and F. Wilczek, “Positron Line Radiation from Halo WIMP Annihilations
+as a Dark Matter Signature”, Phys. Rev. D 42 (1990) 1001; G. Bertone, D. Hooper
+and J. Silk, “Particle dark matter: Evidence, candidates and constraints”, Phys. Rept.
+405 (2005) 279 [arXiv:hep-ph/0404175]; J. L. Feng, “Dark Matter Candidates from Par-
+ticle Physics and Methods of Detection”, Ann. Rev. Astron. Astrophys. 48 (2010) 495
+[arXiv:1003.0904 [astro-ph.CO]].
+
+[3] F. Aharonian et al. [HESS Collaboration], “The energy spectrum of cosmic-ray electrons at
+TeV energies”, Phys. Rev. Lett. 101 (2008) 261104 [arXiv:0811.3894 [astro-ph]]; “Probing
+the ATIC peak in the cosmic-ray electron spectrum with HESS”, Astron. Astrophys. 508
+(2009) 561 [arXiv:0905.0105 [astro-ph.HE]]; P. Brun, “Particle Physics and Cosmology
+with H.E.S.S.”, Nucl. Part. Phys. Proc. 291-293 (2017) 25.
+
+[4] J. Holder [for VERITAS Collaboration], “Latest Results from VERITAS: Gamma 2016”,
+AIP Conf. Proc. 1792 (2017) 020013 [arXiv:1609.02881 [astro-ph.HE]]; D. Staszak [for
+VERITAS Collaboration], “A Cosmic-ray Electron Spectrum with VERITAS”, PoS ICRC
+2015 (2016) 411 [arXiv:1508.06597 [astro-ph.HE]]; “Science Highlights from VERITAS”,
+PoS ICRC 2015 (2016) 868 [arXiv:1510.01269 [astro-ph.HE]].
+
+[5] M. Aguilar et al. [AMS Collaboration], “Towards Understanding the Origin of Cosmic-
+Ray Electrons”, Phys. Rev. Lett. 122 (2019) 101101, no.10; and “Towards Understanding
+the Origin of Cosmic-Ray Positrons”, Phys. Rev. Lett. 122 (2019) 041102, no.4.
+
+[6] S. Abdollahi et al. [Fermi-LAT Collaboration], “Cosmic-ray electron-positron spectrum
+from 7GeV to 2TeV with the Fermi Large Area Telescope”, Phys. Rev. D 95 (2017)
+082007 [arXiv:1704.07195 [astro-ph.HE]]; M. Meehan et al. [Fermi-LAT Collaboration],
+“A Search for Cosmic-ray Proton Anisotropy with the Fermi Large Area Telescope”, PoS
+ICRC 2017 (2018) 170 [arXiv:1708.07796 [astro-ph.HE]].
+
+[7] O. Adriani et al. [CALET Collaboration], “Energy Spectrum of Cosmic-Ray Electron
+and Positron from 10GeV to 3TeV Observed with the Calorimetric Electron Telescope on
+the International Space Station,” Phys. Rev. Lett. 119 (2017) 181101 [arXiv:1712.01711
+[astro-ph.HE]]; and “Extended Measurement of the Cosmic-Ray Electron and Positron
+
+32
+
+Spectrum from 11GeV to 4.8TeV with the Calorimetric Electron Telescope on the Inter-
+national Space Station”, Phys. Rev. Lett. 120 (2018) 261102 [arXiv:1806.09728 [astro-
+ph.HE]].
+
+[8] G. Ambrosi et al. [DAMPE Collaboration], “Direct detection of a break in the ter-
+aelectronvolt cosmic-ray spectrum of electrons and positrons,” Nature 552 (2017) 63
+[arXiv:1711.10981 [astro-ph.HE]].
+
+[9] J. Chang, “Dark Matter Particle Explorer: The First Chinese Cosmic Ray and Hard
+Gamma-ray Detector in Space”, Chinese Journal of Space Science 34 (2014) 550; J. Chang
+et al. [DAMPE Collaboration], “The DArk Matter Particle Explorer mission,” Astropart.
+Phys. 95 (2017) 6 [arXiv:1706.08453 [astro-ph.IM]].
+
+[10] Q. Yuan et al., “Interpretations of the DAMPE electron data,” [arXiv:1711.10989 [astro-
+
+ph.HE]].
+
+[11] K. Fang, X. J. Bi and P. F. Yin, “Explanation of the knee-like feature in the DAMPE
+cosmic e− + e+ energy spectrum,” Astrophys. J. 854 (2018) 57 [arXiv:1711.10996 [astro-
+ph.HE]];
+
+[12] X. J. Huang, Y. L. Wu, W. H. Zhang and Y. F. Zhou, “Origins of sharp cosmic-ray elec-
+tron structures and the DAMPE excess,” Phys. Rev. D 97 (2018) 091701 [arXiv:1712.00005
+[astro-ph.HE]];
+
+[13] H. B. Jin, B. Yue, X. Zhang and X. Chen, “Cosmic ray e+e− spectrum excess and peak
+feature observed by the DAMPE experiment from dark matter,” Phys. Rev. D 98 (2018)
+123008 [arXiv:1712.00362 [astro-ph.HE]];
+
+[14] Y. Gao and Y. Z. Ma, “Implications of dark matter cascade decay from DAMPE,
+HESS, Fermi-LAT and AMS02 data,” Mon. Not. Roy. Astron. Soc. 491 (2020) 965
+[arXiv:1712.00370 [astro-ph.HE]];
+
+[15] F. Yang, M. Su and Y. Zhao, “Dark Matter Annihilation from Nearby Ultra-
+compact Micro Halos to Explain the Tentative Excess at 1.4 TeV in DAMPE data,”
+[arXiv:1712.01724 [astro-ph.HE]]; Y. Zhao, K. Fang, M. Su and M. C. Miller, “A strong
+test of the dark matter origin of a TeV electron excess using icecube neutrinos,” JCAP
+1806 (2018) 030 [arXiv:1712.03210 [astro-ph.HE]].
+
+[16] S. F. Ge, H. J. He, and Y. C. Wang, “Flavor Structure of the Cosmic-Ray Electron/
+Positron Excesses at DAMPE ”, Phys. Lett. B 781 (2018) 88 [arXiv:1712.02744 [astro-
+ph.HE]].
+
+[17] Y. Z. Fan, W. C. Huang, M. Spinrath, Y. L. S. Tsai and Q. Yuan, Phys. Lett. B
+781 (2018) 83 [arXiv:1711.10995 [hep-ph]]; P. H. Gu and X. G. He, Phys. Lett. B
+
+33
+
+778 (2018) 292 [arXiv:1711.11000 [hep-ph]]; G. H. Duan, L. Feng, F. Wang, L. Wu,
+J. M. Yang and R. Zheng, JHEP 1802 (2018) 107 [arXiv:1711.11012 [hep-ph]]; Y. L. Tang,
+L. Wu, M. Zhang and R. Zheng, Sci. China Phys. Mech. Astron. 61 (2018) 101003
+[arXiv:1711.11058 [hep-ph]]; L. Zu, C. Zhang, L. Feng, Q. Yuan and Y. Z. Fan, Phys. Rev.
+D 98 (2018) 063010 [arXiv:1711.11052 [hep-ph]]; W. Chao and Q. Yuan, arXiv:1711.11182
+[hep-ph]; P. Athron, C. Balazs, A. Fowlie and Y. Zhang, JHEP 1802 (2018) 121
+[arXiv:1711.11376 [hep-ph]]; J. Cao, L. Feng, X. Guo, L. Shang, F. Wang and P. Wu, Phys.
+Rev. D 97 (2018) 095011 [arXiv:1711.11452 [hep-ph]]; X. Liu and Z. Liu, Phys. Rev. D 98
+(2018) 035025 [arXiv:1711.11579 [hep-ph]]; G. H. Duan, X. G. He, L. Wu and J. M. Yang,
+Eur. Phys. J. C 78 (2018) 323 [arXiv:1711.11563 [hep-ph]]; J. S. Niu, T. Li, R. Ding,
+B. Zhu, H. F. Xue and Y. Wang, Phys. Rev. D 97 (2018) 083012 [arXiv:1712.00372
+[astro-ph.HE]]; W. Chao, H. K. Guo, H. L. Li and J. Shu, Phys. Lett. B 782 (2018) 517
+[arXiv:1712.00037 [hep-ph]]; C. H. Chen, C. W. Chiang and T. Nomura, Phys. Rev. D
+97 (2018) 061302 [arXiv:1712.00793 [hep-ph]]; T. Li, N. Okada and Q. Shaﬁ, Phys. Lett.
+B 779 (2018) 130 [arXiv:1712.00869 [hep-ph]]; R. Zhu and Y. Zhang, arXiv:1712.01143
+[hep-ph]; T. Nomura and H. Okada, Phys. Dark Univ. 21 (2018) 90 [arXiv:1712.00941
+[hep-ph]]; K. Ghorbani and P. H. Ghorbani, JHEP 1805 (2018) 125 [arXiv:1712.01239
+[hep-ph]]; J. Cao, L. Feng, X. Guo, L. Shang, F. Wang, P. Wu and L. Zu, Eur. Phys. J.
+C 78 (2018) 198 [arXiv:1712.01244 [hep-ph]]; R. Ding, Z. L. Han, L. Feng and B. Zhu,
+Chin. Phys. C 42 (2018) 083104 [arXiv:1712.02021 [hep-ph]]; B. Wang, X. Bi, S. Lin and
+P. Yin, Sci. China Phys. Mech. Astron. 61 (2018) 101004; X. Pan, C. Zhang and L. Feng,
+Sci. China Phys. Mech. Astron. 61 (2018) 101006; F. Elahi and S. Khatibi, Phys. Rev.
+D 100 (2019) 015019 [arXiv:1902.04384 [hep-ph]]; X. Liu, Z. Liu and Y. Su, JHEP 1906
+(2019) 109 [arXiv:1902.04916 [hep-ph]]; L. Feng, Z. Kang, Q. Yuan, P. F. Yin, Y. Z. Fan,
+arXiv:1902.09235 [hep-ph]; M. H. Chan and C. M. Lee, Mon. Not. Roy. Astron. Soc.
+486 (2019) L85 [arXiv:1904.12418 [astro-ph.HE]]; C. Q. Geng, D. Huang and L. Yin,
+[arXiv:1905.10136 [hep-ph]]; Y. Zhao, X. J. Bi, S. J. Lin and P. F. Yin, Chin. Phys. C 43
+(2019) 085101; S. Yaser Ayazi and A. Mohamadnejad, arXiv:1909.10729 [hep-ph].
+
+[18] For a review, Q. Yuan and L. Feng, “Dark Matter Particle Explorer observations of high-
+energy cosmic ray electrons plus positrons and their physical implications”, Sci. China
+Phys. Mech. Astron. 61 (2018) 101002 [arXiv:1807.11638 [astro-ph.HE]].
+
+[19] J. F. Navarro, C. S. Frenk and S. D. M. White, “A Universal density proﬁle from hierar-
+
+chical clustering”, Astrophys. J. 490 (1997) 493 [astro-ph/9611107].
+
+[20] M. Tanabashi et al., [Particle Data Group], Phys. Rev. D 98 (2018) 030001.
+
+[21] Y. Bai and J. Berger, “Lepton Portal Dark Matter”, JHEP 1408 (2014) 153
+
+[arXiv:1402.6696 [hep-ph]].
+
+[22] X. Huang, Y. L. S. Tsai and Q. Yuan, “LikeDM: likelihood calculator of dark matter
+
+detection”, Comput. Phys. Commun. 213 (2017) 252 [arXiv:1603.07119 [hep-ph]].
+
+34
+
+[23] M. Cirelli et al., “PPPC 4 DM ID: A Poor Particle Physicist Cookbook for Dark Mat-
+ter Indirect Detection”, JCAP 1103 (2011) 051, Erratum: JCAP 1210 (2012) E01
+[arXiv:1012.4515 [hep-ph]].
+
+[24] P. Ciafaloni, D. Comelli, A. Riotto, F. Sala, A. Strumia and A. Urbano, “Weak Cor-
+rections are Relevant for Dark Matter Indirect Detection”, JCAP 1103 (2011) 019
+[arXiv:1009.0224 [hep-ph]].
+
+[25] M. Kuhlen and D. Malyshev, “ATIC, PAMELA, HESS, Fermi and nearby Dark Mat-
+ter subhalos”, Phys. Rev. D 79 (2009) 123517 [arXiv:0904.3378 [hep-ph]]; T. Delahaye,
+J. Lavalle, R. Lineros, F. Donato and N. Fornengo, “Galactic electrons and positrons at
+the Earth:new estimate of the primary and secondary ﬂuxes”, Astron. Astrophys. 524
+(2010) A51 [arXiv:1002.1910 [astro-ph.HE]].
+
+[26] T. Ghosh, J. Kumar, D. Marfatia and P. Sandick, “Searching for light from a dark
+matter clump”, JCAP 1808 (2018) 023 [arXiv:1804.05792 [astro-ph.HE]]; A. Coogan,
+B. V. Lehmann and S. Profumo, “Connecting direct and indirect detection with a dark
+spike in the cosmic-ray electron spectrum,” JCAP 1910 (2019) 063 [arXiv:1903.07177
+[astro-ph.HE]]. K. Belotsky, A. Kamaletdinov, M. Laletin and M. Solovyov, “The DAMPE
+excess and gamma-ray constraints,” Phys. Dark Univ. 26 (2019) 100333 [arXiv:1904.02456
+[astro-ph.HE]];
+
+[27] D. Hooper and L. Goodenough, “Dark Matter Annihilation in The Galactic Cen-
+ter As Seen by the Fermi Gamma Ray Space Telescope,” Phys. Lett. B 697 (2011)
+412 [arXiv:1010.2752 [hep-ph]]; T. Daylan, D. P. Finkbeiner, D. Hooper, T. Linden,
+S. K. N. Portillo, N. L. Rodd and T. R. Slatyer, “The characterization of the gamma-ray
+signal from the central Milky Way: A case for annihilating dark matter,” Phys. Dark
+Univ. 12 (2016) 1 [arXiv:1402.6703 [astro-ph.HE]].
+
+[28] F. Acero et al. [Fermi-LAT Collaboration], “Fermi Large Area Telescope Third Source
+
+Catalog,” Astrophys. J. Suppl. 218 (2015) 23 [arXiv:1501.02003 [astro-ph.HE]].
+
+[29] W. A. Rolke, A. M. Lopez and J. Conrad, “Limits and conﬁdence intervals in the presence
+
+of nuisance parameters,” Nucl. Instrum. Meth. A 551 (2005) 493 [physics/0403059].
+
+35
+
+

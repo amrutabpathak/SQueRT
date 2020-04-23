@@ -92,5 +92,5 @@ def getUrl(csvPaperName):
     return url
 
 # Run from here so as to properly employ multithreading
-if __name__ == "__main__":
-    main("What model is used in the paper?", "Machine learning")
+# if __name__ == "__main__":
+#     main("What model is used in the paper?", "Machine learning")
