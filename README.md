@@ -1,6 +1,6 @@
-# 7180QueryTool
-
 # SQueRT: The Scientific Query Research Tool
+
+SQueRT is a web application that assists researchers by leveraging artificial intelligence to query the latest academic literature. It utilizes the state-of-the-art natural language processing deep learning models ALBERT and DistilBERT to search the academic literature database arXiv for articles  relevant to the user's query. SQueRT can greatly reduce the time and effort necessary find reported answers to research questions.
 
 **Who is our user?**\
 Our user is most likely to be a(n):
@@ -66,18 +66,17 @@ We will curate a test set of annotated data with expected output/results. We wil
 **What are our goals for these metrics? How will we use them to refine development?**\
 Good ROUGE and/or BLEU scores. Note: define 'good'! How does our baseline do? How much of an improvement do we want over the baseline?
 
-# Entry point of the project:
-Entry point of the project is app.py. It takes care of rendering the home.html, passing the parameters(inputs and outputs) to and fro from the UI and from the controller methods. 
-Main.py acts as the controller. It coordinates the flow of requests and responses to and from the UI. 
+## Architecture
+SQueRT is a Flask application with SQLite database support that runs in two primary stages. In the first stage, a web scraper is employed to scrape PDFs from arXiv.org based on the user's input. The text from the PDFs is processed and DistilBERT used to locate relevant text snippets. In the second stage, ALBERT is employed to rank candidate snippets according to their relevance to the user's query. Results are displayed on the web page, including a link to the PDF that contains the answer returned by SQueRT. The script Main.py acts as the Controller for the program. For a comprehensive list of packages used, see requirements.txt.
 
-# Deployment Instructions:
-1. Please install all the libraries mentioned in the requirements.txt.
-2. Please run the script download_model.py. This will download the albert model in the albert_models folder.
-3. Please download and save the following resources in the albert_models folder.
-	https://s3.amazonaws.com/models.huggingface.co/bert/ktrapeznikov/albert-xlarge-v2-squad-v2/spiece.model
-	https://s3.amazonaws.com/models.huggingface.co/bert/ktrapeznikov/albert-xlarge-v2-squad-v2/config.json
-4. Run the app.py to run the application.	
+## User Manual
+_Before attempting to run SQueRt, ensure that you have all the required packages installed. These are enumerated in requirements.txt._
 
+The entry point to SQueRT is the script app.py.
 
+**To run:**
 
+Open a terminal window and navigate to the directory where SQueRT is located. On the command line, type ```python app.py```. The message ```Running on http://127.0.0.1:8080``` will appear shortly in Terminal. When it does, copy and paste the link http://127.0.0.1:8080 in a web browser.
 
+> **Note**: Port 8080 must not be in use. If it is, you can either kill the running process and then try running app.py again or you can alter the port in the app.py script.
+	
