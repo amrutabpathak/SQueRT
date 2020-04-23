@@ -84,7 +84,8 @@ def getUrl(csvPaperName):
     # This needs to actually return a url currently it returns a path to the local host
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('localhost', 0))
-    url = 'http://localhost:' + str(s.getsockname()[1]) + '/Data/'
+    # url = 'https://arxiv.org/pdf/' + str(s.getsockname()[1]) + '/Data/'
+    url = 'https://arxiv.org/pdf/'
     fileName = csvPaperName.rsplit('_', 1)[0] +'.pdf'
     pathList = re.split(r'[\\/]', fileName)
     url +=pathList[-1]

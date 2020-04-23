@@ -2,15 +2,15 @@
     "0": [
         {
             "text": "empty",
-            "probability": 0.33208753899086096,
+            "probability": 0.317676998962079,
             "start_logit": 0.0,
             "end_logit": 0.0
         },
         {
             "text": "",
-            "probability": 0.667912461009139,
-            "start_logit": 0.4750811755657196,
-            "end_logit": 0.22367733716964722
+            "probability": 0.682323001037921,
+            "start_logit": 0.5130531191825867,
+            "end_logit": 0.2514148950576782
         }
     ]
 }
