@@ -73,7 +73,12 @@ Path: https://github.ccs.neu.edu/simpsone/7180QueryTool/blob/master/DBDumpToFile
 ReadMe
 Worked on readme to include one pager information, deployment instructions and program entry point.
 
+Added user manual link on the ui. 
+
 Worked on fixing any issues that were hindering us from running the app end to end. 
+
+Tested the app with various question-keyword combos.
+https://github.ccs.neu.edu/simpsone/7180QueryTool/tree/master/results
 
 
 Things that were tried:
