@@ -1,5 +1,7 @@
 # SQueRT: The Scientific Query Research Tool
 
+> _Developed by Amruta Pathak, Gabriel Rada, Kate Schultz, and Evan Simpson for the Spring 2020 CS7180 Project course at Northeastern University Seattle_
+
 SQueRT is a web application that assists researchers by leveraging artificial intelligence to query the latest academic literature. It utilizes the state-of-the-art natural language processing deep learning models ALBERT and DistilBERT to search the academic literature database arXiv for articles  relevant to the user's query. SQueRT can greatly reduce the time and effort necessary find reported answers to research questions.
 
 ![SQueRT_UI](https://github.ccs.neu.edu/simpsone/7180QueryTool/blob/master/images/squert_scrrenshot.png)
@@ -78,7 +80,11 @@ The entry point to SQueRT is the script app.py.
 
 **To run:**
 
-Open a terminal window and navigate to the directory where SQueRT is located. On the command line, type ```python app.py```. The message ```Running on http://127.0.0.1:8080``` will appear shortly in Terminal. When it does, copy and paste the link http://127.0.0.1:8080 in a web browser.
+Open a terminal window and navigate to the directory where SQueRT is located. On the command line, type:
+
+```python app.py``` 
+
+The message ```Running on http://127.0.0.1:8080``` will appear shortly in Terminal. When it does, copy and paste the link http://127.0.0.1:8080 in a web browser.
 
 > **Note**: Port 8080 must not be in use. If it is, you can either kill the running process and then try running app.py again or you can alter the port in the app.py script.
 	
