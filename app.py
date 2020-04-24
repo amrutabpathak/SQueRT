@@ -21,7 +21,7 @@ def predict():
         this_query = query
         this_keyword = keyword
         json_info_str = Main.main(query, keyword)
-        json_info = json.loads(json_info_str)
+        json_info = json.loads(json_info_str, strict=False)
         # print(type(json_info))
         predictions = []
         snippet = []
