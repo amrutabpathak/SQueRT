@@ -33,9 +33,10 @@ def main(query, keyword):
     for root, dirs, files in os.walk(csvdir):
         for file in files:
             os.remove(os.path.join(root, file))
-    start_time = time.time()
+
     # Create Table
     db_operations.createTable()
+    start_time = time.time()
 
     # Scrape papers to pdf folder
     arxiv_pdf_scraper.scrape(keyword, 1)
