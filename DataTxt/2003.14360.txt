@@ -1,0 +1,2161 @@
+Application and Assessment of Deep Learning for the 
+
+Generation of Potential NMDA Receptor Antagonists 
+
+Katherine J. Schultz, Sean M. Colby, Yasemin Yesiltepe, Jamie R. Nuñez, Monee Y. McGrady, 
+
+Ryan R. Renslow* 
+
+Pacific Northwest National Laboratory, Richland, WA, USA. 
+
+ABSTRACT. Uncompetitive antagonists of the N-methyl D-aspartate receptor (NMDAR) have 
+
+demonstrated therapeutic benefit in the treatment of neurological diseases such as Parkinson’s and 
+
+Alzheimer’s, but some also cause dissociative effects that have led to the synthesis of illicit drugs. 
+
+The  ability  to  generate  NMDAR  antagonists in  silico is  therefore  desirable  both  for  new 
+
+medication  development  and  for  preempting  and  identifying  new  designer  drugs.  Recently, 
+
+generative deep learning models have been applied to de novo drug design as a means to expand 
+
+the amount of chemical space that can be explored for potential drug-like compounds. In this study, 
+
+we assess the application of a generative model to the NMDAR to achieve two primary objectives: 
+
+(i)  the  creation  and  release  of  a  comprehensive  library  of  experimentally  validated  NMDAR 
+
+phencyclidine (PCP) site antagonists to assist the drug discovery community and (ii) an analysis 
+
+of both the advantages conferred by applying such generative artificial intelligence models to drug 
+
+design and the current limitations of the approach. We apply, and provide source code for, a variety 
+
+of ligand- and structure-based assessment techniques used in standard drug discovery analyses to 
+
+the  deep  learning-generated  compounds.  We  present  twelve  candidate  antagonists  that  are  not 
+
+ 
+
+1 
+
+available in existing chemical databases to provide an example of what this type of workflow can 
+
+achieve, though synthesis and experimental validation of these compounds is still required. 
+
+INTRODUCTION. Deep learning (DL)-based technology has been widely adopted in realms such 
+
+as natural language processing and computer vision. The success of DL frameworks in those arenas 
+
+led to their more recent adaption to the cheminformatics field, where they have been employed as 
+
+tools to further elucidate topics ranging from chemical property prediction to synthesis planning.1-
+
+2 Furthermore, DL is playing an increasingly important role in the de novo design of molecules 
+
+with desired chemical properties. It is estimated that there are up to 1060 synthesizable drug-like 
+
+organic compounds in chemical space, over 99.9% of which are theoretically accessible but have 
+
+never  been  synthesized.3-4  The  in  silico  design  and  property  prediction  of  biologically  active 
+
+compounds is desirable both as a means to explore previously inaccessible areas of chemical space 
+
+and  as  a  labor-,  cost-,  and  time-effective  alternative  to  the  in  vitro  assessment  of  lead-like 
+
+compounds via high throughput screening. As such, there has been a sizable improvement to in 
+
+silico methodologies for novel molecule generation, discovery, and property prediction in the past 
+
+decade.  These  computer-assisted  drug  discovery  (CADD)  methods  also  have  the  potential  to 
+
+achieve much higher hit-finding rates than laboratory-based high-throughput screening.5 While the 
+
+application of machine learning to the CADD pipeline in the areas of target, property, and activity 
+
+prediction  is  widespread,6-7  its  application  to  de  novo  molecular  generation  is  a  more  recent 
+
+development—one that, while not currently without notable limitations, is demonstrating great 
+
+potential. 
+
+One standard in silico approach to de novo molecular design is to build a molecule piecewise or 
+
+atom-wise inside a pocket that represents the target protein.8 However, this method can result in 
+
+molecules that are difficult to synthesize, overfit to their target, or both. Another approach is to 
+
+ 
+
+2 
+
+use  virtual  chemical  reactions  to  build  novel  molecules.  While  this  method  addresses  the 
+
+synthesizability problem, it limits the scope of chemical space that can be explored.1, 9 To avoid 
+
+these  pitfalls,  inverse  quantitative  structure-activity  relationships  (inverse-QSAR)  has  been 
+
+proposed as an alternate approach to de novo molecular design. The methodology employed by 
+
+inverse-QSAR is to generate compounds by sampling the region of chemical space defined by the 
+
+properties of molecules with known activity.10-12 To this end, DL can be utilized both for learning 
+
+the property space encompassed by the active compounds and for generating novel molecules from 
+
+this  space.9,  13-21  A  promising  recent  development  involves  the  application  of  variational 
+
+autoencoders  (VAEs)22  to  de  novo  molecular  design.14,  23-25  VAEs  are  generative  DL  models 
+
+comprised of two connected networks—an encoder and a decoder. The encoder converts input 
+
+data to a compact representation, shaping the network’s continuous – or latent – space as it learns 
+
+patterns in the input. The decoder samples from the latent space to generate the output. In the case 
+
+of  de  novo  design,  the  VAE’s  latent  space  represents  a  chemical  space  within  which  known 
+
+molecules  can  be  placed  and  from  which  novel  molecular  structures  can  be  derived.  VAE 
+
+architecture is particularly compelling for inverse-QSAR due to its ability to accommodate two-
+
+way traversal: chemical property prediction given input molecular structure or structure generation 
+
+from desired properties.  
+
+Recently,  our  group  developed  the  VAE-based  software  DarkChem  for  mapping  chemical 
+
+properties to molecular structure.26 It was originally intended as a tool for in silico metabolomics 
+
+to aid in the identification of small molecules in complex samples. DarkChem’s latent space is 
+
+shaped using calculable chemical properties, such as molecular mass and collision cross section (a 
+
+gas  phase  property  measured  by  ion  mobility  spectrometry),  to  enable  rapid  construction  of 
+
+massive  molecular  libraries  with  reduced  reliance  on  experimentation.  DarkChem  also  shows 
+
+ 
+
+3 
+
+promise in de novo drug design. When a small set of known channel blockers of the NMDAR (N-
+
+methyl  D-aspartate  receptor)  were  used  as  input  to  DarkChem  to  generate  putative  novel 
+
+compounds,  principal  component  analysis  (PCA)  revealed  that  the  DarkChem-generated 
+
+molecules clustered well according to mass and CCS and warranted a more thorough investigation 
+
+of their capacity as potential NMDAR channel blockers. In an effort to further elucidate both the 
+
+advantages and shortcomings of nascent artificial intelligence-assisted generative approaches like 
+
+DarkChem,  we  chose  to  enter  the  field  of  computational  drug  design  by  exploring  how  our 
+
+computer-generated  molecules  perform  when  applied  to  filtering  and  assessment  methods 
+
+commonly used during virtual screening of existing large molecular databases. It should be noted 
+
+that while synthesizability was assessed during the course of this study, none of the computer-
+
+generated molecules have been synthesized, as this is outside the scope of our work. Our findings 
+
+are intended to offer guidance both to the development of future versions of DarkChem and to the 
+
+drug design community. We opted to conduct our exploration on a target that has received renewed 
+
+interest for drug leads of late,27-29 yet is lacking in readily available and accessible information 
+
+necessary  for  many  CADD  techniques:  the  NMDAR  phencyclidine  (PCP)  site.  As  such,  a 
+
+secondary goal of this study was to provide a comprehensive PCP site library freely to the research 
+
+community. Furthermore, we evaluated our generative artificial intelligence (AI) model against a 
+
+more challenging target – an active site located in the ion channel of a complex plasma membrane 
+
+protein only recently resolved by X-ray crystallography30 – than those used in literature to date, 
+
+which are largely kinases.16, 18, 25, 31-32 
+
+The NMDAR PCP Site 
+
+The NMDAR is a heterotetrameric, ligand- and voltage-gated glutamate receptor expressed in 
+
+the central nervous system (CNS). Irregular NMDAR function is implicated in excitotoxicity and 
+
+ 
+
+4 
+
+a host of nervous system disorders including Alzheimer’s, Parkinson’s, and Huntington’s diseases. 
+
+A  connection  between  NMDAR  dysfunction  and  depression  has  also  been  proposed,  but 
+
+experiments aimed at elucidating the mode of action have yielded ambiguous results.33-34 While 
+
+there are multiple binding sites on the NMDAR (Figure 1), open channel blockers that target the 
+
+PCP site in the ion channel of the transmembrane domain (TMD) have received renewed interest 
+
+due to the recent clinical trial successes of ketamine (a PCP site uncompetitive antagonist) in 
+
+treating major depressive disorder.27-29 Memantine is a PCP site antagonist that is well-tolerated 
+
+and effective in the treatment of Parkinson’s and moderate to severe Alzheimer’s disease.35 Many 
+
+other PCP site antagonists, including the site’s namesake drug PCP and the extremely high-affinity 
+
+channel blocker MK-801 (dizocilpine), result in undesirable dissociative effects in humans that 
+
+negate the potential therapeutic benefit they might confer. Further, many PCP analogs have been 
+
+identified in confiscated street drugs and in the post-mortem setting.36 Due to the nature of known 
+
+PCP site antagonists, the potential benefit of generating novel analogous structures is twofold: to 
+
+aid in the discovery of medicinal drug leads for the treatment of neurological disorders and to 
+
+preempt new designer drugs before they hit the market.  
+A
+B
+
+Figure 1. The NMDAR and some of its notable features. (A) The crystal structure of the NMDAR 
+derived from Protein Data Bank accession no. 5UOW (Lu et al., 2017) with the amino-terminal 
+domain  (ATD),  ligand-binding  domain  (LBD),  and  transmembrane  domain  (TMD)  regions 
+
+ 
+
+ 
+
+5 
+
+labeled. NR1 and NR2B subunits are isolated for clarity. The high-affinity channel blocker MK-
+801  is  shown  bound  in  the  PCP  site  in  the  inset.  (B)  Cation  flow  and  selected  binding  sites 
+including the glycine and glutamate agonist binding sites are depicted in the schematic. 
+
+ 
+
+Despite the significant value the NMDAR has as a target, DL-enabled de novo drug design has 
+
+not been applied to the NMDAR to date – in part due to the lack of publicly available ligand-
+
+protein binding data. To address this data scarcity, we have built a comprehensive NMDAR PCP 
+
+site antagonist library (see Supporting Information). Another impediment to CADD application to 
+
+the NMDAR – and particularly to the PCP site – has been the difficulty in resolving the protein in 
+
+its active state via X-ray crystallography due to its complex structure.37 In 2018, however, Song et 
+
+al. succeeded in resolving a PCP site-bound crystal structure of the NMDAR with a correctly 
+
+assembled TMD channel,30 an achievement noted in part for providing a good assessment tool for 
+
+the binding of NMDAR channel blockers.37 We therefore elected to include a docking study of 
+
+PCP site antagonists using this structure as a component of our assessment. 
+
+ 
+
+Given the high failure rate of NMDAR antagonists in clinical trials and the frequency with 
+
+which new street drugs that target the PCP site are developed, a primary goal of the molecular 
+
+generation aspect of this study was to produce compounds that are structurally unique compared 
+
+to  known  PCP  site  antagonists  yet  still  retain  predicted  target  activity.  The  discovery  of  new 
+
+molecular  scaffolds  and  chemical  classes  with  PCP  site  activity  has  the  potential  to  aid  the 
+
+development of therapeutics without undesirable dissociative effects. In our effort to explore the 
+
+efficacy and limitation of employing AI for molecular generation while providing comprehensive 
+
+information about PCP site antagonists heretofore missing from existing publicly available small 
+
+molecule databases, we utilized a variety of established in silico techniques currently being used 
+
+to  find  candidate  drug  leads.  These  include  ligand-  and  structure-based  methods  for  activity 
+
+assessment, absorption, distribution, metabolism, and excretion (ADME) prediction, substructure 
+
+ 
+
+6 
+
+analysis,  lead-likeness  filters,  synthesizability  scoring,  and  similarity  metrics.  Ultimately,  we 
+
+found twelve new potential antagonists that passed all of our filtering steps. All structures were 
+
+not present in any public database and contained unique molecular backbones compared to known 
+
+active antagonists. The results of applying these techniques to AI-generated compounds provide 
+
+insight  into  some  of  the  advantages  afforded  by  DL  for  de  novo  drug  design,  as  well  as  the 
+
+obstacles. The limitations we identified have the potential to be useful in guiding both our future 
+
+work and, more broadly, the development of generative machine learning models for targeted 
+
+molecule design. 
+
+ 
+
+RESULTS AND DISCUSSION.  
+
+In silico Workflow Strategy  
+
+One of our primary objectives was to assess whether our AI-generated compounds would pass 
+
+in silico screens typically utilized during the CADD process to characterize and filter existing 
+
+compounds or compounds created by other in silico or in vitro means. We therefore developed a 
+
+workflow comprised of both ligand- and structure-based techniques commonly used in the drug 
+
+discovery process to screen AI-generated compounds for potential activity at the NMDAR PCP 
+
+site (Figure 2). Our strategy for the creation of de novo candidate PCP site antagonists was to 
+
+search the chemical space (i.e. the VAE latent space) encompassed by the set of experimentally 
+
+verified PCP site antagonists. This necessitated the creation of a library of known actives to define 
+
+a  region  in  latent  space  from  which  to  sample.  Resulting  generated  compounds  were  filtered 
+
+according to predicted activity at the binding site, favorable molecular docking score, and desirable 
+
+ADME-Toxicity profiles and synthesizability scores. 
+
+ 
+
+ 
+
+7 
+
+A
+
+B
+
+ 
+
+Figure  2.  (A)  Workflow  schematic:  A  PCP  site  library  was  assembled  and  used  as  input  to 
+DarkChem  to  train  an  activity  prediction  model  and  collect  baseline  performance  metrics  for 
+molecular  docking  simulations.  Generated  candidate  structures  were  assessed  with  the  ligand-
+based activity prediction model and the structure-based molecular docking simulation and then 
+further filtered. (B) Detailed representation of the filtering process for AI-generated compounds 
+with the number of passing compounds displayed below the filtering step. All molecules that pass 
+each step are available upon request. 
+ 
+
+NMDAR PCP Site Molecular Library 
+
+The lack of publicly available comprehensive data on NMDAR channel blockers necessitated 
+
+the construction of a library of NMDAR PCP site antagonists. We created a library that contains 
+
+1,142 NMDAR PCP site antagonists, with 818 compounds having experimentally derived activity 
+
+at the PCP site and 324 compounds having unknown activity. Some of the dominant chemical 
+
+classes 
+
+represented 
+
+include  arylcyclohexylamine,  dibenzocycloalkenamine,  dioxolane, 
+
+benzomorphan, diphenylethylamine, aminoadamantane, aminoalkylcyclohexane, morphinan, and 
+
+guanidine. Classes are primarily defined according to the classifications used by the author(s) in 
+
+ 
+
+8 
+
+the  publication  from  which  the  compounds  were  extracted.  If  such  classifications  were  not 
+
+provided, applicable class names already present in the library were applied. The library was built 
+
+from  an  in-depth  literature  search  and  web  scraping  of  online  databases.  A  summary  of  the 
+
+literature-derived library sources is shown in Table 1. Many well-known NMDAR antagonists and 
+
+their analogs are represented, such as PCP, rolicyclidine, ketamine and esketamine, tiletamine, 
+
+lanicemine,  methoxetamine,  dexoxadrol  and  etoxadrol,  memantine,  dextromethorphan  and 
+
+dextrorphan, and dizocilpine (MK-801). The chemical properties of the library entries reveal some 
+
+common trends among them including a low molecular weight (µ: 261.03 Da; σ: 63.79 Da) and 
+
+high  lipophilicity  (µ:  3.75;  σ:  1.29)  compared  to  other  CNS-active  drugs.38  The  library  also 
+
+contains 2,000 decoy molecules—compounds with physicochemical properties that match actives 
+
+but are topologically different and presumed to be inactive at the site of interest. All compounds 
+
+are  represented  by  their  International  Union  of  Pure  and  Applied  Chemistry  (IUPAC)  name, 
+
+common  name  where  applicable,  canonical  simplified  molecular-input  line-entry  specification 
+
+(SMILES), and chemical formula. The library was utilized to define a region in the DarkChem 
+
+latent space to search for novel antagonists, build an activity prediction model during ligand-based 
+
+assessment, and determine baseline molecular docking performance metrics.  
+
+ 
+
+ 
+
+9 
+
+Table  1.  Summary  of  NMDAR  PCP  site  library  sources.  The  full  library  spreadsheet  is 
+available in the Supporting Information. 
+
+Citation  Number of 
+Compounds* 
+
+Chemical Class(es) 
+Dioxolane 
+Aminoacridine 
+Arylcyclohexylamine, Diphenylethylamine 
+Arylcyclohexylamine, Dibenzocycloalkenamine, 
+Octahydrophenanthrenamine 
+Arylcyclohexylamine 
+Arylcyclohexylamine, Arylcyclohexylmorpholine 
+Arylcyclohexylamine, Benzomorphan, Indenopyridine, 
+Benz(f)isoquinoline, Dioxolane 
+Arylcyclohexylamine, Guanidine 
+Phenylpiperidine 
+Dibenzocycloalkenamine 
+Dibenzocycloalkenamine 
+Aminoalkylcyclohexane 
+Quinolone 
+Tetrahydroisoquinoline, Benzomorphan 
+Hexahydrofluorenamine 
+Guanidine 
+Arylcyclohexylamine 
+Diphenylethylamine 
+Arylcyclohexylamine 
+Arylcyclohexylamine, Propanolamine 
+Arylcyclohexylamine, Dioxolane, Benzomorphan 
+Arylcyclohexylamine, Isothiocyanate 
+Arylcyclohexylamine, Dioxolane, Benzomorphan, 
+Benz(f)isoquinoline, Morphinan 
+Dibenzocycloalkenamine 
+Arylmethylguanidine 
+Aminoalkylcyclohexylamine, Tetrahydroisoquinoline, 
+Imidazoline 
+Arylcyclohexylamine, Imidazoline 
+Aminoalkylcyclohexane, Aminoadamantane 
+Arylcyclohexylamine, Adamantine, Aminoadamantane, 
+Aminoalkylcyclohexane 
+Dibenzocycloalkenamine 
+Arylcyclohexylamine, Anisylcyclohexylamine 
+Arylcyclohexylamine 
+Dioxolane 
+Arylcyclohexylamine 
+Diphenylethylamine 
+Dibenzocycloalkenamine 
+Arylcyclohexylamine, Arylcycloheptylamine 
+Aminoadamantane 
+Arylcyclohexylamine, Anisylcyclohexylamine, 
+Diphenylethylamine, Benzofuran, Dioxolane 
+Morphinan 
+Arylcyclohexylamine, Anisylcyclohexylamine 
+Arylcyclohexylamine 
+
+*some compounds appear in multiple sources 
+
+Source 
+Aepkers & Wünsch, 2005 
+Barygin et al., 2009 
+Berger et al., 1998, 2009, 2015 
+Bigge et al., 1993 
+Chaudieu et al., 1989 
+Colestock et al., 2018 
+Domino & Kamenka, 1988 
+Dravid et al., 2007 
+Ebert et al., 1998 
+Elhallaoui et al., 2003 
+Gee et al., 1993, 1994 
+Gilling et al., 2007 
+Gordon et al., 2001 
+Gray et al., 1989 
+Hays et al., 1993 
+Hu et al., 1997 
+Itzhak et al., 1981 
+Kang et al., 2017 
+Kozikowski & Pang, 1990 
+Kozlowski et al., 1986 
+Largent et al., 1986 
+Linders et al., 1993 
+Mendelsohn et al., 1984 
+Monn et al., 1990 
+Naumiec et al., 2015 
+Nicholson & Balster, 2003 
+Olmos et al., 1996 
+Parsons et al., 1995, 1999 
+Rammes et al., 2001 
+Rogawski et al., 1991 
+Roth et al., 2013 
+Sałat et al., 2015 
+Sax & Wünsch, 2006 
+Sax et al., 2008 
+Stefek et al., 1990 
+Subramaniam et al., 1996 
+Thompson et al., 1990 
+Thurkauf et al., 1990 
+Tikhonova et al., 2004 
+Wallach, 2014 
+Wallach et al., 2016 
+Wallach & Brandt, 2018 
+Werling et al., 2007 
+Zarantonello et al., 2011 
+Zukin & Zukin, 1979 
+
+39 
+40 
+41-43 
+44 
+45 
+46 
+47 
+48 
+49 
+50 
+51,52 
+53 
+54 
+55 
+56 
+57 
+58 
+59 
+60 
+61 
+62 
+63 
+64 
+65 
+66 
+67 
+68 
+69, 70 
+71 
+72 
+73 
+74 
+75, 76 
+77 
+78 
+79 
+80 
+81 
+
+5 
+5 
+36 
+47 
+33 
+7 
+43 
+7 
+18 
+36 
+24 
+3 
+1 
+38 
+22 
+66 
+2 
+1 
+12 
+9 
+6 
+25 
+15 
+20 
+17 
+10 
+9 
+55 
+15 
+1 
+6 
+2 
+71 
+4 
+2 
+73 
+37 
+14 
+
+36, 82-85 
+
+86 
+87 
+88 
+
+77 
+
+2 
+12 
+31 
+
+ 
+
+10 
+
+ 
+
+Generation of Potential PCP Site Antagonists 
+
+Our DL-based VAE, DarkChem, was supplied with known actives from the library to seed its 
+
+latent  representation  of chemical  structure,  or  latent space, defining  a  bounded  volume  within 
+
+chemical  space  from  which  to  sample  new  potential  NMDAR  antagonists  (see  Figure  3  and 
+
+Methods).  Ensuing  deduplication  and  SMILES  validity  verification  steps  resulted  in  a  set  of 
+
+198,826  generated  structures.  Among  this  set,  all required chemical  properties for  the  activity 
+
+model could be successfully calculated for 5,629 compounds. The remaining downselection steps, 
+
+which  are  detailed  in  following  sections,  further  reduced  the  candidates  to  twelve  optimized 
+
+potential antagonists (Figure 4), none of which were found in the thirty-one chemical databases 
+
+we cross-referenced. These final putative structures were assessed for their proximity to the set of 
+
+known actives to determine whether generated structures were unique and/or novel, as opposed to 
+
+simple perturbations of the input. The distance between each putative structure and active in the 
+
+128-dimension latent space was computed by L1 norm, as it behaves favorably in high dimensions 
+
+compared to the L2 norm,89 and the closest active was selected for each generated structure (Table 
+
+S5). Example final structures are shown with their closest therapeutic active in latent space in 
+
+Figure 3. The primary drawback to the in silico generation of novel molecules is the unavailability 
+
+of chemical standards for an in vitro assessment of their lead-likeness. When (and if) these de novo 
+
+compounds are synthesized, their ability as PCP site antagonists can be assessed to improve the 
+
+accuracy of the in silico pipeline where needed. 
+
+ 
+ 
+
+ 
+
+11 
+
+A
+a)
+
+B
+
+b)
+
+c)C
+
+D
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+A
+
+B
+
+C
+
+memantine
+
+D
+
+esketamine
+
+E
+
+ketamine
+
+F
+
+dizocilpine (MK-801)
+
+phencyclidine
+
+dextromethorphan
+
+ 
+
+12 
+
+ 
+
+Figure 3. (A) DarkChem network schematic: The network involved an encoder (green), a latent 
+representation  (orange),  and  a  decoder  (purple).  Additionally,  a  property  predictor  (slate)  was 
+attached to the latent representation. For the encoder, layers included SMILES input, character 
+embedding, and a series of convolutional layers. The latent representation was a fully connected 
+dense layer. The decoder was comprised of convolutional layers, followed by a linear layer with 
+softmax  activation  to  yield  outputs.  Finally,  the  property  predictor  was  a  single  dense  layer 
+connected to the latent representation with 20% dropout. Reprinted with permission from Colby 
+et al., 2019. Copyright 2019 American Chemical Society. (B) Latent space: The first two principal 
+components of the 128-dimensional representation are shown, colored by predicted property value 
+(top: m/z, bottom: CCS). The representation is a 2D binned statistic of the mean, with grid size 
+384 in each principal component dimension. A kernel density estimator is also shown for each 
+principal component dimension, emphasizing density of the distribution. In teal is the region of 
+latent space encompassed by PCP site antagonists. (C) Close-up of PCP site antagonist region of 
+latent space: Points 1-8 represent a selection of known PCP site antagonists, and the therapeutic 
+subset  of  known  antagonists  is  represented  as A-F.  (D)  Molecular  structures  corresponding  to 
+points 1-8 and A-F. 
+ 
+
+Ligand-Based Analysis 
+
+Drug  screening  is  a  costly  and  time-consuming  process.  Many  attempts  have  been  made  to 
+
+expedite the process by developing metrics to filter lead-like compounds from large libraries of 
+
+contenders based on the physiocochemical properties of the ligands alone. The most famous of 
+
+these metrics is arguably Lipinski’s Rule of Five (Ro5).90 There are many exceptions to the Ro5, 
+
+however, and numerous other metrics have been developed in an effort to improve upon it. The 
+
+current consensus regarding these rules is that while they are a good starting place for filtering 
+
+candidate compounds, they are far from comprehensive. In addition, the Ro5 and similar rules 
+
+have been demonstrated to be less applicable to CNS active compounds.91 They are, however, 
+
+approachable and easy to implement.  
+
+In  our  work,  once  properties  were  calculated  for  PCP  site  library  compounds,  the  Ro5  and 
+
+several other filters were applied to ascertain whether they could effectively distinguish between 
+
+active and inactive/decoy compounds. None of the filters performed meaningfully better on the 
+
+ 
+
+13 
+
+actives, and in fact many filtered out a higher proportion of actives than inactives and decoys. This 
+
+is likely due in part to the highly tuned nature of the inactives and decoys in the library and lends 
+
+further support to the maxim that such rules should only be applied as an early step when filtering 
+
+very large and chemically diverse compound databases. Thus, we applied a more rigorous ligand-
+
+based analysis technique, detailed below, which resulted in a substantially enhanced ability to 
+
+distinguish between active and inactive library compounds. 
+
+Initially,  130  0-,  1-,  and  2-D  properties,  including  atom  and  bond  counts,  functional  group 
+
+counts,  and  topological  indices,  respectively,  were  calculated  for  all  library  compounds  for 
+
+property  analysis.  We  omitted  3-D  properties  because  they  greatly  increase  computational 
+
+resources and often do not achieve superior performance to 2-D QSAR methods.92-94 Applying the 
+
+library  compounds  to  the  principal  component  analysis  (PCA)  space  of  computed  properties 
+
+revealed that the actives tend to cluster tightly while the inactives routinely display much larger 
+
+variance (Figure S1). Calculated chemical properties were applied to supervised machine learning 
+
+activity analysis to build a QSAR model. The number of descriptors used in building the model 
+
+was  chosen  to  balance  the  “curse  of  dimensionality”,  wherein  too  many  descriptors  result  in 
+
+decreased model performance, with the loss of relevant information that can occur with too few 
+
+features.  This  approach  also  follows  the  recommendation  that  for  building  machine  learning 
+
+models for QSAR analysis the number of instances should be at least five times the number of 
+
+features.95 
+
+Although  developed  fairly  recently,  support  vector  machines  (SVM)  have  demonstrated 
+
+significant  value  as  activity  prediction  models.96-97  The  SVM  model  for  PCP  site  activity 
+
+prediction achieved a ten-fold cross-validated accuracy of 0.95, with a weighted average precision 
+
+of 0.98, recall of 0.97, and f1 of 0.97 on the test set (Figure S2). We built the initial classification 
+
+ 
+
+14 
+
+models using a training set comprised of samples from only the library actives and inactives, which 
+
+resulted in worse than desired performance due to the scarcity of inactives (N=X). Incorporation 
+
+of decoy compounds (N=Y) to the inactive class resulted in the considerably more accurate and 
+
+robust final model built for activity prediction. Decoys are an integral part of the CADD process, 
+
+used both as controls for assessing docking simulation results and for building QSAR models in 
+
+the  absence  of  sufficient  known  inactive  compounds.  While  there  is  a  degree  of  inherent 
+
+uncertainty  when  using  decoys,  as  presumed  inactivity  does  not  necessarily  equate  to  true 
+
+inactivity, the application of an unpaired t-test on the binding outcomes of a docking study of 
+
+library actives, inactives, and decoys demonstrated statistically significant differences between 
+
+actives and inactives and between actives and decoys that did not exist between inactives and 
+
+decoys. This is discussed in further detail in the next section. These results provided confidence in 
+
+incorporating the decoys to the inactive class for activity model training. To avoid overfitting, a 
+
+frequent pitfall of QSAR models,98 we assessed the robustness of our model using both ten-fold 
+
+cross-validation and a randomly generated test set comprised of data not seen in training. The 
+
+model’s  cross-validated  accuracy  of  0.95  and  AUPR  of  0.95  demonstrate  its  usefulness  as  an 
+
+assessment tool for PCP site activity. The code for the SVM is available as a Python notebook in 
+
+the Supporting Information. The SVM model predicted 628 of the 5,628 generated compounds 
+
+with successfully calculated properties as active. 
+
+Structure-Based Analysis 
+
+There are two 3D crystallographic NMDAR structures with a PCP site-bound ligand available: 
+
+Protein Data Bank (PDB) codes 5UOW99 and 5UN1.30 The structures were compared by running 
+
+trial docking simulations following the same receptor preparation method, after which the higher 
+
+resolution structure 5UN1 (3.6 Å) was chosen for the library and de novo compound docking 
+
+ 
+
+15 
+
+studies. AutoDock Vina outputs the top binding poses and scores for each ligand. A ligand’s score 
+
+represents the estimated free energy of binding, where a more negative score corresponds to a 
+
+higher  likelihood  of  binding.  Vina’s  energy  of  binding  estimates  contain  widely  reported 
+
+inconsistencies and should not be assumed to represent correct values for the purposes of ranking, 
+
+but they have been demonstrated to be accurate in predicting binding poses and distinguishing 
+
+between  active  and  inactive  compounds  in  the  aggregate.100  A  common  method  for  docking 
+
+assessment is to determine how well docking scores correlate to experimental binding affinities 
+
+for  a  given  library  of  compounds.  However,  this  approach  is  problematic  due  to  the  fact  that 
+
+experimental binding affinities present in ligand libraries are extracted from multiple sources with 
+
+varying experimental parameters, including the location of the receptor in the body. We therefore 
+
+decided on an alternative approach to docking wherein the ability to distinguish between verified 
+
+active, verified inactive, and decoy compounds using docking scores was assessed. We found that 
+
+the docking scores for the library compounds display a statistically significant difference between 
+
+the active and inactive compounds as well as between the active and decoy compounds (two-tailed 
+
+p < 0.0001 for both), but not between the decoys and inactives (two-tailed p = 0.3, Table S2). This 
+
+result lends support to the use of docking studies for assessing potential activity of novel PCP site 
+
+antagonists  and,  more  generally,  provides  confidence  in  this  approach  to  docking  for  activity 
+
+analysis. 
+
+A noteworthy finding was that the mean docking score for the DarkChem-generated compounds 
+
+was less negative than for any of the library compound classes. While individual docking scores 
+
+were  not  found  to  correlate  with  activity,  the  mean  scores  for  each  library  class  were 
+
+distinguishable. This finding could reflect a shortcoming of the present generative AI approach 
+
+and indicate a need to incorporate receptor structural data into the molecular generation process. 
+
+ 
+
+16 
+
+A  comparative  assessment  of  generative  models  with  and  without  the  inclusion  of  structural 
+
+information would be a valuable area for future work, and we are currently expanding DarkChem 
+
+to include hundreds of chemical properties along with a valid-structure discriminator in order to 
+
+improve candidate generation.  
+
+A common bottleneck in DL models is the requirement of large quantities of high-quality data. 
+
+In drug discovery DL applications as in others, more information is typically correlated with better 
+
+model performance.101 Therefore, for this work we selected the 473 molecules with docking scores 
+
+in the actives scoring range to proceed to the next stages of filtering. 
+
+Further Assessment of Generated Compounds and Top Final Leads 
+
+None of the generated structures were found to exist in the thirty-three compound databases that 
+
+were cross-referenced for duplicates. ADME-Toxicity, predicted off-site activity, synthesizability, 
+
+and stability filters were applied to the remaining compounds next (details in Methods). In line 
+
+with the goal of assisting in the identification of unique scaffolds of molecules with PCP site 
+
+activity to aid in the search for potentially therapeutic compounds, the filter tolerances were set to 
+
+be consistent with the properties of known therapeutic actives from the library. This screening 
+
+process  reduced  the  number  of  compounds  to  twelve  finalists  (Figure  4).  As  the  failure  to 
+
+accurately account for breakdown products has been implicated as the cause of many lead failures 
+
+during the drug discovery process,102 we predicted metabolites for each of the twelve candidates 
+
+(see metabolites xlsx file in Supporting Information). 
+
+ 
+
+ 
+
+17 
+
+A
+a)
+
+b)B
+
+a
+C 11H 16N 2S
+M olec ular Wt. = 208.32 Da
+
+c
+C 12H 17NOS
+M olec ular Wt. = 223.33 Da
+
+b
+C 11H 17NOS
+M olec ular Wt. = 211.32 Da
+
+e
+C 13H 25NS
+M olec ular Wt. = 227.41 Da
+
+f
+C 15H 25N
+M olec ular Wt. = 219.37 Da
+
+d
+C 11H 16N 2S
+M olec ular Wt. = 226.38 Da
+
+i
+C 15H 3 1N 3
+M olec ular Wt. = 253.43 Da
+
+g
+C 15H 25N
+M olec ular Wt. = 219.37 Da
+
+h
+C 14H 29NS 2
+M olec ular Wt. = 275.51 Da
+
+k
+C 16H 33N 3
+M olec ular Wt. = 267.46 Da
+
+l
+C 15H 30N 2OS
+M olec ular Wt. = 286.48 Da
+
+j
+C 16H 31NS
+M olec ular Wt. = 269.49 Da
+
+ 
+
+ 
+
+18 
+
+Figure  4.  (A)  Close-up  of  the  first  two  PCA  dimensions  from  DarkChem’s  latent  space 
+encompassed by the twelve generated finalist molecules, labeled as a-l. (B) The twelve generated 
+finalist structures with their letter designation corresponding to that in A. 
+ 
+
+Similarity assessment of the final structures to the library actives training set revealed that the 
+
+generated compounds were unique and not merely simple perturbations of the input. Of the twenty 
+
+most common unique substructures found in at least 50% of the library actives, each substructure 
+
+is represented in no more than 0.25% of the set of generated compounds. In addition, each of the 
+
+final twelve compounds contain only between one and eight of the twenty common substructures 
+
+(Table S3, Table S4). Finalist compounds also display a high degree of uniqueness when compared 
+
+to the training set using L1 distance and Tanimoto score metrics (Figure 5). The most similar active 
+
+training  set  compounds  by  L1  distance  in  128-dimensional  space  and  by  Tanimoto  score  are 
+
+reported  for  each  finalist  molecule  in  Table  S5.  The  ability  of  generated  compounds  to  pass 
+
+multiple stages of standard CADD filtering processes demonstrates the promise of this technique 
+
+in application to challenging targets. However, the lack of in vitro and in vivo experimental data 
+
+for verification and benchmarks for quality assessment pose immediate challenges to a robust 
+
+assessment  of  this  and  other  DL-assisted  generative  models.  Furthermore,  while  the  finalist 
+
+molecules all have favorable synthesizability scores, true synthesizability and stability are difficult 
+
+to assess and many of the generated compounds are somewhat peculiar looking. To improve DL-
+
+assisted  de  novo  design  methods,  representing  compounds  for  DL  models  as  molecular  graph 
+
+convolutions  instead  of  SMILES  strings  has  shown  promise  as  a  superior  mode  of  structural 
+
+representation.103  We  plan  to  transition  future  versions  of  DarkChem  to  graph  convolution 
+
+molecular  representations  to  improve  the  ability  to  generate  increasingly  realistic,  stable 
+
+compounds. 
+
+ 
+
+19 
+
+ 
+
+Figure 5. Finalist generated structures display a high degree of uniqueness compared to training 
+set molecules. Representative finalist compounds, the three leftmost molecules, are juxtaposed 
+with the most similar training set therapeutic by L1 distance and the most similar training set active 
+by Tanimoto score. 
+ 
+Current State of AI for De Novo Molecular Design 
+
+AI is demonstrating promise as a tool in the drug design and discovery process. However, the 
+
+field is in its infancy and is regularly described with either over-inflated hype about what it can 
+
+deliver or harsh derision and dismissal. As such, many in the field are calling for a more measured 
+
+approach coupled with the development of suitable guidelines for measuring performance of AI 
+
+models to better understand current limitations and possibilities.104 While sensationalist headlines 
+
+would have one believe that we are nearing the point in which AI can effectively generate novel 
+
+drugs with desirable in vivo properties for a target of interest, the reality is that current generative 
+
+models have a considerable way to go before that claim can reasonably be made. In fact, it may 
+
+ 
+
+20 
+
+not be possible for a single AI to autonomously design drugs; it could be that the best outcome 
+
+will  arise  from  a suite of  AI models  used  in  concert  at  various stages  of the  drug  design  and 
+
+optimization process. Furthermore, the ideal model(s) might be dependent on the individual target 
+
+rather than being universal.105 There are many suggestions regarding specific intermediate goals 
+
+that the AI drug design community should strive to achieve in an effort to establish standards by 
+
+which  generative  models  can  be  judged.  One  such  suggested  near-term  goal  is  for  generative 
+
+models to demonstrate the effective shrinking of the vast search space used by traditional virtual 
+
+and high-throughput screening methods.106 However, the means by which to demonstrate success 
+
+at such a task is up for debate. A large obstacle facing the AI drug design community is that there 
+
+is no current “best practice” for assessing performance. It is widely agreed that at a minimum, the 
+
+similarity  of  generated molecules  to  training  molecules  should  be  assessed.  Other  suggestions 
+
+include comparing output to that produced by other drug design tools and bioisosteric replacement 
+
+methods, assessment of activity at off-targets, and sensitivity analysis of how data quality and 
+
+quantity affect output. To begin to fill this gap, some nascent benchmarking sets have recently 
+
+been introduced.8, 107 While the authors highlight the inherent difficult in creating objective quality 
+
+metrics and note that many of the benchmarks are too easily solved by most DL-based de novo 
+
+design models, the benchmarks offer a promising initial step in the development of robust quality 
+
+assessment techniques.  
+
+ 
+
+CONCLUSION. In summary, we produced a library of NMDAR PCP site antagonists including 
+
+known actives, known inactives, and decoys. We demonstrated the application of this library to 
+
+the  AI-assisted  generation  of  structurally  unique  putative  active  compounds  targeting  a  more 
+
+complex site than previously seen that were then downselected using standard CADD techniques. 
+
+ 
+
+21 
+
+We identified current limitations of generative models in de novo design including the absence of 
+
+receptor structural information during the training process and the lack of existing baselines for 
+
+comparison.  While  the ability  of  AI-generated  compounds  to  pass  ligand-  and  structure-based 
+
+filters for a complex target is promising, we advise that rigorous benchmarks are needed for more 
+
+robust assessment of this technology. 
+
+ 
+
+METHODS.  
+
+NMDAR Antagonist Library 
+
+The NMDAR PCP site antagonist library was built by extracting from a comprehensive literature 
+
+search for experimental Ki and IC50 values of ligands used in PCP site binding assays.33, 36, 39-71, 73-
+
+88, 108-116 Ligands with Ki values less than 100 µM were placed in the ‘Actives’ section of the 
+
+library, and those 100 µM or greater were placed in the ‘Inactives’ section. The library contains 
+
+728 active and 87 inactive literature-verified compounds, and 297 PCP analogs and near-analogs 
+
+without binding data scraped from the website isomerdesign.com. The html code from the page 
+
+was parsed using the Python library BeautifulSoup117 by visiting every compound stored under the 
+
+tag ‘arylcycloalkylamine’ and extracting the molecular information. A set of thirty-nine actives 
+
+from a single study83 (‘validation1’ in Figure S1) with a wide range of PCP site activities were 
+
+used to seed the generation of decoy molecules using the Database of Useful Decoys: Enhanced 
+
+(DUD-E) database,118 which were added to the library. All library compounds are represented by 
+
+their  canonical  SMILES.  Canonicalization  was  performed  using  OpenBabel  (version  2.4.1, 
+
+2019, http://openbabel.org).119 The complete library can be found in Supporting Information. 
+
+Ligand- and Structure-Based Analysis 
+
+ 
+
+22 
+
+Both 1- and 2-D physiocochemical properties were calculated for each of library compounds 
+
+using  ChemAxon’s  cxcalc  (version  5.2.0,  http://www.chemaxon.com).  The  properties  were 
+
+normalized  and  applied  to  the  chemical  property  PCA  space  using  the  Python  library  scikit-
+
+learn,120  in  which  PCA  space  was  defined  following  the  method  outlined  in  the  Colby  et  al. 
+
+DarkChem publication.121 
+
+The library compounds were split into training and test sets (75%/25%) using stratified random 
+
+sampling with ten-fold cross-validation to account for the imbalance between classes. An SVM 
+
+binary classification model for predicting binding affinity was built and trained on the training set 
+
+with scikit-learn, with performance assessed using recall, precision, f1 score, and area under the 
+
+precision-recall curve (AUPR). The properties used in model building are enumerated in Table S1. 
+
+Structure-based analysis was performed using a 3D crystallographic structure of the NMDAR 
+
+(PDB code 5UN1) downloaded from www.rcsb.com.30 The receptor was prepared with Chimera122 
+
+by removing the bound ligand MK-801 after creating a centroid to extract the center coordinates 
+
+of the bound ligand. Next, the Chimera structure editing “dock prep” feature was run with the 
+
+option to consider H-bonds, the AMBER ff14sb option to include charges for standard residues, 
+
+and the AM1-BCC option to include charges for non-standard residues. The resulting NMDAR 
+
+structure was saved for docking in PDB format after removing all hydrogens. Using this structure, 
+
+the active, inactive, and decoy compounds from the library were run through an AutoDock Vina123 
+
+docking simulation using PyRX124, where the previously extracted centroid coordinates were used 
+
+to define the search space in the protein. The top eight pose scores, or the maximum number found 
+
+if below eight, were collected for each compound. 
+
+De Novo Design of Potential Channel Blockers 
+
+ 
+
+23 
+
+Putative structures were generated using DarkChem, a SMILES-based VAE implementation 
+
+with  coupled  property  predictor,  with  model  parameters  matching  those  of  Colby  et  al.26  The 
+
+model was initialized with pretrained weights from a transfer learning configuration including 
+
+~55M mass-labeled compounds from PubChem;100 ~700K mass- and computed collision cross 
+
+section (CCS)- labeled compounds from the union of the Universal Natural Product Database,125 
+
+Human Metabolome Database,126 and Distributed Structure-searchable Toxicity127 datasets; and 
+
+~500 mass- and experimental CCS- labeled compounds curated from the literature. This pretrained 
+
+model was used to encode the set of 728 known NMDAR actives into a 128-dimension latent 
+
+vector representation of molecular structure.  The mean and variance of the actives was calculated 
+
+for each dimension and used to define a 128-dimension random normal distribution from which 
+
+100K  latent  vectors  were  sampled.  Each  latent  vector  was  decoded  to  the  k  most  probable 
+
+structures using beamsearch (k=100), resulting in 10M putative structures. These were initially 
+
+downselected by SMILES canonicalization and duplicate removal, checking for SMILES validity 
+
+using rdkit (rdkit.org), and ensuring sampled latent vectors fell within the convex hull defined by 
+
+the 728 known actives, reducing the putative set to 198,826. The convex hull was constructed from 
+
+the first 8 principal components of the latent representation using the Quickhull128 algorithm from 
+
+the spatial module of SciPy.129 
+
+Downselection of Generated Compounds 
+
+The remaining structures were assessed for potential PCP site activity by being tested against 
+
+the classification model. Passing compounds were then run through the same docking simulation 
+
+as the library compounds. The compounds with docking scores in the range of known actives were 
+
+assessed for synthesizability and filtered for desirable ADME properties using SwissADME,130 for 
+
+which  the  known  therapeutic  PCP  site  actives  memantine,  ketamine,  dextromethorphan,  and 
+
+ 
+
+24 
+
+amantadine were used as a basis for comparison. A synthetic accessibility score of six or higher 
+
+(on a scale of one to ten) was considered undesirable. Drug- and lead-likeness violations were only 
+
+accepted if any of the known PCP site therapeutics contained the same violation. Predicted activity 
+
+at  any  of  the  set  of  receptors  checked  by  SwissADME  was  also  only  accepted  if  any  known 
+
+therapeutics  demonstrated  the  same  prediction.  Remaining  compounds  were  then  filtered  for 
+
+desirable gastrointestinal absorption, blood-brain barrier permeability, and solubility. The passing 
+
+molecules were further compared against the known therapeutics and filtered to those containing 
+
+at least one hydrogen bond acceptor, no more than six heavy aromatic atoms, at least one nitrogen 
+
+atom, and a consensus logP between two and four. A link to the Jupyter notebook containing the 
+
+filtering script is included in Supporting Information. The twelve finalist compounds were cross-
+
+referenced against a chemical library comprised of a collection of thirty-one chemical databases 
+
+and websites to determine their novelty.125-126, 131-159 Predicted metabolites for each of the twelve 
+
+finalist  compounds  were  generated  using  BioTransformer135  and  are  reported  in  Supporting 
+
+Information. 
+
+Similarity Assessment of AI-Generated Compounds to Known Actives 
+
+Substructure  assessment  was  conducted  utilizing  graph  theory  (i.e.  subgraph  isomorphism) 
+
+where the molecular graph was defined by a set of nodes (i.e. atoms) and a set of connecting edges 
+
+(i.e. bonds). Substructures ranging in size from one atom of a molecule to the entire molecule were 
+
+found in two stages. In the first stage, only the paths consisting of a straight chain of nodes where 
+
+each node is connected to every other in the molecule were found. Breadth-first search was used 
+
+to find every possible path in the molecule by starting with an arbitrary atom in a molecular graph 
+
+and exploring by degree, starting from all first-degree neighbor nodes and then moving to one-
+
+degree deeper nodes until all connecting nodes were visited. In the second stage, paths containing 
+
+ 
+
+25 
+
+branches were searched using depth-first search by exploring each node branch to the deepest level 
+
+from the starting node until no more connections were found. As a result, branches were mapped 
+
+to the chain paths at possible positions. Obtained substructures were stored as canonical SMILES. 
+
+The  distance  between  each  finalist  structure  and  active  in  the  128-dimension  space  was 
+
+computed by L1 norm. The Tanimoto similarity between each of the twelve final structures and 
+
+every library active was computed using RDKit. The similarity scores were evaluated to locate the 
+
+nearest active by L1 norm and Tanimoto similarity to each finalist molecule.  
+
+ 
+
+ASSOCIATED CONTENT. 
+
+Supporting Information. NMDAR PCP site library, enumerated compounds at each stage of 
+
+screening, additional figures and tables illustrating activity model assessment, PCA, docking 
+
+numerics, and similarity assessment, ADME-based filtering script, QSAR SVM script, and 
+
+predicted metabolites.  
+
+The following files are available free of charge. 
+
+NMDAR PCP Site Library (XLSX) 
+
+Supporting Figures and Tables (PDF) 
+
+Filtering Script (IPYNB) 
+
+QSAR SVM Script (IPYNB) 
+
+Predicted Metabolites of Finalists (XLSX) 
+
+ 
+AUTHOR INFORMATION 
+
+Corresponding Author 
+
+*Email: ryan.renslow@pnnl.gov 
+
+ 
+
+26 
+
+Author Contributions 
+
+The manuscript was written through contributions of all authors. All authors have given approval 
+
+to the final version of the manuscript.  
+
+Notes 
+
+The authors declare no competing financial interests. 
+
+ACKNOWLEDGMENT 
+
+This research was supported by the Pacific Northwest National Laboratory (PNNL) Laboratory 
+
+Directed Research and Development program. PNNL is operated for DOE by Battelle Memorial 
+
+Institute under contract DE-AC05-76RL01830. 
+
+We thank Nathan Baker for his input on protein preparation for molecular docking simulations 
+
+and Madison Blumer for providing BioTransformer assessment. 
+
+ABBREVIATIONS USED 
+
+ADME,  absorption,  distribution,  metabolism  and  excretion;  AI,  artificial  intelligence;  CADD, 
+
+computer-assisted drug discovery; CNS, central nervous system; DL, deep learning; NMDAR, N-
+
+methyl  D-aspartate  receptor;  PCA,  principal  component  analysis;  PCP,  phencyclidine;  QSAR, 
+
+quantitative  structure-activity  relationship;  SMILES,  Simplified  Molecular  Input  Line  Entry 
+
+Specification; SVM, support vector machine; TMD, transmembrane domain; VAE, variational 
+
+autoencoder. 
+
+REFERENCES 
+
+1. 
+Ching, T.; Himmelstein Daniel, S.; Beaulieu-Jones Brett, K.; Kalinin Alexandr, A.; Do 
+Brian, T.; Way Gregory, P.; Ferrero, E.; Agapow, P.-M.; Zietz, M.; Hoffman Michael, M.; Xie, 
+W.; Rosen Gail, L.; Lengerich Benjamin, J.; Israeli, J.; Lanchantin, J.; Woloszynek, S.; 
+Carpenter Anne, E.; Shrikumar, A.; Xu, J.; Cofer Evan, M.; Lavender Christopher, A.; Turaga 
+
+ 
+
+27 
+
+Doman, T. N.; McGovern, S. L.; Witherbee, B. J.; Kasten, T. P.; Kurumbail, R.; 
+
+Ekins, S.; Puhl, A. C.; Zorn, K. M.; Lane, T. R.; Russo, D. P.; Klein, J. J.; Hickey, A. J.; 
+
+Brown, N.; Fiscato, M.; Segler, M. H. S.; Vaucher, A. C., GuacaMol: Benchmarking 
+
+Segler, M. H. S.; Kogej, T.; Tyrchan, C.; Waller, M. P., Generating Focused Molecule 
+
+Segler, M. H. S.; Preuss, M.; Waller, M. P., Planning chemical syntheses with deep 
+
+Reymond, J.-L.; Awale, M., Exploring Chemical Space for Drug Discovery Using the 
+
+Rifaioglu, A. S.; Atas, H.; Martin, M. J.; Cetin-Atalay, R.; Atalay, V.; Doğan, T., Recent 
+
+Bohacek, R. S.; McMartin, C.; Guida, W. C., The art and practice of structure-based drug 
+
+Srinivas, C.; Alexandari Amr, M.; Lu, Z.; Harris David, J.; DeCaprio, D.; Qi, Y.; Kundaje, A.; 
+Peng, Y.; Wiley Laura, K.; Segler Marwin, H. S.; Boca Simina, M.; Swamidass, S. J.; Huang, A.; 
+Gitter, A.; Greene Casey, S., Opportunities and obstacles for deep learning in biology and 
+medicine. Journal of The Royal Society Interface 2018, 15 (141), 20170387. 
+2. 
+neural networks and symbolic AI. Nature 2018, 555 (7698), 604-610. 
+3. 
+Chemical Universe Database. ACS Chemical Neuroscience 2012, 3 (9), 649-657. 
+4. 
+design: A molecular modeling perspective. Medicinal Research Reviews 1996, 16 (1), 3-50. 
+5. 
+Stallings, W. C.; Connolly, D. T.; Shoichet, B. K., Molecular Docking and High-Throughput 
+Screening for Novel Inhibitors of Protein Tyrosine Phosphatase-1B. Journal of Medicinal 
+Chemistry 2002, 45 (11), 2213-2221. 
+6. 
+Clark, A. M., Exploiting machine learning for end-to-end drug discovery and development. 
+Nature Materials 2019, 18 (5), 435-441. 
+7. 
+applications of deep learning and machine intelligence on in silico drug discovery: methods, 
+tools and databases. Briefings in Bioinformatics 2018. 
+8. 
+Models for de Novo Molecular Design. Journal of Chemical Information and Modeling 2019, 59 
+(3), 1096-1108. 
+9. 
+Libraries for Drug Discovery with Recurrent Neural Networks. ACS Central Science 2018, 4 (1), 
+120-131. 
+10.  Miyao, T.; Kaneko, H.; Funatsu, K., Inverse QSPR/QSAR Analysis for Chemical 
+Structure Generation (from y to x). Journal of Chemical Information and Modeling 2016, 56 (2), 
+286-299. 
+11.  Wong, W. W. L.; Burkowski, F. J., A constructive approach for discovering new drug 
+leads: Using a kernel methodology for the inverse-QSAR problem. Journal of Cheminformatics 
+2009, 1 (1), 4. 
+Churchwell, C. J.; Rintoul, M. D.; Martin, S.; Visco, D. P.; Kotu, A.; Larson, R. S.; 
+12. 
+Sillerud, L. O.; Brown, D. C.; Faulon, J.-L., The signature molecular descriptor. 3. Inverse-
+quantitative structure-activity relationship of ICAM-1 inhibitory peptides. J Mol Graph Model 
+2004, 22 (4), 263-273. 
+13. 
+A., Objective-reinforced generative adversarial networks (ORGAN) for sequence generation 
+models. arXiv preprint arXiv:1705.10843 2017. 
+14. 
+Lengeling, B.; Sheberla, D.; Aguilera-Iparraguirre, J.; Hirzel, T. D.; Adams, R. P.; Aspuru-
+Guzik, A., Automatic Chemical Design Using a Data-Driven Continuous Representation of 
+Molecules. ACS Central Science 2018, 4 (2), 268-276. 
+15. 
+Translating from Reduced Graphs to SMILES. Journal of Chemical Information and Modeling 
+2019, 59 (3), 1136-1146. 
+
+Guimaraes, G. L.; Sanchez-Lengeling, B.; Outeiral, C.; Farias, P. L. C.; Aspuru-Guzik, 
+
+Gómez-Bombarelli, R.; Wei, J. N.; Duvenaud, D.; Hernández-Lobato, J. M.; Sánchez-
+
+Pogány, P.; Arad, N.; Genway, S.; Pickett, S. D., De Novo Molecule Design by 
+
+ 
+
+28 
+
+Kadurin, A.; Nikolenko, S.; Khrabrov, K.; Aliper, A.; Zhavoronkov, A., druGAN: An 
+
+Chen, H.; Engkvist, O.; Wang, Y.; Olivecrona, M.; Blaschke, T., The rise of deep 
+
+Kingma, D. P.; Welling, M., Auto-encoding variational bayes. arXiv preprint 
+
+Blaschke, T.; Olivecrona, M.; Engkvist, O.; Bajorath, J.; Chen, H., Application of 
+
+Lim, J.; Ryu, S.; Kim, J. W.; Kim, W. Y., Molecular generative model based on 
+
+Polykovskiy, D.; Zhebrak, A.; Vetrov, D.; Ivanenkov, Y.; Aladinskiy, V.; Mamoshina, 
+
+Ståhl, N.; Falkman, G.; Karlsson, A.; Mathiason, G.; Boström, J., Deep Reinforcement 
+
+Putin, E.; Asadulaev, A.; Vanhaelen, Q.; Ivanenkov, Y.; Aladinskaya, A. V.; Aliper, A.; 
+
+16. 
+Zhavoronkov, A., Adversarial Threshold Neural Computer for Molecular de Novo Design. 
+Molecular Pharmaceutics 2018, 15 (10), 4386-4397. 
+17. 
+Advanced Generative Adversarial Autoencoder Model for de Novo Generation of New 
+Molecules with Desired Molecular Properties in Silico. Molecular Pharmaceutics 2017, 14 (9), 
+3098-3104. 
+18. 
+P.; Bozdaganyan, M.; Aliper, A.; Zhavoronkov, A.; Kadurin, A., Entangled Conditional 
+Adversarial Autoencoder for de Novo Drug Discovery. Molecular Pharmaceutics 2018, 15 (10), 
+4398-4405. 
+19. 
+Sattarov, B.; Baskin, I. I.; Horvath, D.; Marcou, G.; Bjerrum, E. J.; Varnek, A., De Novo 
+Molecular Design by Combining Deep Autoencoder Recurrent Neural Networks with Generative 
+Topographic Mapping. Journal of Chemical Information and Modeling 2019, 59 (3), 1182-1196. 
+20. 
+Learning for Multiparameter Optimization in de novo Drug Design. Journal of Chemical 
+Information and Modeling 2019, 59 (7), 3166-3176. 
+21. 
+learning in drug discovery. Drug Discovery Today 2018, 23 (6), 1241-1250. 
+22. 
+arXiv:1312.6114 2013. 
+23. 
+Generative Autoencoder in De Novo Molecular Design. Molecular Informatics 2018, 37 (1-2), 
+1700123. 
+24. 
+conditional variational autoencoder for de novo molecular design. Journal of Cheminformatics 
+2018, 10 (1), 31. 
+25. 
+Aladinskaya, A. V.; Terentiev, V. A.; Polykovskiy, D. A.; Kuznetsov, M. D.; Asadulaev, A.; 
+Volkov, Y.; Zholus, A.; Shayakhmetov, R. R.; Zhebrak, A.; Minaeva, L. I.; Zagribelnyy, B. A.; 
+Lee, L. H.; Soll, R.; Madge, D.; Xing, L.; Guo, T.; Aspuru-Guzik, A., Deep learning enables 
+rapid identification of potent DDR1 kinase inhibitors. Nature Biotechnology 2019, 37 (9), 1038-
+1040. 
+26. 
+to generate in silico chemical property libraries and candidate molecules for small molecule 
+identification in complex samples. arXiv preprint arXiv:1905.08411 2019. 
+Kadriu, B.; Gold, P. W.; Luckenbaugh, D. A.; Lener, M. S.; Ballard, E. D.; Niciu, M. J.; 
+27. 
+Henter, I. D.; Park, L. T.; De Sousa, R. T.; Yuan, P.; Machado-Vieira, R.; Zarate, C. A., Acute 
+ketamine administration corrects abnormal inflammatory bone markers in major depressive 
+disorder. Molecular Psychiatry 2018, 23 (7), 1626-1631. 
+28. 
+Default Mode Connectivity in Major Depressive Disorder Measured Up to 10 Days After 
+Ketamine Administration. Biological Psychiatry 2018, 84 (8), 582-590. 
+29. 
+Zarate, C. A., Ketamine has distinct electrophysiological and behavioral effects in depressed and 
+healthy subjects. Molecular Psychiatry 2019, 24 (7), 1040-1052. 
+
+Colby, S. M.; Nuñez, J. R.; Hodas, N. O.; Corley, C. D.; Renslow, R. R., Deep learning 
+
+Zhavoronkov, A.; Ivanenkov, Y. A.; Aliper, A.; Veselov, M. S.; Aladinskiy, V. A.; 
+
+Evans, J. W.; Szczepanik, J.; Brutsché, N.; Park, L. T.; Nugent, A. C.; Zarate, C. A., 
+
+Nugent, A. C.; Ballard, E. D.; Gould, T. D.; Park, L. T.; Moaddel, R.; Brutsche, N. E.; 
+
+ 
+
+29 
+
+Popova, M.; Isayev, O.; Tropsha, A., Deep reinforcement learning for de novo drug 
+
+Zanos, P.; Moaddel, R.; Morris, P. J.; Riggs, L. M.; Highland, J. N.; Georgiou, P.; 
+
+Li, Y.; Zhang, L.; Liu, Z., Multi-objective de novo drug design with conditional graph 
+
+Vinicius Santana, M.; Castro, H.; Abreu, P., NMDA Receptor as a Molecular Target for 
+
+30. 
+Song, X.; Jensen, M. Ø.; Jogini, V.; Stein, R. A.; Lee, C.-H.; McHaourab, H. S.; Shaw, 
+D. E.; Gouaux, E., Mechanism of NMDA receptor channel block by MK-801 and memantine. 
+Nature 2018, 556 (7702), 515-519. 
+31. 
+design. Science Advances 2018, 4 (7), eaap7885. 
+32. 
+generative model. Journal of Cheminformatics 2018, 10 (1), 33. 
+Zanos, P.; Moaddel, R.; Morris, P. J.; Georgiou, P.; Fischell, J.; Elmer, G. I.; Alkondon, 
+33. 
+M.; Yuan, P.; Pribut, H. J.; Singh, N. S., NMDAR inhibition-independent antidepressant actions 
+of ketamine metabolites. Nature 2016, 533 (7604), 481. 
+34. 
+Pereira, E. F. R.; Albuquerque, E. X.; Thomas, C. J.; Zarate, C. A., Jr.; Gould, T. D., Ketamine 
+and Ketamine Metabolite Pharmacology: Insights into Therapeutic Mechanisms. Pharmacol Rev 
+2018, 70 (3), 621-660. 
+35. 
+Central Nervous System Disorders: The Advances and Contributions of Molecular Modeling. 
+2017; pp 211-249. 
+36.  Wallach, J.; Brandt, S. D., Phencyclidine-Based New Psychoactive Substances. In New 
+Psychoactive Substances : Pharmacology, Clinical, Forensic and Analytical Toxicology, Maurer, 
+H. H.; Brandt, S. D., Eds. Springer International Publishing: Cham, 2018; pp 261-303. 
+37.  Wang, J. X.; Furukawa, H., Dissecting diverse functions of NMDA receptors by 
+structural biology. Current Opinion in Structural Biology 2019, 54, 34-42. 
+38. 
+Brain Exposure. Journal of Medicinal Chemistry 2015, 58 (6), 2584-2608. 
+39. 
+NMDA receptor antagonists derived from dexoxadrol and etoxadrol. Bioorganic & Medicinal 
+Chemistry 2005, 13 (24), 6836-6849. 
+40. 
+Barygin, O. I.; Gmiro, V. E.; Kim, K. K.; Magazanik, L. G.; Tikhonov, D. B., Blockade 
+of NMDA receptor channels by 9-aminoacridine and its derivatives. Neuroscience Letters 2009, 
+451 (1), 29-33. 
+41. 
+modulatory site of the NMDA receptor: 50-fold increase in potency by insertion of an aromatic 
+ring into an alkanediamine chain. European Journal of Medicinal Chemistry 1998, 33 (1), 3-14. 
+42. 
+affinities of 1,2-diphenylethylamine and 1-(1,2-diphenylethyl)piperidine enantiomers and of 
+related compounds. Bioorganic & Medicinal Chemistry 2009, 17 (9), 3456-3462. 
+43. 
+Kaźmierczak, P.; Rezler, M.; Jarak, I.; Piantanida, I.; Karminski-Zamola, G.; Mayence, A.; 
+Rebernik, P.; Kumar, A.; Ismail, M. A.; Boykin, D. W.; Huang, T. L., Pentamidine analogs as 
+inhibitors of [(3)H]MK-801 and [(3)H]ifenprodil binding to rat brain NMDA receptors. 
+Bioorganic & medicinal chemistry 2015, 23 (15), 4489-4500. 
+44. 
+Retz, D. M.; Ortwine, D. F.; Probert Jr, A. W., Synthesis and pharmacological evaluation of 4a-
+phenanthrenamine derivatives acting at the phencyclidine binding site of the N-methyl-D-
+aspartate receptor complex. Journal of medicinal chemistry 1993, 36 (14), 1977-1995. 
+
+Rankovic, Z., CNS Drug Design: Balancing Physicochemical Properties for Optimal 
+
+Aepkers, M.; Wünsch, B., Structure–affinity relationship studies of non-competitive 
+
+Bigge, C. F.; Malone, T. C.; Hays, S. J.; Johnson, G.; Novak, P. M.; Lescosky, L. J.; 
+
+Berger, M. L.; Schödl, C.; Noe, C. R., Inverse agonists at the polyamine-sensitive 
+
+Berger, M. L.; Schweifer, A.; Rebernik, P.; Hammerschmidt, F., NMDA receptor 
+
+Berger, M. L.; Maciejewska, D.; Vanden Eynde, J. J.; Mottamal, M.; Żabiński, J.; 
+
+ 
+
+30 
+
+Chaudieu, I.; Vignon, J.; Chicheportiche, M.; Kamenka, J.-M.; Trouiller, G.; 
+
+Gee, K. R.; Barmettler, P.; Rhodes, M. R.; McBurney, R. N.; Reddy, N. L.; Hu, L. Y.; 
+
+Gilling, K.; Jatzke, C.; Wollenburg, C.; Vanejevs, M.; Kauss, V.; Jirgensons, A.; Parsons, 
+
+Domino, E. F.; Kamenka, J. M.; Centre national de la recherche, s., Sigma and 
+
+Dravid, S. M.; Erreger, K.; Yuan, H.; Nicholson, K.; Le, P.; Lyuboslavsky, P.; Almonte, 
+
+Ebert, B.; Thorkildsen, C.; Andersen, S.; Christrup, L. L.; Hjeds, H., Opioid analgesics as 
+
+45. 
+Chicheportiche, R., Role of the aromatic group in the inhibition of phencyclidine binding and 
+dopamine uptake by PCP analogs. Pharmacology Biochemistry and Behavior 1989, 32 (3), 699-
+705. 
+46. 
+Colestock, T.; Wallach, J.; Mansi, M.; Filemban, N.; Morris, H.; Elliott, S. P.; Westphal, 
+F.; Brandt, S. D.; Adejare, A., Syntheses, analytical and pharmacological characterizations of the 
+‘legal high’ 4-[1-(3-methoxyphenyl)cyclohexyl]morpholine (3-MeO-PCMo) and analogues. 
+Drug Testing and Analysis 2018, 10 (2), 272-283. 
+47. 
+Phencyclidine-like Compounds as Molecular Probes in Biology. NPP Books: 1988. 
+48. 
+A.; Murray, E.; Mosley, C.; Barber, J.; French, A.; Balster, R.; Murray, T. F.; Traynelis, S. F., 
+Subunit-specific mechanisms and proton sensitivity of NMDA receptor channel block. The 
+Journal of Physiology 2007, 581 (1), 107-128. 
+49. 
+noncompetitive N-methyl-d-aspartate (NMDA) antagonists. Biochemical Pharmacology 1998, 
+56 (5), 553-559. 
+50. 
+Elhallaoui, M.; Elasri, M.; Ouazzani, F.; Mechaqrane, A.; Lakhlifi, T., Quantitative 
+Structure-Activity Relationships of Noncompetitive Antagonists of the NMDA Receptor: A 
+Study of a Series of MK801 Derivative Molecules Using Statistical Methods and Neural 
+Network. International Journal of Molecular Sciences 2003, 4. 
+51. 
+Cotter, R. E.; Hamilton, P. N.; Weber, E.; Keana, J. F. W., 10, 5-(Iminomethano)-10, 11-
+dihydro-5H-dibenzo [a, d] cycloheptene and derivatives. Potent PCP receptor ligands. Journal of 
+medicinal chemistry 1993, 36 (14), 1938-1946. 
+52. 
+E.; Weber, E.; Keana, J. F. W., Arene Chromium and Manganese Tricarbonyl Analogs of the 
+PCP Receptor Ligands 5-Methyl-10,11-dihydro-5H-dibenzo[a,d]cyclohepten-5,10-imine (MK-
+801) and 10,5-(Iminomethano)-10,11-dihydro-5H-dibenzo[a,d]cycloheptene (IDDC). The 
+Journal of Organic Chemistry 1994, 59 (6), 1492-1498. 
+53. 
+C. G., A novel class of amino-alkylcyclohexanes as uncompetitive, fast, voltage-dependent, N-
+methyl-D-aspartate (NMDA) receptor antagonists – in vitro characterization. Journal of Neural 
+Transmission 2007, 114 (12), 1529-1537. 
+54. 
+Gordon, R. K.; Nigam, S. V.; Weitz, J. A.; Dave, J. R.; Doctor, B. P.; Ved, H. S., The 
+NMDA receptor ion channel: a site for binding of huperzine A. Journal of Applied Toxicology 
+2001, 21 (S1), S47-S51. 
+55. 
+Gray, N. M.; Cheng, B. K.; Mick, S. J.; Lair, C. M.; Contreras, P. C., Phencyclidine-like 
+effects of tetrahydroisoquinolines and related compounds. Journal of Medicinal Chemistry 1989, 
+32 (6), 1242-1248. 
+56. 
+Hays, S. J.; Novak, P. M.; Ortwine, D. F.; Bigge, C. F.; Colbry, N. L.; Johnson, G.; 
+Lescosky, L. J.; Malone, T. C.; Michael, A., Synthesis and pharmacological evaluation of 
+hexahydrofluorenamines as noncompetitive antagonists at the N-methyl-D-aspartate receptor. 
+Journal of Medicinal Chemistry 1993, 36 (6), 654-670. 
+57. 
+Synthesis and Pharmacological Evaluation of N-(2,5-Disubstituted phenyl)-N‘-(3-substituted 
+
+Gee, K. R.; Lu, Y.; Barmettler, P.; Rhodes, M. R.; Reddy, N. L.; Fischer, J. B.; Cotter, R. 
+
+Hu, L.-Y.; Guo, J.; Magar, S. S.; Fischer, J. B.; Burke-Howie, K. J.; Durant, G. J., 
+
+ 
+
+31 
+
+Itzhak, Y.; Kalir, A.; Weissman, B. A.; Cohen, S., New analgesic drugs derived from 
+
+Kang, H.; Park, P.; Bortolotto, Z. A.; Brandt, S. D.; Colestock, T.; Wallach, J.; 
+
+Kozlowski, M. R.; Browne, R. G.; Vinick, F. J., Discriminative stimulus properties of 
+
+Linders, J. T. M.; Monn, J. A.; Mattson, M. V.; George, C.; Jacobson, A. E.; Rice, K. C., 
+
+phenyl)-N‘-methylguanidines As N-Methyl-d-aspartate Receptor Ion-Channel Blockers. Journal 
+of Medicinal Chemistry 1997, 40 (26), 4281-4289. 
+58. 
+phencyclidine. Journal of Medicinal Chemistry 1981, 24 (5), 496-499. 
+59. 
+Collingridge, G. L.; Lodge, D., Ephenidine: A new psychoactive agent with ketamine-like 
+NMDA receptor antagonist properties. Neuropharmacology 2017, 112 (Pt A), 144-149. 
+Kozikowski, A. P.; Pang, Y. P., Structural determinants of affinity for the phencyclidine 
+60. 
+binding site of the N-methyl-D-aspartate receptor complex: discovery of a rigid phencyclidine 
+analogue of high binding affinity. Molecular Pharmacology 1990, 37 (3), 352. 
+61. 
+phencyclidine (PCP)-related compounds: Correlations with 3H-PCP binding potency measured 
+autoradiographically. Pharmacology Biochemistry and Behavior 1986, 25 (5), 1051-1058. 
+62. 
+Largent, B. L.; Gundlach, A. L.; Snyder, S. H., Pharmacological and autoradiographic 
+discrimination of sigma and phencyclidine receptor binding sites in brain with (+)-[3H]SKF 
+10,047, (+)-[3H]-3-[3-hydroxyphenyl]-N-(1-propyl)piperidine and [3H]-1-[1-(2-
+thienyl)cyclohexyl]piperidine. Journal of Pharmacology and Experimental Therapeutics 1986, 
+238 (2), 739. 
+63. 
+Synthesis and binding properties of MK-801 isothiocyanates; (+)-3-isothiocyanato-5-methyl-
+10,11-dihydro-5H-dibenzo[a,d]cyclohepten-5,10-imine hydrochloride: a new, potent and 
+selective electrophilic affinity ligand for the NMDA receptor-coupled phencyclidine binding site. 
+Journal of Medicinal Chemistry 1993, 36 (17), 2499-2507. 
+64.  Mendelsohn, L. G.; Kerchner, G. A.; Kalra, V.; Zimmerman, D. M.; Leander, J. D., 
+Phencyclidine receptors in rat brain cortex. Biochemical Pharmacology 1984, 33 (22), 3529-
+3535. 
+65.  Monn, J. A.; Thurkauf, A.; Mattson, M. V.; Jacobson, A. E.; Rice, K. C., Synthesis and 
+structure-activity relationship of C5-substituted analogs of (.+-.)-10, 11-dihydro-5H-dibenzo [a, 
+d] cyclohepten-5, 10-imine [(.+-.)-desmethyl-MK801]: ligands for the NMDA receptor-coupled 
+phencyclidine binding site. Journal of medicinal chemistry 1990, 33 (3), 1069-1076. 
+66. 
+Naumiec, G. R.; Jenko, K. J.; Zoghbi, S. S.; Innis, R. B.; Cai, L.; Pike, V. W., N′-3-
+(Trifluoromethyl)phenyl Derivatives of N-Aryl-N′-methylguanidines as Prospective PET 
+Radioligands for the Open Channel of the N-Methyl-d-aspartate (NMDA) Receptor: Synthesis 
+and Structure–Affinity Relationships. Journal of Medicinal Chemistry 2015, 58 (24), 9722-9730. 
+67. 
+stimulus effects of novel NMDA channel blockers in rats. Psychopharmacology 2003, 170 (2), 
+215-224. 
+68. 
+phencyclidine site of NMDA receptors in the rat brain. European Journal of Pharmacology 
+1996, 310 (2), 273-276. 
+69. 
+Parsons, C. G.; Quack, G.; Bresink, I.; Baran, L.; Przegalinski, E.; Kostowski, W.; 
+Krzascik, P.; Hartmann, S.; Danysz, W., Comparison of the potency, kinetics and voltage-
+dependency of a series of uncompetitive NMDA receptor antagonists in vitro with anticonvulsive 
+and motor impairment activity in vivo. Neuropharmacology 1995, 34 (10), 1239-1258. 
+70. 
+M.; Eilbacher, B.; Quack, G., Amino-alkyl-cyclohexanes are novel uncompetitive NMDA 
+
+Olmos, G.; Ribera, J.; García-Sevilla, J. A., Imidazoli(di)ne compounds interact with the 
+
+Parsons, C. G.; Danysz, W.; Bartmann, A.; Spielmanns, P.; Frankiewicz, T.; Hesselink, 
+
+Nicholson, K. L.; Balster, R. L., Evaluation of the phencyclidine-like discriminative 
+
+ 
+
+32 
+
+Sałat, K.; Siwek, A.; Starowicz, G.; Librowski, T.; Nowak, G.; Drabik, U.; Gajdosz, R.; 
+
+receptor antagonists with strong voltage-dependency and fast blocking kinetics: in vitro and in 
+vivo characterization. Neuropharmacology 1999, 38 (1), 85-108. 
+71. 
+Rammes, G.; Rupprecht, R.; Ferrari, U.; Zieglgänsberger, W.; Parsons, C. G., The N-
+methyl-d-aspartate receptor channel blockers memantine, MRZ 2/579 and other amino-alkyl-
+cyclohexanes antagonise 5-HT3 receptor currents in cultured HEK-293 and N1E-115 cell 
+systems in a non-competitive manner. Neuroscience Letters 2001, 306 (1), 81-84. 
+72. 
+Rogawski, M. A.; Yamaguchi, S.; Jones, S. M.; Rice, K. C.; Thurkauf, A.; Monn, J. A., 
+Anticonvulsant activity of the low-affinity uncompetitive N-methyl-D- aspartate antagonist (+-)-
+5-aminocarbonyl-10,11-dihydro-5H- dibenzo[a,d]cyclohepten-5,10-imine (ADCI): comparison 
+with the structural analogs dizocilpine (MK-801) and carbamazepine. Journal of Pharmacology 
+and Experimental Therapeutics 1991, 259 (1), 30. 
+73. 
+Roth, B. L.; Gibbons, S.; Arunotayanun, W.; Huang, X.-P.; Setola, V.; Treble, R.; 
+Iversen, L., The Ketamine Analogue Methoxetamine and 3- and 4-Methoxy Analogues of 
+Phencyclidine Are High Affinity and Selective Ligands for the Glutamate NMDA Receptor. 
+PLOS ONE 2013, 8 (3), e59334. 
+74. 
+Popik, P., Antidepressant-like effects of ketamine, norketamine and dehydronorketamine in 
+forced swim test: Role of activity at NMDA receptor. Neuropharmacology 2015, 99, 301-307. 
+75. 
+Sax, M.; Wunsch, B., Relationships Between the Structure of Dexoxadrol and Etoxadrol 
+Analogues and their NMDA Receptor Affinity. Current Topics in Medicinal Chemistry 2006, 6 
+(7), 723-732. 
+76. 
+Sax, M.; Fröhlich, R.; Schepmann, D.; Wünsch, B., Synthesis and NMDA Receptor 
+Affinity of Ring and Side Chain Homologues of Dexoxadrol. European Journal of Organic 
+Chemistry 2008, 2008 (35), 6015-6028. 
+77. 
+some phencyclidine analogues by rat tissue and its pharmacological implications. Xenobiotica 
+1990, 20 (6), 591-600. 
+78. 
+receptor by remacemide and its des-glycine metabolite. Journal of Pharmacology and 
+Experimental Therapeutics 1996, 276 (1), 161. 
+79. 
+Thompson, W. J.; Anderson, P. S.; Britcher, S. F.; Lyle, T. A.; Thies, J. E.; Magill, C. A.; 
+Varga, S. L.; Schwering, J. E.; Lyle, P. A., Synthesis and pharmacological evaluation of a series 
+of dibenzo[a,d]cycloalkenimines as N-methyl-D-aspartate antagonists. Journal of Medicinal 
+Chemistry 1990, 33 (2), 789-808. 
+80. 
+Mattson Mv Fau - Jacobson, A. E.; Jacobson Ae Fau - Rice, K. C.; Rice Kc Fau - Rogawski, M. 
+A.; Rogawski, M. A., Synthesis and anticonvulsant activity of 1-phenylcyclohexylamine 
+analogues. 1990,  (0022-2623 (Print)). 
+81. 
+Channel of NMDA Receptor: Qualitative and Quantitative Modeling of the Blocker Binding. 
+Doklady Biochemistry and Biophysics 2004, 396 (1), 181-186. 
+82.  Wallach, J.; Brandt, S. D., 1,2-Diarylethylamine- and Ketamine-Based New Psychoactive 
+Substances. In New Psychoactive Substances : Pharmacology, Clinical, Forensic and Analytical 
+Toxicology, Maurer, H. H.; Brandt, S. D., Eds. Springer International Publishing: Cham, 2018; 
+pp 305-352. 
+
+Stefek, M.; Ransom, R. W.; Distefano, E. W.; Cho, A. K., The alpha carbon oxidation of 
+
+Subramaniam, S.; Donevan, S. D.; Rogawski, M. A., Block of the N-methyl-D-aspartate 
+
+Thurkauf, A.; de Costa B Fau - Yamaguchi, S.; Yamaguchi S Fau - Mattson, M. V.; 
+
+Tikhonova, I. G.; Baskin, I. I.; Palyulin, V. A.; Zefirov, N. S., 3D-Model of the Ion 
+
+ 
+
+33 
+
+Zukin, S. R.; Zukin, R. S., Specific [3H]phencyclidine binding in rat central nervous 
+
+Lipinski, C. A., Lead- and drug-like compounds: the rule-of-five revolution. Drug 
+
+Zarantonello, P.; Bettini, E.; Paio, A.; Simoncelli, C.; Terreni, S.; Cardullo, F., Novel 
+
+83.  Wallach, J. In Structure activity relationship (SAR) studies of arylcycloalkylamines as N-
+methyl-D-aspartate receptor antagonists, 2014. 
+84.  Wallach, J.; Paoli, G. D.; Adejare, A.; Brandt, S. D., Preparation and analytical 
+characterization of 1-(1-phenylcyclohexyl)piperidine (PCP) and 1-(1-
+phenylcyclohexyl)pyrrolidine (PCPy) analogues. Drug Testing and Analysis 2014, 6 (7-8), 633-
+650. 
+85.  Wallach, J.; Kang, H.; Colestock, T.; Morris, H.; Bortolotto, Z. A.; Collingridge, G. L.; 
+Lodge, D.; Halberstadt, A. L.; Brandt, S. D.; Adejare, A., Pharmacological Investigations of the 
+Dissociative ‘Legal Highs’ Diphenidine, Methoxphenidine and Analogues. PLOS ONE 2016, 11 
+(6), e0157021. 
+86.  Werling, L. L.; Keller, A.; Frank, J. G.; Nuwayhid, S. J., A comparison of the binding 
+profiles of dextromethorphan, memantine, fluoxetine and amitriptyline: Treatment of involuntary 
+emotional expression disorder. Experimental Neurology 2007, 207 (2), 248-257. 
+87. 
+analogues of ketamine and phencyclidine as NMDA receptor antagonists. Bioorganic & 
+Medicinal Chemistry Letters 2011, 21 (7), 2059-2063. 
+88. 
+system. Proceedings of the National Academy of Sciences of the United States of America 1979, 
+76 (0027-8424 (Print)), 5372-5376. 
+89. 
+Aggarwal, C. C.; Hinneburg, A.; Keim, D. A. In On the Surprising Behavior of Distance 
+Metrics in High Dimensional Space, Database Theory — ICDT 2001, Berlin, Heidelberg, 2001//; 
+Van den Bussche, J.; Vianu, V., Eds. Springer Berlin Heidelberg: Berlin, Heidelberg, 2001; pp 
+420-434. 
+90. 
+Discovery Today: Technologies 2004, 1 (4), 337-341. 
+91.  Walters, W. P.; Murcko, M. A., Prediction of ‘drug-likeness’. Advanced Drug Delivery 
+Reviews 2002, 54 (3), 255-271. 
+92. 
+Nettles, J. H.; Jenkins, J. L.; Bender, A.; Deng, Z.; Davies, J. W.; Glick, M., Bridging 
+Chemical and Biological Space:  “Target Fishing” Using 2D and 3D Molecular Descriptors. 
+Journal of Medicinal Chemistry 2006, 49 (23), 6802-6810. 
+93. 
+and drug discovery. Drug Discovery Today 2018, 23 (8), 1538-1546. 
+94. 
+like” and “Nondrug-like” Molecules? Journal of Medicinal Chemistry 1998, 41 (18), 3314-3324. 
+95. 
+Ethyl 2-[(3-Methyl-2,5-dioxo(3-pyrrolinyl))amino]-4-(trifluoromethyl) pyrimidine-5-
+carboxylate:  An Inhibitor of AP-1 and NF-κB Mediated Gene Expression Based on Support 
+Vector Machines. Journal of Chemical Information and Computer Sciences 2003, 43 (4), 1288-
+1296. 
+96.  Miyao, T.; Funatsu, K.; Bajorath, J., Exploring Alternative Strategies for the 
+Identification of Potent Compounds Using Support Vector Machine and Regression Modeling. 
+Journal of Chemical Information and Modeling 2019, 59 (3), 983-992. 
+97. 
+Chemistry. In Annual Reports in Computational Chemistry, Spellmeyer, D. C., Ed. Elsevier: 
+2006; Vol. 2, pp 127-140. 
+
+Lo, Y.-C.; Rensi, S. E.; Torng, W.; Altman, R. B., Machine learning in chemoinformatics 
+
+Ajay; Walters, W. P.; Murcko, M. A., Can We Learn To Distinguish between “Drug-
+
+Liu, H. X.; Zhang, R. S.; Yao, X. J.; Liu, M. C.; Hu, Z. D.; Fan, B. T., QSAR Study of 
+
+Goldman, B. B.; Walters, W. P., Chapter 8 Machine Learning in Computational 
+
+ 
+
+34 
+
+Kenny, P. W., Computation, experiment and molecular design. Journal of Computer-
+
+Lü, W.; Du, J.; Goehring, A.; Gouaux, E., Cryo-EM structures of the triheteromeric 
+
+Issa, N. T.; Wathieu, H.; Ojo, A.; Byers, S. W.; Dakshanamurthy, S., Drug Metabolism in 
+
+98. 
+Aided Molecular Design 2012, 26 (1), 69-72. 
+99. 
+NMDA receptor and its allosteric modulation. Science 2017, 355 (6331), eaal3729. 
+100.  Kim, S.; Thiessen, P. A.; Bolton, E. E.; Chen, J.; Fu, G.; Gindulyte, A.; Han, L.; He, J.; 
+He, S.; Shoemaker, B. A.; Wang, J.; Yu, B.; Zhang, J.; Bryant, S. H., PubChem Substance and 
+Compound databases. Nucleic Acids Res 2016, 44 (D1), D1202-D1213. 
+101.  Ramsundar, B.; Kearnes, S.; Riley, P.; Webster, D.; Konerding, D.; Pande, V., Massively 
+multitask networks for drug discovery. arXiv preprint arXiv:1502.02072 2015. 
+102. 
+Preclinical Drug Development: A Survey of the Discovery Process, Toxicology, and 
+Computational Tools. Curr Drug Metab 2017, 18 (6), 556-565. 
+103.  Kearnes, S.; McCloskey, K.; Berndl, M.; Pande, V.; Riley, P., Molecular graph 
+convolutions: moving beyond fingerprints. Journal of Computer-Aided Molecular Design 2016, 
+30 (8), 595-608. 
+104.  Schneider, P.; Walters, W. P.; Plowright, A. T.; Sieroka, N.; Listgarten, J.; Goodnow, R. 
+A.; Fisher, J.; Jansen, J. M.; Duca, J. S.; Rush, T. S.; Zentgraf, M.; Hill, J. E.; Krutoholow, E.; 
+Kohler, M.; Blaney, J.; Funatsu, K.; Luebkemann, C.; Schneider, G., Rethinking drug design in 
+the artificial intelligence era. Nature Reviews Drug Discovery 2019. 
+105.  Sellwood, M. A.; Ahmed, M.; Segler, M. H. S.; Brown, N., Artificial intelligence in drug 
+discovery. Future Medicinal Chemistry 2018, 10 (17), 2025-2028. 
+106.  Smith, J. S.; Roitberg, A. E.; Isayev, O., Transforming Computational Drug Discovery 
+with Machine Learning and AI. ACS Medicinal Chemistry Letters 2018, 9 (11), 1065-1069. 
+107.  Polykovskiy, D.; Zhebrak, A.; Sanchez-Lengeling, B.; Golovanov, S.; Tatanov, O.; 
+Belyaev, S.; Kurbanov, R.; Artamonov, A.; Aladinskiy, V.; Veselov, M., Molecular sets 
+(MOSES): a benchmarking platform for molecular generation models. arXiv preprint 
+arXiv:1811.12823 2018. 
+108.  Albuquerque, E.; Aguayo, L.; E Warnick, J.; Weinstein, H.; D Glick, S.; Maayani, S.; K 
+Ickowicz, R.; P Blaustein, M., The behavioral effects of phencyclidine may be due to their 
+blockade of potassium channels. Proceedings of the National Academy of Sciences of the United 
+States of America 1982, 78, 7792-6. 
+109.  Dilmore, J. G.; Johnson, J. W., Open channel block and alteration of N-methyl-D-aspartic 
+acid receptor gating by an analog of phencyclidine. Biophys J 1998, 75 (4), 1801-1816. 
+110.  Elhallaoui, M.; Laguerre, M.; Carpy, A.; Ouazzani, F. C., Molecular modeling of 
+noncompetitive antagonists of the NMDA receptor: proposal of a pharmacophore and a 
+description of the interaction mode. Molecular modeling annual 2002, 8 (2), 65-72. 
+111. 
+and Preliminary Biochemical Evaluation of Novel Derivatives of PCP. Letters in Drug Design & 
+Discovery 2010, 7 (2), 79-87. 
+112.  Lockhart, B. P.; Soulard, P.; Benicourt, C.; Privat, A.; Junien, J.-L., Distinct 
+neuroprotective profiles for σ ligands against N-methyl-d-aspartate (NMDA), and hypoxia-
+mediated neurotoxicity in neuronal culture toxicity studies. Brain Research 1995, 675 (1), 110-
+120. 
+113.  Lodge, D.; Mercier, M. S., Ketamine and phencyclidine: the good, the bad and the 
+unexpected. British Journal of Pharmacology 2015, 172 (17), 4254-4276. 
+
+Joannes, T. M. L.; David, C. F.; Mariena, V. M.; Arthur, E. J.; Kenner, C. R., Synthesis 
+
+ 
+
+35 
+
+114.  Poulsen, M. H.; Andersen, J.; Christensen, R.; Hansen, K. B.; Traynelis, S. F.; 
+Strømgaard, K.; Kristensen, A. S., Binding of ArgTX-636 in the NMDA receptor ion channel. J 
+Mol Biol 2015, 427 (1), 176-189. 
+115.  Zarate, C. A.; Mathews, D.; Ibrahim, L.; Chaves, J. F.; Marquardt, C.; Ukoh, I.; 
+Jolkovsky, L.; Brutsche, N. E.; Smith, M. A.; Luckenbaugh, D. A., A Randomized Trial of a 
+Low-Trapping Nonselective N-Methyl-D-Aspartate Channel Blocker in Major Depression. 
+Biological Psychiatry 2013, 74 (4), 257-264. 
+116.  Manallack, D. T.; Wong, M. G.; Costa, M.; Andrews, P. R.; Beart, P. M., Receptor site 
+topographies for phencyclidine-like and sigma drugs: predictions from quantitative 
+conformational, electrostatic potential, and radioreceptor analyses. Molecular Pharmacology 
+1988, 34 (6), 863. 
+117.  Richardson, L. Beautiful soup documentation, 2007. 
+118.  Mysinger, M. M.; Carchia, M.; Irwin, J. J.; Shoichet, B. K., Directory of Useful Decoys, 
+Enhanced (DUD-E): Better Ligands and Decoys for Better Benchmarking. Journal of Medicinal 
+Chemistry 2012, 55 (14), 6582-6594. 
+119.  O'Boyle, N. M.; Banck, M.; James, C. A.; Morley, C.; Vandermeersch, T.; Hutchison, G. 
+R., Open Babel: An open chemical toolbox. Journal of Cheminformatics 2011, 3 (1), 33. 
+120.  Pedregosa, F.; Varoquaux, G.; Gramfort, A.; Michel, V.; Thirion, B.; Grisel, O.; Blondel, 
+M.; Prettenhofer, P.; Weiss, R.; Dubourg, V., Scikit-learn: Machine learning in Python. Journal 
+of machine learning research 2011, 12 (Oct), 2825-2830. 
+121.  Colby, S. M.; Nunez, J. R.; Hodas, N. O.; Corley, C. D.; Renslow, R. S., Deep learning to 
+generate in silico chemical property libraries and candidate molecules for small molecule 
+identification in complex samples. Analytical Chemistry 2019. 
+122.  Pettersen, E. F.; Goddard, T. D.; Huang, C. C.; Couch, G. S.; Greenblatt, D. M.; Meng, E. 
+C.; Ferrin, T. E., UCSF Chimera—A visualization system for exploratory research and analysis. 
+Journal of Computational Chemistry 2004, 25 (13), 1605-1612. 
+123.  Trott, O.; Olson, A. J., AutoDock Vina: Improving the speed and accuracy of docking 
+with a new scoring function, efficient optimization, and multithreading. Journal of 
+Computational Chemistry 2010, 31 (2), 455-461. 
+124.  Dallakyan, S.; Olson, A. J., Small-Molecule Library Screening by Docking with PyRx. In 
+Chemical Biology: Methods and Protocols, Hempel, J. E.; Williams, C. H.; Hong, C. C., Eds. 
+Springer New York: New York, NY, 2015; pp 243-250. 
+125.  Gu, J.; Gui, Y.; Chen, L.; Yuan, G.; Lu, H.-Z.; Xu, X., Use of natural products as 
+chemical library for drug discovery and network pharmacology. PloS one 2013, 8 (4), e62839-
+e62839. 
+126.  Wishart, D. S.; Feunang, Y. D.; Marcu, A.; Guo, A. C.; Liang, K.; Vázquez-Fresno, R.; 
+Sajed, T.; Johnson, D.; Li, C.; Karu, N.; Sayeeda, Z.; Lo, E.; Assempour, N.; Berjanskii, M.; 
+Singhal, S.; Arndt, D.; Liang, Y.; Badran, H.; Grant, J.; Serra-Cayuela, A.; Liu, Y.; Mandal, R.; 
+Neveu, V.; Pon, A.; Knox, C.; Wilson, M.; Manach, C.; Scalbert, A., HMDB 4.0: the human 
+metabolome database for 2018. Nucleic Acids Res 2018, 46 (D1), D608-D617. 
+127.  Richard, A. M.; Williams, C. R., Distributed structure-searchable toxicity (DSSTox) 
+public database network: a proposal. Mutation Research/Fundamental and Molecular 
+Mechanisms of Mutagenesis 2002, 499 (1), 27-52. 
+128.  Barber, C. B.; Dobkin, D. P.; Dobkin, D. P.; Huhdanpaa, H., The quickhull algorithm for 
+convex hulls. ACM Transactions on Mathematical Software (TOMS) 1996, 22 (4), 469-483. 
+129. 
+
+Jones, E.; Oliphant, T.; Peterson, P., SciPy: Open source scientific tools for Python. 2001. 
+
+ 
+
+36 
+
+130.  Daina, A.; Michielin, O.; Zoete, V., SwissADME: a free web tool to evaluate 
+pharmacokinetics, drug-likeness and medicinal chemistry friendliness of small molecules. Sci 
+Rep 2017, 7, 42717-42717. 
+131.  Banerjee, P.; Erehman, J.; Gohlke, B.-O.; Wilhelm, T.; Preissner, R.; Dunkel, M., Super 
+Natural II—a database of natural products. Nucleic Acids Res 2014, 43 (D1), D935-D939. 
+132.  Barupal, D. K.; Fiehn, O., Generating the Blood Exposome Database Using a 
+Comprehensive Text Mining and Database Fusion Approach. Environmental Health 
+Perspectives 2019, 127 (9), 097008. 
+133.  Caspi, R.; Altman, T.; Billington, R.; Dreher, K.; Foerster, H.; Fulcher, C. A.; Holland, T. 
+A.; Keseler, I. M.; Kothari, A.; Kubo, A.; Krummenacker, M.; Latendresse, M.; Mueller, L. A.; 
+Ong, Q.; Paley, S.; Subhraveti, P.; Weaver, D. S.; Weerasinghe, D.; Zhang, P.; Karp, P. D., The 
+MetaCyc database of metabolic pathways and enzymes and the BioCyc collection of 
+Pathway/Genome Databases. Nucleic Acids Res 2013, 42 (D1), D459-D471. 
+134.  Centre, T. M. I. Bovine Metabolome Database. http://www.cowmetdb.ca/ (accessed Sept 
+6). 
+135.  Djoumbou-Feunang, Y.; Fiamoncini, J.; Gil-de-la-Fuente, A.; Greiner, R.; Manach, C.; 
+Wishart, D. S., BioTransformer: a comprehensive computational tool for small molecule 
+metabolism prediction and metabolite identification. Journal of Cheminformatics 2019, 11 (1), 2. 
+136.  DS, W. FooDB: the food database. FooDB version 1.0. http://foodb.ca (accessed July 2). 
+137.  Enamine REAL Database. https://enamine.net (accessed Aug 13). 
+138.  EPA, U. Distributed Structure-Searchable Toxicity (DSSTox) Database. 
+https://www.epa.gov/chemical-research/distributed-structure-searchable-toxicity-dsstox-database 
+(accessed July 1). 
+139.  EPA's National Center for Computational, T., ToxCast Database (invitroDB). 2019. 
+140.  Gateway, L. M. L. LIPID MAPS In-Silico Structure Database (LMISS). http://lipidmaps-
+dev.babraham.ac.uk/data/classification/x_LM_classification_exp.php (accessed June 21). 
+141.  Gaulton, A.; Hersey, A.; Nowotka, M.; Bento, A. P.; Chambers, J.; Mendez, D.; Mutowo, 
+P.; Atkinson, F.; Bellis, L. J.; Cibrián-Uhalte, E.; Davies, M.; Dedman, N.; Karlsson, A.; 
+Magariños, M. P.; Overington, J. P.; Papadatos, G.; Smit, I.; Leach, A. R., The ChEMBL 
+database in 2017. Nucleic Acids Res 2017, 45 (D1), D945-D954. 
+142.  Hastings, J.; Owen, G.; Dekker, A.; Ennis, M.; Kale, N.; Muthukrishnan, V.; Turner, S.; 
+Swainston, N.; Mendes, P.; Steinbeck, C., ChEBI in 2016: Improved services and an expanding 
+collection of metabolites. Nucleic Acids Res 2016, 44 (D1), D1214-D1219. 
+143.  Horai, H.; Arita, M.; Kanaya, S.; Nihei, Y.; Ikeda, T.; Suwa, K.; Ojima, Y.; Tanaka, K.; 
+Tanaka, S.; Aoshima, K.; Oda, Y.; Kakazu, Y.; Kusano, M.; Tohge, T.; Matsuda, F.; Sawada, Y.; 
+Hirai, M. Y.; Nakanishi, H.; Ikeda, K.; Akimoto, N.; Maoka, T.; Takahashi, H.; Ara, T.; Sakurai, 
+N.; Suzuki, H.; Shibata, D.; Neumann, S.; Iida, T.; Tanaka, K.; Funatsu, K.; Matsuura, F.; Soga, 
+T.; Taguchi, R.; Saito, K.; Nishioka, T., MassBank: a public repository for sharing mass spectral 
+data for life sciences. Journal of Mass Spectrometry 2010, 45 (7), 703-714. 
+144. 
+L. J.; Hanson, A. D.; Fiehn, O.; Tyo, K. E. J.; Henry, C. S., MINEs: open access databases of 
+computationally predicted enzyme promiscuity products for untargeted metabolomics. Journal of 
+Cheminformatics 2015, 7 (1), 44. 
+145. 
+Huynh, J.; Zhou, Y.; Arndt, D.; Djoumbou, Y.; Liu, Y.; Deng, L.; Guo, A. C.; Han, B.; Pon, A.; 
+
+Jeffryes, J. G.; Colastani, R. L.; Elbadawi-Sidhu, M.; Kind, T.; Niehaus, T. D.; Broadbelt, 
+
+Jewison, T.; Su, Y.; Disfany, F. M.; Liang, Y.; Knox, C.; Maciejewski, A.; Poelzer, J.; 
+
+ 
+
+37 
+
+Wilson, M.; Rafatnia, S.; Liu, P.; Wishart, D. S., SMPDB 2.0: big improvements to the Small 
+Molecule Pathway Database. Nucleic Acids Res 2014, 42 (Database issue), D478-D484. 
+146.  Keseler, I. M.; Mackie, A.; Santos-Zavaleta, A.; Billington, R.; Bonavides-Martínez, C.; 
+Caspi, R.; Fulcher, C.; Gama-Castro, S.; Kothari, A.; Krummenacker, M.; Latendresse, M.; 
+Muñiz-Rascado, L.; Ong, Q.; Paley, S.; Peralta-Gil, M.; Subhraveti, P.; Velázquez-Ramírez, D. 
+A.; Weaver, D.; Collado-Vides, J.; Paulsen, I.; Karp, P. D., The EcoCyc database: reflecting new 
+knowledge about Escherichia coli K-12. Nucleic Acids Res 2016, 45 (D1), D543-D550. 
+147.  Kim, S.; Chen, J.; Cheng, T.; Gindulyte, A.; He, J.; He, S.; Li, Q.; Shoemaker, B. A.; 
+Thiessen, P. A.; Yu, B.; Zaslavsky, L.; Zhang, J.; Bolton, E. E., PubChem 2019 update: 
+improved access to chemical data. Nucleic Acids Res 2018, 47 (D1), D1102-D1109. 
+148.  MolMall MolMall Database. http://www.molmall.net (accessed July 16). 
+149.  Psychogios, N.; Hau, D. D.; Peng, J.; Guo, A. C.; Mandal, R.; Bouatra, S.; Sinelnikov, I.; 
+Krishnamurthy, R.; Eisner, R.; Gautam, B.; Young, N.; Xia, J.; Knox, C.; Dong, E.; Huang, P.; 
+Hollander, Z.; Pedersen, T. L.; Smith, S. R.; Bamforth, F.; Greiner, R.; McManus, B.; Newman, 
+J. W.; Goodfriend, T.; Wishart, D. S., The human serum metabolome. PloS one 2011, 6 (2), 
+e16957-e16957. 
+150.  Ramirez-Gaona, M.; Marcu, A.; Pon, A.; Guo, A. C.; Sajed, T.; Wishart, N. A.; Karu, N.; 
+Djoumbou Feunang, Y.; Arndt, D.; Wishart, D. S., YMDB 2.0: a significantly expanded version 
+of the yeast metabolome database. Nucleic Acids Res 2017, 45 (D1), D440-D445. 
+151.  Sajed, T.; Marcu, A.; Ramirez, M.; Pon, A.; Guo, A. C.; Knox, C.; Wilson, M.; Grant, J. 
+R.; Djoumbou, Y.; Wishart, D. S., ECMDB 2.0: A richer resource for understanding the 
+biochemistry of E. coli. Nucleic Acids Res 2016, 44 (D1), D495-D501. 
+152.  Schläpfer, P.; Zhang, P.; Wang, C.; Kim, T.; Banf, M.; Chae, L.; Dreher, K.; Chavali, A. 
+K.; Nilo-Poyanco, R.; Bernard, T.; Kahn, D.; Rhee, S. Y., Genome-Wide Prediction of Metabolic 
+Enzymes, Pathways, and Gene Clusters in Plants. Plant Physiology 2017, 173 (4), 2041. 
+153.  Sterling, T.; Irwin, J. J., ZINC 15 – Ligand Discovery for Everyone. Journal of Chemical 
+Information and Modeling 2015, 55 (11), 2324-2337. 
+154.  Sud, M.; Fahy, E.; Cotter, D.; Brown, A.; Dennis, E. A.; Glass, C. K.; Merrill, A. H., Jr.; 
+Murphy, R. C.; Raetz, C. R. H.; Russell, D. W.; Subramaniam, S., LMSD: LIPID MAPS 
+structure database. Nucleic Acids Res 2007, 35 (Database issue), D527-D532. 
+155.  Wishart, D.; Arndt, D.; Pon, A.; Sajed, T.; Guo, A. C.; Djoumbou, Y.; Knox, C.; Wilson, 
+M.; Liang, Y.; Grant, J.; Liu, Y.; Goldansaz, S. A.; Rappaport, S. M., T3DB: the toxic exposome 
+database. Nucleic Acids Res 2015, 43 (Database issue), D928-D934. 
+156.  Wishart, D. S.; Feunang, Y. D.; Guo, A. C.; Lo, E. J.; Marcu, A.; Grant, J. R.; Sajed, T.; 
+Johnson, D.; Li, C.; Sayeeda, Z.; Assempour, N.; Iynkkaran, I.; Liu, Y.; Maciejewski, A.; Gale, 
+N.; Wilson, A.; Chin, L.; Cummings, R.; Le, D.; Pon, A.; Knox, C.; Wilson, M., DrugBank 5.0: a 
+major update to the DrugBank database for 2018. Nucleic Acids Res 2018, 46 (D1), D1074-
+D1082. 
+157.  Wishart, D. S.; Lewis, M. J.; Morrissey, J. A.; Flegel, M. D.; Jeroncic, K.; Xiong, Y.; 
+Cheng, D.; Eisner, R.; Gautam, B.; Tzur, D.; Sawhney, S.; Bamforth, F.; Greiner, R.; Li, L., The 
+human cerebrospinal fluid metabolome. Journal of Chromatography B 2008, 871 (2), 164-173. 
+158.  Wishart, D. S.; Li, C.; Marcu, A.; Badran, H.; Pon, A.; Budinski, Z.; Patron, J.; Lipton, 
+D.; Cao, X.; Oler, E.; Li, K.; Paccoud, M.; Hong, C.; Guo, A. C.; Chan, C.; Wei, W.; Ramirez-
+Gaona, M., PathBank: a comprehensive pathway database for model organisms. Nucleic Acids 
+Res 2019. 
+
+ 
+
+38 
+
+159.  Workbench, M. Metabolite Database. 
+https://www.metabolomicsworkbench.org/databases/metabolitedatabase.php (accessed June 21). 
+ 
+
+ 
+
+39 
+
+

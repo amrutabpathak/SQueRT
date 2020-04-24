@@ -26,7 +26,7 @@ split_sentences = re.compile(r'(?<!\w\.\w.)(?<!\s[A-Z][a-z]\.)(?<!\s[A-Z]\.)(?<!
 remove_intext_citations = r'\([\w-]+\s[\w&]+\s[\w,\.]+\s[0-9]+\)'
 replace_words = [r'conv\.', r'\sal\.', r'\spp\.', r'\sFig\.', r'\s\.\s', r'\sEqn.', 'ﬁ', r'\(Nos.', remove_intext_citations]
 replace_to_word = [' conv', ' al', ' pp', ' Fig', '', ' Eqn', 'fi', '(Nos', '']
-remove_references = r'REFERENCES\n|Works Cited\n|References\n'
+remove_references = r'REFERENCES\s*\n|Works Cited\s*\n|References\s*\n'
 
 #     f = open(file, encoding='utf8', errors='ignore')
 #     file_content = f.read()
