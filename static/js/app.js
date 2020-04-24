@@ -39,6 +39,7 @@ jQuery(document).ready(function () {
             console.log(jsondata)
             alert(jsondata['responseText'])
         });
+        $('#dropdownMenuButton').show();    
     })
 
 
