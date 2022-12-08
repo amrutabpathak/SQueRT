@@ -3,7 +3,7 @@ attrs==19.3.0
 autopep8==1.4.3
 beautifulsoup4==4.8.2
 bs4==0.0.1
-certifi==2020.4.5.1
+certifi==2022.12.7
 click==7.1.1
 clickclick==1.2.2
 colorama==0.4.1
